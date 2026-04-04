@@ -1,0 +1,39 @@
+{
+    "name": "razor-script-language",
+    "displayName": "Razor Script Language",
+    "description": "Syntax Highlighting for Razor Script Language",
+    "version": "0.0.2",
+    "icon": "images/icon.png",
+    "repository": {
+        "url": "https://github.com/guilhermeledes/uo-outlands-vscode-razor-script-language.git"
+    },
+    "publisher": "UOOutlandsRazorScriptLanguage",
+    "engines": {
+        "vscode": "^1.69.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [
+            {
+                "id": "razor-script",
+                "aliases": [
+                    "Razor Script",
+                    "razor-script"
+                ],
+                "extensions": [
+                    ".razor"
+                ],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "razor-script",
+                "scopeName": "source.razor",
+                "path": "./syntaxes/razor-script.tmLanguage.json"
+            }
+        ]
+    }
+}

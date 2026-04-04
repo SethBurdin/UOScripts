@@ -1,0 +1,29 @@
+{
+  "include": [
+    "**/*.py"
+  ],
+  "extraPaths": [
+    ".."
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/node_modules",
+    "**/.venv"
+  ],
+  "stubPath": "stubs",
+  "reportMissingImports": "none",
+  "reportMissingTypeStubs": false,
+  "reportUndefinedVariable": "none",
+  "reportGeneralTypeIssues": "information",
+  "reportOptionalMemberAccess": "information", 
+  "reportOptionalSubscript": "information",
+  "reportUnknownMemberType": "none",
+  "reportUnknownVariableType": "none",
+  "reportUnknownArgumentType": "none",
+  "reportUnknownParameterType": "none",
+  "reportAttributeAccessIssue": "information",
+  "pythonVersion": "2.7",
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true,
+  "autoSearchPaths": true
+}

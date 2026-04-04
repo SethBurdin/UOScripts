@@ -1,0 +1,7 @@
+Player.UseSkill('Imbuing')
+Gumps.WaitForGump(1697188745, 10000)
+Gumps.SendAction(1697188745, 10011)
+Target.WaitForTarget(10000, False)
+Target.TargetExecute(0x4027E2DB)
+Gumps.WaitForGump(3074326971, 10000)
+Gumps.SendAction(3074326971, 1)
