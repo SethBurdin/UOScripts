@@ -1,0 +1,81 @@
+{
+  "name": "Runebook",
+  "gate_button_formula": "button = 98 + slot_index",
+  "serial_dec": 1073926617,
+  "charges": 0,
+  "max_charges": 18,
+  "serial_hex": "0x4002D1D9",
+  "runes": [
+    {
+      "coordinate": "47o 17'N, 139o 46'W",
+      "has_location": true,
+      "slot": 0,
+      "gate_button": 98,
+      "name": "glow mage shop"
+    },
+    {
+      "coordinate": "67o 24'N, 133o 27'W",
+      "has_location": true,
+      "slot": 1,
+      "gate_button": 99,
+      "name": "glow mages pap"
+    },
+    {
+      "coordinate": "44o 54'N, 142o 44'W",
+      "has_location": true,
+      "slot": 2,
+      "gate_button": 100,
+      "name": "alch"
+    },
+    {
+      "coordinate": "83o 13'S, 152o 47'E",
+      "has_location": true,
+      "slot": 3,
+      "gate_button": 101,
+      "name": "bank"
+    },
+    {
+      "coordinate": "76o 59'S, 151o 56'E",
+      "has_location": true,
+      "slot": 4,
+      "gate_button": 102,
+      "name": "have mage"
+    },
+    {
+      "coordinate": null,
+      "has_location": false,
+      "slot": 5,
+      "gate_button": 103,
+      "name": "ice dungeon"
+    },
+    {
+      "coordinate": "98o 20'N, 13o 46'W",
+      "has_location": true,
+      "slot": 6,
+      "gate_button": 104,
+      "name": "home"
+    },
+    {
+      "coordinate": "96o 14'N, 22o 34'W",
+      "has_location": true,
+      "slot": 7,
+      "gate_button": 105,
+      "name": "have mage"
+    },
+    {
+      "coordinate": "45o 21'S, 46o 28'W",
+      "has_location": true,
+      "slot": 8,
+      "gate_button": 106,
+      "name": "skara mage"
+    },
+    {
+      "coordinate": "5o 58'N, 11o 44'E",
+      "has_location": true,
+      "slot": 9,
+      "gate_button": 107,
+      "name": "brit mage"
+    }
+  ],
+  "captured_at": "2026-04-04T11:34:43"
+}

@@ -1,0 +1,762 @@
+
+============================================================
+  DIAGNOSTIC SCAN  2026-04-05 18:52:06
+============================================================
+2026-04-05 18:52:06  === DIAGNOSTIC MODE — no crafting will occur ===
+2026-04-05 18:52:06  Target the spellbook or container to scan...
+2026-04-05 18:52:07  Target: spellbook  ItemID=0x0EFA  Serial=0x4012361B
+2026-04-05 18:52:10  Contains empty after first open — retrying once...
+2026-04-05 18:52:13  Contains empty after retry — falling back to prop lines.
+2026-04-05 18:52:13  Prop lines (5 total):
+2026-04-05 18:52:13  Prop match: 1 spell(s) identified.
+2026-04-05 18:52:13  --- Spells FOUND in spellbook (1) ---
+2026-04-05 18:52:13    [HAVE] Bless
+2026-04-05 18:52:13  --- Spells MISSING from spellbook (63) ---
+2026-04-05 18:52:13    [NEED] Circle 1  Clumsy                      scroll ID 0x1F2E
+2026-04-05 18:52:13    [NEED] Circle 1  Create Food                 scroll ID 0x1F2F
+2026-04-05 18:52:13    [NEED] Circle 1  Feeblemind                  scroll ID 0x1F30
+2026-04-05 18:52:13    [NEED] Circle 1  Heal                        scroll ID 0x1F31
+2026-04-05 18:52:13    [NEED] Circle 1  Magic Arrow                 scroll ID 0x1F32
+2026-04-05 18:52:13    [NEED] Circle 1  Night Sight                 scroll ID 0x1F33
+2026-04-05 18:52:13    [NEED] Circle 1  Reactive Armor              scroll ID 0x1F2D
+2026-04-05 18:52:13    [NEED] Circle 1  Weaken                      scroll ID 0x1F34
+2026-04-05 18:52:13    [NEED] Circle 2  Agility                     scroll ID 0x1F35
+2026-04-05 18:52:13    [NEED] Circle 2  Cunning                     scroll ID 0x1F36
+2026-04-05 18:52:13    [NEED] Circle 2  Cure                        scroll ID 0x1F37
+2026-04-05 18:52:13    [NEED] Circle 2  Harm                        scroll ID 0x1F38
+2026-04-05 18:52:13    [NEED] Circle 2  Magic Trap                  scroll ID 0x1F39
+2026-04-05 18:52:13    [NEED] Circle 2  Magic Untrap                scroll ID 0x1F3A
+2026-04-05 18:52:13    [NEED] Circle 2  Protection                  scroll ID 0x1F3B
+2026-04-05 18:52:13    [NEED] Circle 2  Strength                    scroll ID 0x1F3C
+2026-04-05 18:52:13    [NEED] Circle 3  Fireball                    scroll ID 0x1F3E
+2026-04-05 18:52:13    [NEED] Circle 3  Magic Lock                  scroll ID 0x1F3F
+2026-04-05 18:52:13    [NEED] Circle 3  Poison                      scroll ID 0x1F40
+2026-04-05 18:52:13    [NEED] Circle 3  Telekinesis                 scroll ID 0x1F41
+2026-04-05 18:52:13    [NEED] Circle 3  Teleport                    scroll ID 0x1F42
+2026-04-05 18:52:13    [NEED] Circle 3  Unlock                      scroll ID 0x1F43
+2026-04-05 18:52:13    [NEED] Circle 3  Wall of Stone               scroll ID 0x1F44
+2026-04-05 18:52:13    [NEED] Circle 4  Arch Cure                   scroll ID 0x1F45
+2026-04-05 18:52:13    [NEED] Circle 4  Arch Protection             scroll ID 0x1F46
+2026-04-05 18:52:13    [NEED] Circle 4  Curse                       scroll ID 0x1F47
+2026-04-05 18:52:13    [NEED] Circle 4  Fire Field                  scroll ID 0x1F48
+2026-04-05 18:52:13    [NEED] Circle 4  Greater Heal                scroll ID 0x1F49
+2026-04-05 18:52:13    [NEED] Circle 4  Lightning                   scroll ID 0x1F4A
+2026-04-05 18:52:13    [NEED] Circle 4  Mana Drain                  scroll ID 0x1F4B
+2026-04-05 18:52:13    [NEED] Circle 4  Recall                      scroll ID 0x1F4C
+2026-04-05 18:52:13    [NEED] Circle 5  Blade Spirits               scroll ID 0x1F4D
+2026-04-05 18:52:13    [NEED] Circle 5  Dispel Field                scroll ID 0x1F4E
+2026-04-05 18:52:13    [NEED] Circle 5  Incognito                   scroll ID 0x1F4F
+2026-04-05 18:52:13    [NEED] Circle 5  Magic Reflection            scroll ID 0x1F50
+2026-04-05 18:52:13    [NEED] Circle 5  Mind Blast                  scroll ID 0x1F51
+2026-04-05 18:52:13    [NEED] Circle 5  Paralyze                    scroll ID 0x1F52
+2026-04-05 18:52:13    [NEED] Circle 5  Poison Field                scroll ID 0x1F53
+2026-04-05 18:52:13    [NEED] Circle 5  Summon Creature             scroll ID 0x1F54
+2026-04-05 18:52:13    [NEED] Circle 6  Dispel                      scroll ID 0x1F55
+2026-04-05 18:52:13    [NEED] Circle 6  Energy Bolt                 scroll ID 0x1F56
+2026-04-05 18:52:13    [NEED] Circle 6  Explosion                   scroll ID 0x1F57
+2026-04-05 18:52:13    [NEED] Circle 6  Invisibility                scroll ID 0x1F58
+2026-04-05 18:52:13    [NEED] Circle 6  Mark                        scroll ID 0x1F59
+2026-04-05 18:52:13    [NEED] Circle 6  Mass Curse                  scroll ID 0x1F5A
+2026-04-05 18:52:13    [NEED] Circle 6  Paralyze Field              scroll ID 0x1F5B
+2026-04-05 18:52:13    [NEED] Circle 6  Reveal                      scroll ID 0x1F5C
+2026-04-05 18:52:13    [NEED] Circle 7  Chain Lightning             scroll ID 0x1F5D
+2026-04-05 18:52:13    [NEED] Circle 7  Energy Field                scroll ID 0x1F5E
+2026-04-05 18:52:13    [NEED] Circle 7  Flamestrike                 scroll ID 0x1F5F
+2026-04-05 18:52:13    [NEED] Circle 7  Gate Travel                 scroll ID 0x1F60
+2026-04-05 18:52:13    [NEED] Circle 7  Mana Vampire                scroll ID 0x1F61
+2026-04-05 18:52:13    [NEED] Circle 7  Mass Dispel                 scroll ID 0x1F62
+2026-04-05 18:52:13    [NEED] Circle 7  Meteor Swarm                scroll ID 0x1F63
+2026-04-05 18:52:13    [NEED] Circle 7  Polymorph                   scroll ID 0x1F64
+2026-04-05 18:52:13    [NEED] Circle 8  Earthquake                  scroll ID 0x1F65
+2026-04-05 18:52:13    [NEED] Circle 8  Energy Vortex               scroll ID 0x1F66
+2026-04-05 18:52:13    [NEED] Circle 8  Resurrection                scroll ID 0x1F67
+2026-04-05 18:52:13    [NEED] Circle 8  Summon Air Elemental        scroll ID 0x1F68
+2026-04-05 18:52:13    [NEED] Circle 8  Summon Daemon               scroll ID 0x1F69
+2026-04-05 18:52:13    [NEED] Circle 8  Summon Earth Elemental      scroll ID 0x1F6A
+2026-04-05 18:52:13    [NEED] Circle 8  Summon Fire Elemental       scroll ID 0x1F6B
+2026-04-05 18:52:13    [NEED] Circle 8  Summon Water Elemental      scroll ID 0x1F6C
+2026-04-05 18:52:13  Scan complete.  Have: 1   Need: 63
+
+============================================================
+  DIAGNOSTIC SCAN  2026-04-05 19:07:46
+============================================================
+2026-04-05 19:07:46  === DIAGNOSTIC MODE — no crafting will occur ===
+2026-04-05 19:07:46  Target the spellbook or container to scan...
+2026-04-05 19:07:51  Target: spellbook  ItemID=0x0EFA  Serial=0x4012361B
+2026-04-05 19:07:53  Contains empty after first open — retrying once...
+2026-04-05 19:07:56  Contains empty after retry — falling back to prop lines.
+2026-04-05 19:07:56  Prop lines (5 total):
+2026-04-05 19:07:56  Prop match: 1 spell(s) identified.
+2026-04-05 19:07:56  --- Spells FOUND in spellbook (1) ---
+2026-04-05 19:07:56    [HAVE] Bless
+2026-04-05 19:07:56  --- Spells MISSING from spellbook (63) ---
+2026-04-05 19:07:56    [NEED] Circle 1  Clumsy                      scroll ID 0x1F2E
+2026-04-05 19:07:56    [NEED] Circle 1  Create Food                 scroll ID 0x1F2F
+2026-04-05 19:07:56    [NEED] Circle 1  Feeblemind                  scroll ID 0x1F30
+2026-04-05 19:07:56    [NEED] Circle 1  Heal                        scroll ID 0x1F31
+2026-04-05 19:07:56    [NEED] Circle 1  Magic Arrow                 scroll ID 0x1F32
+2026-04-05 19:07:56    [NEED] Circle 1  Night Sight                 scroll ID 0x1F33
+2026-04-05 19:07:56    [NEED] Circle 1  Reactive Armor              scroll ID 0x1F2D
+2026-04-05 19:07:56    [NEED] Circle 1  Weaken                      scroll ID 0x1F34
+2026-04-05 19:07:56    [NEED] Circle 2  Agility                     scroll ID 0x1F35
+2026-04-05 19:07:56    [NEED] Circle 2  Cunning                     scroll ID 0x1F36
+2026-04-05 19:07:56    [NEED] Circle 2  Cure                        scroll ID 0x1F37
+2026-04-05 19:07:56    [NEED] Circle 2  Harm                        scroll ID 0x1F38
+2026-04-05 19:07:56    [NEED] Circle 2  Magic Trap                  scroll ID 0x1F39
+2026-04-05 19:07:56    [NEED] Circle 2  Magic Untrap                scroll ID 0x1F3A
+2026-04-05 19:07:56    [NEED] Circle 2  Protection                  scroll ID 0x1F3B
+2026-04-05 19:07:56    [NEED] Circle 2  Strength                    scroll ID 0x1F3C
+2026-04-05 19:07:56    [NEED] Circle 3  Fireball                    scroll ID 0x1F3E
+2026-04-05 19:07:56    [NEED] Circle 3  Magic Lock                  scroll ID 0x1F3F
+2026-04-05 19:07:56    [NEED] Circle 3  Poison                      scroll ID 0x1F40
+2026-04-05 19:07:56    [NEED] Circle 3  Telekinesis                 scroll ID 0x1F41
+2026-04-05 19:07:56    [NEED] Circle 3  Teleport                    scroll ID 0x1F42
+2026-04-05 19:07:56    [NEED] Circle 3  Unlock                      scroll ID 0x1F43
+2026-04-05 19:07:56    [NEED] Circle 3  Wall of Stone               scroll ID 0x1F44
+2026-04-05 19:07:56    [NEED] Circle 4  Arch Cure                   scroll ID 0x1F45
+2026-04-05 19:07:56    [NEED] Circle 4  Arch Protection             scroll ID 0x1F46
+2026-04-05 19:07:56    [NEED] Circle 4  Curse                       scroll ID 0x1F47
+2026-04-05 19:07:56    [NEED] Circle 4  Fire Field                  scroll ID 0x1F48
+2026-04-05 19:07:56    [NEED] Circle 4  Greater Heal                scroll ID 0x1F49
+2026-04-05 19:07:56    [NEED] Circle 4  Lightning                   scroll ID 0x1F4A
+2026-04-05 19:07:56    [NEED] Circle 4  Mana Drain                  scroll ID 0x1F4B
+2026-04-05 19:07:56    [NEED] Circle 4  Recall                      scroll ID 0x1F4C
+2026-04-05 19:07:56    [NEED] Circle 5  Blade Spirits               scroll ID 0x1F4D
+2026-04-05 19:07:56    [NEED] Circle 5  Dispel Field                scroll ID 0x1F4E
+2026-04-05 19:07:56    [NEED] Circle 5  Incognito                   scroll ID 0x1F4F
+2026-04-05 19:07:56    [NEED] Circle 5  Magic Reflection            scroll ID 0x1F50
+2026-04-05 19:07:56    [NEED] Circle 5  Mind Blast                  scroll ID 0x1F51
+2026-04-05 19:07:56    [NEED] Circle 5  Paralyze                    scroll ID 0x1F52
+2026-04-05 19:07:56    [NEED] Circle 5  Poison Field                scroll ID 0x1F53
+2026-04-05 19:07:56    [NEED] Circle 5  Summon Creature             scroll ID 0x1F54
+2026-04-05 19:07:56    [NEED] Circle 6  Dispel                      scroll ID 0x1F55
+2026-04-05 19:07:56    [NEED] Circle 6  Energy Bolt                 scroll ID 0x1F56
+2026-04-05 19:07:56    [NEED] Circle 6  Explosion                   scroll ID 0x1F57
+2026-04-05 19:07:56    [NEED] Circle 6  Invisibility                scroll ID 0x1F58
+2026-04-05 19:07:56    [NEED] Circle 6  Mark                        scroll ID 0x1F59
+2026-04-05 19:07:56    [NEED] Circle 6  Mass Curse                  scroll ID 0x1F5A
+2026-04-05 19:07:56    [NEED] Circle 6  Paralyze Field              scroll ID 0x1F5B
+2026-04-05 19:07:56    [NEED] Circle 6  Reveal                      scroll ID 0x1F5C
+2026-04-05 19:07:56    [NEED] Circle 7  Chain Lightning             scroll ID 0x1F5D
+2026-04-05 19:07:56    [NEED] Circle 7  Energy Field                scroll ID 0x1F5E
+2026-04-05 19:07:56    [NEED] Circle 7  Flamestrike                 scroll ID 0x1F5F
+2026-04-05 19:07:56    [NEED] Circle 7  Gate Travel                 scroll ID 0x1F60
+2026-04-05 19:07:56    [NEED] Circle 7  Mana Vampire                scroll ID 0x1F61
+2026-04-05 19:07:56    [NEED] Circle 7  Mass Dispel                 scroll ID 0x1F62
+2026-04-05 19:07:56    [NEED] Circle 7  Meteor Swarm                scroll ID 0x1F63
+2026-04-05 19:07:56    [NEED] Circle 7  Polymorph                   scroll ID 0x1F64
+2026-04-05 19:07:56    [NEED] Circle 8  Earthquake                  scroll ID 0x1F65
+2026-04-05 19:07:56    [NEED] Circle 8  Energy Vortex               scroll ID 0x1F66
+2026-04-05 19:07:56    [NEED] Circle 8  Resurrection                scroll ID 0x1F67
+2026-04-05 19:07:56    [NEED] Circle 8  Summon Air Elemental        scroll ID 0x1F68
+2026-04-05 19:07:56    [NEED] Circle 8  Summon Daemon               scroll ID 0x1F69
+2026-04-05 19:07:56    [NEED] Circle 8  Summon Earth Elemental      scroll ID 0x1F6A
+2026-04-05 19:07:56    [NEED] Circle 8  Summon Fire Elemental       scroll ID 0x1F6B
+2026-04-05 19:07:56    [NEED] Circle 8  Summon Water Elemental      scroll ID 0x1F6C
+2026-04-05 19:07:56  Scan complete.  Have: 1   Need: 63
+
+============================================================
+  RUN START  2026-04-05 19:25:37
+============================================================
+2026-04-05 19:25:37  No inscription pen found in backpack. Stopping.
+
+============================================================
+  RUN START  2026-04-05 19:25:47
+============================================================
+2026-04-05 19:25:47  Target the spellbook or container to fill...
+2026-04-05 19:25:47  Destination: spellbook (serial 0x4012361B).
+2026-04-05 19:25:49  Contains empty after first open — retrying once...
+2026-04-05 19:25:53  Contains empty after retry — falling back to prop lines.
+2026-04-05 19:25:53  Prop lines (5 total):
+2026-04-05 19:25:53    PROP: 'Spellbook'
+2026-04-05 19:25:53    PROP: 'Blessed'
+2026-04-05 19:25:53    PROP: 'spell damage increase 9%'
+2026-04-05 19:25:53    PROP: 'lower mana cost 5%'
+2026-04-05 19:25:53    PROP: '29 Spells'
+2026-04-05 19:25:53  Prop match: 1 spell(s) identified.
+2026-04-05 19:25:53  Need to craft 63 scroll(s).
+2026-04-05 19:25:56  Gump opened with ID 2653346093 (expected 949095101) — updating CRAFT_GUMP_ID.
+2026-04-05 19:25:56  Found 'Clumsy' scroll in backpack — dragging to spellbook.
+2026-04-05 19:25:57  Found 'Create Food' scroll in backpack — dragging to spellbook.
+2026-04-05 19:25:58  Skipping 'Feeblemind' — missing: blank scroll
+2026-04-05 19:25:58  Found 'Heal' scroll in backpack — dragging to spellbook.
+2026-04-05 19:25:59  Found 'Magic Arrow' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:00  Found 'Night Sight' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:02  Found 'Reactive Armor' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:03  Found 'Weaken' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:04  Skipping 'Agility' — missing: blank scroll
+2026-04-05 19:26:04  Skipping 'Cunning' — missing: blank scroll
+2026-04-05 19:26:04  Skipping 'Cure' — missing: blank scroll
+2026-04-05 19:26:04  Skipping 'Harm' — missing: blank scroll
+2026-04-05 19:26:04  Skipping 'Magic Trap' — missing: blank scroll
+2026-04-05 19:26:04  Skipping 'Magic Untrap' — missing: blank scroll
+2026-04-05 19:26:04  Skipping 'Protection' — missing: blank scroll
+2026-04-05 19:26:04  Skipping 'Strength' — missing: blank scroll
+2026-04-05 19:26:04  Found 'Fireball' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:05  Found 'Magic Lock' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:06  Found 'Poison' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:08  Found 'Telekinesis' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:09  Found 'Teleport' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:10  Found 'Unlock' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:11  Skipping 'Wall of Stone' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Arch Cure' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Arch Protection' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Curse' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Fire Field' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Greater Heal' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Lightning' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Mana Drain' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Recall' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Blade Spirits' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Dispel Field' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Incognito' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Magic Reflection' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Mind Blast' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Paralyze' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Poison Field' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Summon Creature' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Dispel' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Energy Bolt' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Explosion' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Invisibility' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Mark' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Mass Curse' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Paralyze Field' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Reveal' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Chain Lightning' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Energy Field' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Flamestrike' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Gate Travel' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Mana Vampire' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Mass Dispel' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Meteor Swarm' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Polymorph' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Earthquake' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Energy Vortex' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Resurrection' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Summon Air Elemental' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Summon Daemon' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Summon Earth Elemental' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Summon Fire Elemental' — missing: blank scroll
+2026-04-05 19:26:11  Skipping 'Summon Water Elemental' — missing: blank scroll
+2026-04-05 19:26:12  Done.  Crafted: 13   Failed: 50
+
+============================================================
+  RUN START  2026-04-05 19:26:21
+============================================================
+2026-04-05 19:26:21  Target the spellbook or container to fill...
+2026-04-05 19:26:23  Destination: spellbook (serial 0x4012361B).
+2026-04-05 19:26:25  Contains empty after first open — retrying once...
+2026-04-05 19:26:28  Contains empty after retry — falling back to prop lines.
+2026-04-05 19:26:28  Prop lines (5 total):
+2026-04-05 19:26:28    PROP: 'Spellbook'
+2026-04-05 19:26:28    PROP: 'Blessed'
+2026-04-05 19:26:28    PROP: 'spell damage increase 9%'
+2026-04-05 19:26:28    PROP: 'lower mana cost 5%'
+2026-04-05 19:26:28    PROP: '29 Spells'
+2026-04-05 19:26:28  Prop match: 1 spell(s) identified.
+2026-04-05 19:26:28  Need to craft 63 scroll(s).
+2026-04-05 19:26:31  Gump opened with ID 2653346093 (expected 949095101) — updating CRAFT_GUMP_ID.
+2026-04-05 19:26:31  Found 'Clumsy' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:32  Found 'Create Food' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:33  Skipping 'Feeblemind' — missing: blank scroll
+2026-04-05 19:26:33  Found 'Heal' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:34  Found 'Magic Arrow' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:36  Found 'Night Sight' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:37  Found 'Reactive Armor' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:38  Found 'Weaken' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:39  Skipping 'Agility' — missing: blank scroll
+2026-04-05 19:26:39  Skipping 'Cunning' — missing: blank scroll
+2026-04-05 19:26:39  Skipping 'Cure' — missing: blank scroll
+2026-04-05 19:26:39  Skipping 'Harm' — missing: blank scroll
+2026-04-05 19:26:39  Skipping 'Magic Trap' — missing: blank scroll
+2026-04-05 19:26:39  Skipping 'Magic Untrap' — missing: blank scroll
+2026-04-05 19:26:39  Skipping 'Protection' — missing: blank scroll
+2026-04-05 19:26:39  Skipping 'Strength' — missing: blank scroll
+2026-04-05 19:26:39  Found 'Fireball' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:40  Found 'Magic Lock' scroll in backpack — dragging to spellbook.
+2026-04-05 19:26:42  Found 'Poison' scroll in backpack — dragging to spellbook.
+
+============================================================
+  RUN START  2026-04-05 19:27:22
+============================================================
+2026-04-05 19:27:22  No inscription pen found in backpack. Stopping.
+
+============================================================
+  RUN START  2026-04-05 19:27:30
+============================================================
+2026-04-05 19:27:31  Target the spellbook or container to fill...
+2026-04-05 19:27:31  Destination: spellbook (serial 0x4012361B).
+2026-04-05 19:27:33  Contains empty after first open — retrying once...
+2026-04-05 19:27:36  Contains empty after retry — falling back to prop lines.
+2026-04-05 19:27:36  Prop lines (5 total):
+2026-04-05 19:27:36    PROP: 'Spellbook'
+2026-04-05 19:27:36    PROP: 'Blessed'
+2026-04-05 19:27:36    PROP: 'spell damage increase 9%'
+2026-04-05 19:27:36    PROP: 'lower mana cost 5%'
+2026-04-05 19:27:36    PROP: '29 Spells'
+2026-04-05 19:27:36  Prop match: 1 spell(s) identified.
+2026-04-05 19:27:36  Need to craft 63 scroll(s).
+2026-04-05 19:27:39  Gump opened with ID 2653346093 (expected 949095101) — updating CRAFT_GUMP_ID.
+2026-04-05 19:27:39  Found 'Clumsy' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:40  Found 'Create Food' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:42  Skipping 'Feeblemind' — missing: blank scroll
+2026-04-05 19:27:42  Found 'Heal' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:43  Found 'Magic Arrow' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:44  Found 'Night Sight' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:45  Found 'Reactive Armor' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:46  Found 'Weaken' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:48  Skipping 'Agility' — missing: blank scroll
+2026-04-05 19:27:48  Skipping 'Cunning' — missing: blank scroll
+2026-04-05 19:27:48  Skipping 'Cure' — missing: blank scroll
+2026-04-05 19:27:48  Skipping 'Harm' — missing: blank scroll
+2026-04-05 19:27:48  Skipping 'Magic Trap' — missing: blank scroll
+2026-04-05 19:27:48  Skipping 'Magic Untrap' — missing: blank scroll
+2026-04-05 19:27:48  Skipping 'Protection' — missing: blank scroll
+2026-04-05 19:27:48  Skipping 'Strength' — missing: blank scroll
+2026-04-05 19:27:48  Found 'Fireball' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:49  Found 'Magic Lock' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:50  Found 'Poison' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:51  Found 'Telekinesis' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:53  Found 'Teleport' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:54  Found 'Unlock' scroll in backpack — dragging to spellbook.
+2026-04-05 19:27:55  Skipping 'Wall of Stone' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Arch Cure' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Arch Protection' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Curse' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Fire Field' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Greater Heal' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Lightning' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Mana Drain' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Recall' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Blade Spirits' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Dispel Field' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Incognito' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Magic Reflection' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Mind Blast' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Paralyze' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Poison Field' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Summon Creature' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Dispel' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Energy Bolt' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Explosion' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Invisibility' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Mark' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Mass Curse' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Paralyze Field' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Reveal' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Chain Lightning' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Energy Field' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Flamestrike' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Gate Travel' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Mana Vampire' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Mass Dispel' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Meteor Swarm' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Polymorph' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Earthquake' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Energy Vortex' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Resurrection' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Summon Air Elemental' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Summon Daemon' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Summon Earth Elemental' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Summon Fire Elemental' — missing: blank scroll
+2026-04-05 19:27:55  Skipping 'Summon Water Elemental' — missing: blank scroll
+2026-04-05 19:27:56  Done.  Crafted: 13   Failed: 50
+
+============================================================
+  RUN START  2026-04-05 19:51:23
+============================================================
+2026-04-05 19:51:23  Target the spellbook or container to fill...
+2026-04-05 19:51:26  Destination: spellbook (serial 0x4012361B).
+2026-04-05 19:51:28  Contains empty after first open — retrying once...
+2026-04-05 19:51:31  Contains empty after retry — falling back to prop lines.
+2026-04-05 19:51:31  Prop lines (5 total):
+2026-04-05 19:51:31    PROP: 'Spellbook'
+2026-04-05 19:51:31    PROP: 'Blessed'
+2026-04-05 19:51:31    PROP: 'spell damage increase 9%'
+2026-04-05 19:51:31    PROP: 'lower mana cost 5%'
+2026-04-05 19:51:31    PROP: '29 Spells'
+2026-04-05 19:51:31  Prop match: 1 spell(s) identified.
+2026-04-05 19:51:31  Need to craft 63 scroll(s).
+2026-04-05 19:51:34  Gump opened with ID 2653346093 (expected 949095101) — updating CRAFT_GUMP_ID.
+2026-04-05 19:51:34  Found 'Clumsy' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:36  Found 'Create Food' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:37  Skipping 'Feeblemind' — missing: blank scroll
+2026-04-05 19:51:37  Found 'Heal' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:38  Found 'Magic Arrow' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:39  Found 'Night Sight' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:40  Found 'Reactive Armor' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:42  Found 'Weaken' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:43  Skipping 'Agility' — missing: blank scroll
+2026-04-05 19:51:43  Skipping 'Cunning' — missing: blank scroll
+2026-04-05 19:51:43  Skipping 'Cure' — missing: blank scroll
+2026-04-05 19:51:43  Skipping 'Harm' — missing: blank scroll
+2026-04-05 19:51:43  Skipping 'Magic Trap' — missing: blank scroll
+2026-04-05 19:51:43  Skipping 'Magic Untrap' — missing: blank scroll
+2026-04-05 19:51:43  Skipping 'Protection' — missing: blank scroll
+2026-04-05 19:51:43  Skipping 'Strength' — missing: blank scroll
+2026-04-05 19:51:43  Found 'Fireball' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:44  Found 'Magic Lock' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:45  Found 'Poison' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:46  Found 'Telekinesis' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:48  Found 'Teleport' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:49  Found 'Unlock' scroll in backpack — dragging to spellbook.
+2026-04-05 19:51:50  Skipping 'Wall of Stone' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Arch Cure' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Arch Protection' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Curse' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Fire Field' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Greater Heal' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Lightning' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Mana Drain' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Recall' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Blade Spirits' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Dispel Field' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Incognito' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Magic Reflection' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Mind Blast' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Paralyze' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Poison Field' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Summon Creature' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Dispel' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Energy Bolt' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Explosion' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Invisibility' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Mark' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Mass Curse' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Paralyze Field' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Reveal' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Chain Lightning' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Energy Field' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Flamestrike' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Gate Travel' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Mana Vampire' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Mass Dispel' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Meteor Swarm' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Polymorph' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Earthquake' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Energy Vortex' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Resurrection' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Summon Air Elemental' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Summon Daemon' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Summon Earth Elemental' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Summon Fire Elemental' — missing: blank scroll
+2026-04-05 19:51:50  Skipping 'Summon Water Elemental' — missing: blank scroll
+2026-04-05 19:51:51  Done.  Crafted: 13   Failed: 50
+
+============================================================
+  RUN START  2026-04-05 19:56:23
+============================================================
+2026-04-05 19:56:23  Target the spellbook or container to fill...
+2026-04-05 19:56:25  Destination: spellbook (serial 0x4012361B).
+2026-04-05 19:56:27  Contains empty after first open — retrying once...
+2026-04-05 19:56:30  Contains empty after retry — falling back to prop lines.
+2026-04-05 19:56:30  Prop lines (5 total):
+2026-04-05 19:56:30    PROP: 'Spellbook'
+2026-04-05 19:56:30    PROP: 'Blessed'
+2026-04-05 19:56:30    PROP: 'spell damage increase 9%'
+2026-04-05 19:56:30    PROP: 'lower mana cost 5%'
+2026-04-05 19:56:30    PROP: '29 Spells'
+2026-04-05 19:56:30  Prop match: 1 spell(s) identified.
+2026-04-05 19:56:30  Need to craft 63 scroll(s).
+2026-04-05 19:56:30  Warning: found ~0 blank scroll(s) but may need up to 51. Server will find them in sub-bags; continuing.
+2026-04-05 19:56:33  Gump opened with ID 2653346093 (expected 949095101) — updating CRAFT_GUMP_ID.
+2026-04-05 19:56:33  Found 'Clumsy' scroll in backpack — dragging to spellbook.
+2026-04-05 19:56:34  Found 'Create Food' scroll in backpack — dragging to spellbook.
+2026-04-05 19:56:40  Scroll for 'Feeblemind' not found in backpack after craft.
+2026-04-05 19:56:40  Found 'Heal' scroll in backpack — dragging to spellbook.
+2026-04-05 19:56:41  Found 'Magic Arrow' scroll in backpack — dragging to spellbook.
+2026-04-05 19:56:46  Scroll for 'Night Sight' not found in backpack after craft.
+2026-04-05 19:56:46  Found 'Reactive Armor' scroll in backpack — dragging to spellbook.
+2026-04-05 19:56:47  Found 'Weaken' scroll in backpack — dragging to spellbook.
+2026-04-05 19:56:52  Scroll for 'Agility' not found in backpack after craft.
+2026-04-05 19:56:56  Scroll for 'Cunning' not found in backpack after craft.
+2026-04-05 19:57:00  Scroll for 'Cure' not found in backpack after craft.
+2026-04-05 19:57:03  Scroll for 'Harm' not found in backpack after craft.
+2026-04-05 19:57:07  Scroll for 'Magic Trap' not found in backpack after craft.
+2026-04-05 19:57:10  Scroll for 'Magic Untrap' not found in backpack after craft.
+2026-04-05 19:57:14  Scroll for 'Protection' not found in backpack after craft.
+2026-04-05 19:57:19  Found 'Fireball' scroll in backpack — dragging to spellbook.
+2026-04-05 19:57:20  Found 'Magic Lock' scroll in backpack — dragging to spellbook.
+2026-04-05 19:57:21  Found 'Poison' scroll in backpack — dragging to spellbook.
+2026-04-05 19:57:22  Found 'Telekinesis' scroll in backpack — dragging to spellbook.
+2026-04-05 19:57:24  Found 'Teleport' scroll in backpack — dragging to spellbook.
+2026-04-05 19:57:25  Found 'Unlock' scroll in backpack — dragging to spellbook.
+2026-04-05 19:57:26  Found 'Wall of Stone' scroll in backpack — dragging to spellbook.
+2026-04-05 19:57:36  Scroll for 'Arch Protection' not found in backpack after craft.
+2026-04-05 19:57:47  Mana 25/130 — meditating...
+2026-04-05 19:58:26  Mana restored: 130/130
+2026-04-05 19:58:31  Scroll for 'Greater Heal' not found in backpack after craft.
+2026-04-05 19:58:49  Scroll for 'Blade Spirits' not found in backpack after craft.
+2026-04-05 19:58:53  Scroll for 'Dispel Field' not found in backpack after craft.
+2026-04-05 19:58:57  Scroll for 'Incognito' not found in backpack after craft.
+2026-04-05 19:59:00  Scroll for 'Magic Reflection' not found in backpack after craft.
+2026-04-05 19:59:04  Scroll for 'Mind Blast' not found in backpack after craft.
+2026-04-05 19:59:07  Scroll for 'Paralyze' not found in backpack after craft.
+2026-04-05 19:59:11  Scroll for 'Poison Field' not found in backpack after craft.
+2026-04-05 19:59:20  Scroll for 'Dispel' not found in backpack after craft.
+2026-04-05 19:59:24  Crafting gump closed unexpectedly. Stopping.
+2026-04-05 19:59:24  Done.  Crafted: 40   Failed: 0
+
+============================================================
+  RUN START  2026-04-05 19:59:57
+============================================================
+2026-04-05 19:59:57  Target the spellbook or container to fill...
+2026-04-05 19:59:57  Destination: spellbook (serial 0x4012361B).
+2026-04-05 19:59:59  Contains empty after first open â€” retrying once...
+2026-04-05 20:00:02  Contains empty after retry â€” falling back to prop lines.
+2026-04-05 20:00:02  Prop lines (5 total):
+2026-04-05 20:00:02    PROP: 'Spellbook'
+2026-04-05 20:00:02    PROP: 'Blessed'
+2026-04-05 20:00:02    PROP: 'spell damage increase 9%'
+2026-04-05 20:00:02    PROP: 'lower mana cost 5%'
+2026-04-05 20:00:02    PROP: '31 Spells'
+2026-04-05 20:00:02  Prop match: 1 spell(s) identified.
+2026-04-05 20:00:02  Need to craft 63 scroll(s).
+2026-04-05 20:00:03  Warning: found ~0 blank scroll(s) but may need up to 46. Server will find them in sub-bags; continuing.
+2026-04-05 20:00:06  Gump opened with ID 2653346093 (expected 949095101) â€” updating CRAFT_GUMP_ID.
+2026-04-05 20:00:06  Found 'Clumsy' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:07  Found 'Create Food' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:12  Scroll for 'Feeblemind' not found in backpack after craft.
+2026-04-05 20:00:12  Found 'Heal' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:14  Found 'Magic Arrow' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:18  Scroll for 'Night Sight' not found in backpack after craft.
+2026-04-05 20:00:18  Found 'Reactive Armor' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:20  Found 'Weaken' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:25  Scroll for 'Agility' not found in backpack after craft.
+2026-04-05 20:00:29  Scroll for 'Cunning' not found in backpack after craft.
+2026-04-05 20:00:32  Scroll for 'Cure' not found in backpack after craft.
+2026-04-05 20:00:36  Scroll for 'Harm' not found in backpack after craft.
+2026-04-05 20:00:40  Scroll for 'Magic Trap' not found in backpack after craft.
+2026-04-05 20:00:43  Scroll for 'Magic Untrap' not found in backpack after craft.
+2026-04-05 20:00:47  Scroll for 'Protection' not found in backpack after craft.
+2026-04-05 20:00:50  Scroll for 'Strength' not found in backpack after craft.
+2026-04-05 20:00:50  Found 'Fireball' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:52  Found 'Magic Lock' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:53  Found 'Poison' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:54  Found 'Telekinesis' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:55  Found 'Teleport' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:56  Found 'Unlock' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:00:58  Found 'Wall of Stone' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:01:03  Scroll for 'Arch Cure' not found in backpack after craft.
+2026-04-05 20:01:08  Crafted 'Arch Protection' (0x1F5E) â†’ spellbook.
+2026-04-05 20:01:13  Crafted 'Curse' (0x1F5F) â†’ spellbook.
+2026-04-05 20:01:13  Mana 41/130 â€” meditating...
+2026-04-05 20:01:37  Mana restored: 130/130
+2026-04-05 20:01:43  Crafted 'Fire Field' (0x1F60) â†’ spellbook.
+2026-04-05 20:01:48  Crafted 'Greater Heal' (0x1F61) â†’ spellbook.
+2026-04-05 20:01:52  Scroll for 'Lightning' not found in backpack after craft.
+2026-04-05 20:01:55  Scroll for 'Mana Drain' not found in backpack after craft.
+2026-04-05 20:01:59  Scroll for 'Recall' not found in backpack after craft.
+2026-04-05 20:02:03  Scroll for 'Blade Spirits' not found in backpack after craft.
+2026-04-05 20:02:07  Scroll for 'Dispel Field' not found in backpack after craft.
+2026-04-05 20:02:10  Scroll for 'Incognito' not found in backpack after craft.
+2026-04-05 20:02:14  Scroll for 'Magic Reflection' not found in backpack after craft.
+2026-04-05 20:02:18  Scroll for 'Mind Blast' not found in backpack after craft.
+2026-04-05 20:02:21  Scroll for 'Paralyze' not found in backpack after craft.
+2026-04-05 20:02:25  Scroll for 'Poison Field' not found in backpack after craft.
+2026-04-05 20:02:28  Scroll for 'Summon Creature' not found in backpack after craft.
+2026-04-05 20:02:33  Scroll for 'Dispel' not found in backpack after craft.
+2026-04-05 20:02:36  Scroll for 'Energy Bolt' not found in backpack after craft.
+2026-04-05 20:02:40  Scroll for 'Explosion' not found in backpack after craft.
+2026-04-05 20:02:44  Scroll for 'Invisibility' not found in backpack after craft.
+2026-04-05 20:02:47  Scroll for 'Mark' not found in backpack after craft.
+2026-04-05 20:02:51  Scroll for 'Mass Curse' not found in backpack after craft.
+2026-04-05 20:02:54  Scroll for 'Paralyze Field' not found in backpack after craft.
+2026-04-05 20:02:58  Scroll for 'Reveal' not found in backpack after craft.
+2026-04-05 20:02:58  Found 'Chain Lightning' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:02:59  Found 'Energy Field' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:03:00  Found 'Flamestrike' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:03:02  Found 'Gate Travel' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:03:07  Scroll for 'Mana Vampire' not found in backpack after craft.
+2026-04-05 20:03:07  Found 'Mass Dispel' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:03:08  Found 'Meteor Swarm' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:03:10  Found 'Polymorph' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:03:15  Scroll for 'Earthquake' not found in backpack after craft.
+2026-04-05 20:03:19  Scroll for 'Energy Vortex' not found in backpack after craft.
+2026-04-05 20:03:22  Scroll for 'Resurrection' not found in backpack after craft.
+2026-04-05 20:03:27  Crafted 'Summon Air Elemental' (0x2259) â†’ spellbook.
+2026-04-05 20:03:31  Scroll for 'Summon Daemon' not found in backpack after craft.
+2026-04-05 20:03:34  Scroll for 'Summon Earth Elemental' not found in backpack after craft.
+2026-04-05 20:03:38  Scroll for 'Summon Fire Elemental' not found in backpack after craft.
+2026-04-05 20:03:42  Scroll for 'Summon Water Elemental' not found in backpack after craft.
+2026-04-05 20:03:42  Done.  Crafted: 63   Failed: 0
+
+============================================================
+  RUN START  2026-04-05 20:06:38
+============================================================
+2026-04-05 20:06:38  Target the spellbook or container to fill...
+2026-04-05 20:06:40  Destination: spellbook (serial 0x4012361B).
+2026-04-05 20:06:42  Contains empty after first open â€” retrying once...
+2026-04-05 20:06:45  Contains empty after retry â€” falling back to prop lines.
+2026-04-05 20:06:45  Prop lines (5 total):
+2026-04-05 20:06:45    PROP: 'Spellbook'
+2026-04-05 20:06:45    PROP: 'Blessed'
+2026-04-05 20:06:45    PROP: 'spell damage increase 9%'
+2026-04-05 20:06:45    PROP: 'lower mana cost 5%'
+2026-04-05 20:06:45    PROP: '32 Spells'
+2026-04-05 20:06:45  Prop match: 1 spell(s) identified.
+2026-04-05 20:06:45  Need to craft 63 scroll(s).
+2026-04-05 20:06:45  Warning: found ~0 blank scroll(s) but may need up to 43. Server will find them in sub-bags; continuing.
+2026-04-05 20:06:48  Gump opened with ID 2653346093 (expected 949095101) â€” updating CRAFT_GUMP_ID.
+2026-04-05 20:06:48  Found 'Clumsy' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:06:49  Found 'Create Food' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:06:55  Scroll for 'Feeblemind' not found in backpack after craft.
+2026-04-05 20:06:55  Found 'Heal' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:06:56  Found 'Magic Arrow' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:07:01  Scroll for 'Night Sight' not found in backpack after craft.
+2026-04-05 20:07:01  Found 'Reactive Armor' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:07:02  Found 'Weaken' scroll in backpack â€” dragging to spellbook.
+2026-04-05 20:07:08  Scroll for 'Agility' not found in backpack after craft.
+2026-04-05 20:07:12  Scroll for 'Cunning' not found in backpack after craft.
+2026-04-05 20:07:15  Scroll for 'Cure' not found in backpack after craft.
+2026-04-05 20:07:19  Scroll for 'Harm' not found in backpack after craft.
+2026-04-05 20:07:22  Scroll for 'Magic Trap' not found in backpack after craft.
+
+============================================================
+  RUN START  2026-04-07 07:08:06
+============================================================
+2026-04-07 07:08:06  Target the spellbook or container to fill...
+2026-04-07 07:08:12  Destination: spellbook (serial 0x4012361B).
+2026-04-07 07:08:14  Contains empty after first open â€” retrying once...
+2026-04-07 07:08:17  Contains empty after retry â€” falling back to prop lines.
+2026-04-07 07:08:17  Prop lines (5 total):
+2026-04-07 07:08:17    PROP: 'Spellbook'
+2026-04-07 07:08:17    PROP: 'Blessed'
+2026-04-07 07:08:17    PROP: 'spell damage increase 9%'
+2026-04-07 07:08:17    PROP: 'lower mana cost 5%'
+2026-04-07 07:08:17    PROP: '32 Spells'
+2026-04-07 07:08:17  Prop match: 0 spell(s) identified.
+2026-04-07 07:08:17  Need to craft 64 scroll(s).
+2026-04-07 07:08:17  Warning: found ~0 blank scroll(s) but may need up to 63. Server will find them in sub-bags; continuing.
+2026-04-07 07:08:20  Gump opened with ID 2653346093 (expected 949095101) â€” updating CRAFT_GUMP_ID.
+2026-04-07 07:08:25  Scroll for 'Clumsy' (0x1F2E) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:08:29  Scroll for 'Create Food' (0x1F2F) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:08:33  Scroll for 'Feeblemind' (0x1F30) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:08:33  Found 'Heal' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:08:35  Found 'Magic Arrow' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:08:40  Scroll for 'Night Sight' (0x1F33) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:08:40  Found 'Reactive Armor' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:08:41  Found 'Weaken' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:08:47  Scroll for 'Agility' (0x1F35) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:08:52  Scroll for 'Cunning' (0x1F36) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:08:55  Scribe's pen wore out â€” finding a replacement...
+2026-04-07 07:09:00  Scroll for 'Harm' (0x1F38) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:04  Scroll for 'Magic Trap' (0x1F39) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:09  Scroll for 'Magic Untrap' (0x1F3A) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:13  Scroll for 'Protection' (0x1F3B) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:17  Scroll for 'Strength' (0x1F3C) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:17  Found 'Bless' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:09:18  Found 'Fireball' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:09:19  Found 'Magic Lock' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:09:21  Found 'Poison' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:09:22  Found 'Telekinesis' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:09:23  Found 'Teleport' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:09:24  Found 'Unlock' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:09:25  Found 'Wall of Stone' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:09:32  Scroll for 'Arch Cure' (0x1F45) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:36  Scroll for 'Arch Protection' (0x1F46) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:40  Scroll for 'Curse' (0x1F47) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:44  Scroll for 'Fire Field' (0x1F48) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:48  Scroll for 'Greater Heal' (0x1F49) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:09:49  Mana 40/130 â€” meditating...
+2026-04-07 07:10:19  Mana restored: 130/130
+2026-04-07 07:10:24  Scroll for 'Lightning' (0x1F4A) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:10:28  Scroll for 'Mana Drain' (0x1F4B) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:10:33  Scroll for 'Recall' (0x1F4C) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:10:38  Scroll for 'Blade Spirits' (0x1F4D) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:10:42  Scroll for 'Dispel Field' (0x1F4E) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:10:46  Scroll for 'Incognito' (0x1F4F) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:10:50  Scroll for 'Magic Reflection' (0x1F50) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:10:54  Scroll for 'Mind Blast' (0x1F51) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:10:59  Scroll for 'Paralyze' (0x1F52) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:03  Scroll for 'Poison Field' (0x1F53) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:07  Scroll for 'Summon Creature' (0x1F54) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:12  Scroll for 'Dispel' (0x1F55) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:16  Scroll for 'Energy Bolt' (0x1F56) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:20  Scroll for 'Explosion' (0x1F57) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:25  Scroll for 'Invisibility' (0x1F58) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:29  Scroll for 'Mark' (0x1F59) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:33  Scroll for 'Mass Curse' (0x1F5A) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:37  Scroll for 'Paralyze Field' (0x1F5B) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:41  Scroll for 'Reveal' (0x1F5C) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:11:41  Found 'Chain Lightning' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:11:43  Found 'Energy Field' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:11:44  Found 'Flamestrike' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:11:45  Found 'Gate Travel' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:11:46  Found 'Mana Vampire' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:11:47  Found 'Mass Dispel' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:11:49  Found 'Meteor Swarm' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:11:50  Found 'Polymorph' scroll in backpack â€” dragging to spellbook.
+2026-04-07 07:11:56  Scroll for 'Earthquake' (0x1F65) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:12:00  Scroll for 'Energy Vortex' (0x1F66) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:12:04  Scroll for 'Resurrection' (0x1F67) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:12:09  Scroll for 'Summon Air Elemental' (0x1F68) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:12:13  Scroll for 'Summon Daemon' (0x1F69) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:12:17  Scroll for 'Summon Earth Elemental' (0x1F6A) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:12:21  Scroll for 'Summon Fire Elemental' (0x1F6B) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:12:26  Scroll for 'Summon Water Elemental' (0x1F6C) not found after craft. Top-level backpack: [0x0FF2, 0x0E9B, 0x0F0E, 0x0F0B, 0x09C0, 0x2253, 0x0EFA, 0x0EFA, 0x09C9, 0x09D2, 0x1BD7, 0x2266]
+2026-04-07 07:12:26  Done.  Crafted: 63   Failed: 0
+
+============================================================
+  RUN START  2026-04-11 10:32:55
+============================================================
+2026-04-11 10:33:05  Gump ID 2653346093 detected (expected 949095101) â€” updating.
+2026-04-11 10:33:10  'Clumsy': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:33:14  'Create Food': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:33:18  'Feeblemind': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:33:22  'Heal': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:33:26  'Magic Arrow': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:33:30  'Night Sight': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:33:34  'Reactive Armor': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:33:38  'Weaken': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:33:43  'Agility' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:33:48  'Cunning' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:33:53  'Cure' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:33:58  'Harm' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:34:03  'Magic Trap' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:34:07  'Magic Untrap' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:34:12  'Protection' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:34:17  'Strength' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:34:24  Crafted 'Bless' â†’ chest.
+2026-04-11 10:34:30  Crafted 'Fireball' â†’ chest.
+2026-04-11 10:34:35  Crafted 'Magic Lock' â†’ chest.
+2026-04-11 10:34:41  Crafted 'Poison' â†’ chest.
+2026-04-11 10:34:47  Crafted 'Telekinesis' â†’ chest.
+2026-04-11 10:34:53  Crafted 'Teleport' â†’ chest.
+2026-04-11 10:34:59  Crafted 'Unlock' â†’ chest.
+2026-04-11 10:35:04  Crafted 'Wall of Stone' â†’ chest.
+2026-04-11 10:35:10  'Arch Cure' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:35:15  'Arch Protection' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:35:19  'Curse': mana 47â†’54 (no drop) â€” craft failed.
+2026-04-11 10:35:24  'Fire Field' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:35:24  Mana 25/130 â€” meditating...
+2026-04-11 10:35:59  Mana restored: 130/130
+2026-04-11 10:36:05  'Greater Heal' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:36:09  'Lightning': mana 96â†’103 (no drop) â€” craft failed.
+2026-04-11 10:36:13  'Mana Drain': mana 104â†’111 (no drop) â€” craft failed.
+2026-04-11 10:36:18  'Recall' crafted (mana dropped) but scroll not found in backpack â€” may be in a locked sub-bag.
+2026-04-11 10:36:22  'Blade Spirits': mana 83â†’90 (no drop) â€” craft failed.
+2026-04-11 10:36:26  'Dispel Field': mana 91â†’98 (no drop) â€” craft failed.
+2026-04-11 10:36:30  'Incognito': mana 99â†’106 (no drop) â€” craft failed.
+2026-04-11 10:36:34  'Magic Reflection': mana 107â†’107 (no drop) â€” craft failed.
+2026-04-11 10:36:38  'Mind Blast': mana 108â†’115 (no drop) â€” craft failed.
+2026-04-11 10:36:42  'Paralyze': mana 116â†’123 (no drop) â€” craft failed.
+2026-04-11 10:36:46  'Poison Field': mana 124â†’130 (no drop) â€” craft failed.
+2026-04-11 10:36:50  'Summon Creature': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:36:55  'Dispel': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:36:59  'Energy Bolt': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:03  'Explosion': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:07  'Invisibility': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:11  'Mark': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:15  'Mass Curse': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:19  'Paralyze Field': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:23  'Reveal': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:28  'Chain Lightning': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:32  'Energy Field': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:36  'Flamestrike': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:40  'Gate Travel': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:44  'Mana Vampire': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:48  'Mass Dispel': mana 130â†’130 (no drop) â€” craft failed.
+2026-04-11 10:37:52  Crafting gump closed unexpectedly. Stopping.
+2026-04-11 10:37:52  CRAFT done.  Crafted: 21   Failed: 33

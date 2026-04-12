@@ -134,12 +134,12 @@ def AttackParagonWithPets( paragon ):
 
     Misc.SendMessage( 'Pets ready — all kill!', colors[ 'cyan' ] )
     Player.ChatSay( 690, 'all kill' )
-    Target.WaitForTarget( 2000, True )
+    Target.WaitForTarget( 4000, False )
     Target.TargetExecute( fresh )
 
     # Cast Invisibility on ourselves while the pets fight
     Spells.CastMagery( 'Invisibility' )
-    Target.WaitForTarget( 2000, True )
+    Target.WaitForTarget( 4000, False )
     Target.TargetExecute( Player.Serial )
 
     # Wait until the fight resolves before returning to patrol

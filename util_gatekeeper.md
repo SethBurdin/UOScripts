@@ -3,17 +3,36 @@
 ## Overview
 Three scripts work together over party chat to coordinate player extraction via Gate Travel.
 
-1. **`util_runebook_explorer.py`** — Standalone tool: opens a runebook gump, dumps all rune data, and saves it to a JSON file keyed by runebook serial. Run this first to build the location database.
+1. **`util_runebook_explorer.py`** — Standalone tool: scans one or more runebooks in a single session, merging all rune data into a single `runebook_locations.json` file keyed by runebook serial. Re-run whenever runes change.
 2. **`util_gatekeeper.py`** — Listens to party chat, selects the nearest rune to a requester's coordinates, casts Gate Travel, rezzes and heals ghosts on request, and manages its own mana via meditation.
-3. **`util_extractor.py`** — Broadcasts the player's current tile coordinates over party chat as a `gate` command so the gatekeeper can open a gate to their location.
+3. **`util_extractor.py`** — One-shot script. Reads the player's current tile coordinates once and broadcasts a single `gate <X> <Y>` command over party chat, then exits.
 
 ---
 
 ## Runebook Data
 
-Rune data is parsed from the runebook gump at runtime. The gump exposes text pairs: rune name followed by its coordinate string (degree-minute notation, e.g. `47o 17'N, 139o 46'W`). The explorer script converts these strings to tile X/Y at parse time and stores both the friendly name and tile coordinates in JSON, keyed by runebook serial.
+Rune data is stored in a single static file: `runebook_locations.json`, located in the script folder. The explorer script populates this file and can be re-run any time runes change.
 
-Gump sequence reference: `0x138e`. The gump exposes rune name and coordinate text one entry at a time. All pages of a runebook must be iterated to capture all runes (up to 16 per book).
+File structure — top-level dict keyed by serial hex string, each entry contains the book's metadata and its rune list:
+```json
+{
+  "last_updated": "2026-04-04T11:34:43",
+  "runebooks": {
+    "0x4002D1D9": {
+      "serial_hex": "0x4002D1D9",
+      "serial_dec": 1073926617,
+      "name": "Runebook",
+      "charges": 0,
+      "max_charges": 18,
+      "runes": [
+        { "slot": 0, "name": "bank", "coordinate": "83o 13'S, 152o 47'E", "has_location": true, "gate_button": 98 }
+      ]
+    }
+  }
+}
+```
+
+The gatekeeper loads this file once at startup and flattens all runes across all books into a single searchable list. Each rune retains its source `serial_hex` so the gatekeeper can open the correct book before firing the gate button.
 
 ---
 
@@ -23,11 +42,9 @@ All commands are sent over party chat. The gatekeeper trusts all party members e
 
 | Command | Sender | Meaning |
 |---|---|---|
-| `gate <X> <Y>` | Extractor / player | Open a gate to the rune nearest to tile X, Y |
+| `gate <X> <Y>` | Extractor | Open a gate to the rune nearest to tile X, Y (broadcast once by the extractor then script exits) |
 | `gate <name>` | Player | Open a gate to the rune whose name partially matches `<name>` (case-insensitive) |
-| `need rez` | Player | Cast Resurrection on the sender's ghost, then heal to full |
-
-The extractor script broadcasts the player's current tile coordinates as `gate <X> <Y>`.
+| `rez` | Player | Cast Resurrection on the sender's ghost, then heal to full |
 
 ---
 
@@ -36,7 +53,8 @@ The extractor script broadcasts the player's current tile coordinates as `gate <
 - Parse incoming `gate` command: if the argument is two integers treat as tile X/Y; otherwise treat as a partial rune name match.
 - For coordinate-based requests: convert rune coordinate strings to tile X/Y and select the rune with the smallest Euclidean distance to the requester.
 - If the nearest rune is fewer than 3 screens away (~48 tiles), gate to it anyway and notify the party with the rune's friendly name.
-- Cast `Gate Travel` (Magery), target the chosen rune in the runebook, wait for the moongate to appear, then `Items.UseItem` the gate.
+- Look up the rune's source book serial in `runebook_locations.json`, open that book with `Items.FindBySerial` + `Items.UseItem`, then fire `Gumps.SendAction(89, gate_button)`. Wait for the moongate to appear, then `Items.UseItem` the gate.
+- On successful gate: broadcast in party chat `Gate opened to <rune friendly name>`.
 - All runes are assumed to be on the gatekeeper's current facet — no cross-facet collision handling.
 
 ---
@@ -60,20 +78,14 @@ The extractor script broadcasts the player's current tile coordinates as `gate <
 
 ---
 
-## Runebook Explorer (`util_runebook_explorer.py`)
+## Extractor (`util_extractor.py`)
 
-Standalone, run once per runebook (or whenever runes change). Opens the runebook gump, iterates all pages, extracts name + coordinate pairs, converts coordinates to tile X/Y, and writes/merges the result into `runebook_locations.json` keyed by runebook serial. Targeting: runtime target cursor — script prompts the player to click the runebook.
+One-shot, run when the player needs a gate. Reads `Player.Position` (X, Y), broadcasts `gate <X> <Y>` in party chat, and exits. No looping. No runebook knowledge — coordinate-to-rune resolution is entirely the gatekeeper's responsibility.
 
 ---
 
-## Open Questions
+## Resolved Decisions
 
-**1 — Runebook gump paging mechanics**
-Does the gump expose a "next page" button we can click programmatically, or does paging require sending a specific button ID? This determines how the explorer iterates beyond the first 8 runes.
-
-**2 — Rez trigger phrase**
-Using `need rez` (case-insensitive) as the keyword. Confirm this is acceptable, or specify an alternative (e.g. `[REZ]`). case can always be ignored. let's change this to jsut rez no brackets.
-
-
-**3 — Extractor Z coordinate**
-The extractor will broadcast `gate <X> <Y>`. Should it include Z as well (`gate <X> <Y> <Z>`)? Relevant for dungeon levels where surface and underground share the same X/Y.
+- **Runebook gump ID**: `89` (confirmed — buttons 102, 103, 104 observed for gate actions; exact stride TBD from `util_runebook_explorer.py` JSON output)
+- **Rez trigger phrase**: `rez` (case-insensitive, no brackets)
+- **Extractor command format**: `gate <X> <Y>` — extractor broadcasts raw tile coordinates once and exits. The gatekeeper resolves the nearest rune internally. Players can also type `gate <partial-name>` manually in party chat.

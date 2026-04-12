@@ -13,7 +13,7 @@
 # 1.6.2 - Initial release
 #
 
-import clr, time, thread, time, re, datetime, sys
+import clr, time, re, datetime, sys, os
 clr.AddReference('System')
 clr.AddReference('System.Drawing')
 clr.AddReference('System.Windows.Forms')
@@ -21,13 +21,12 @@ clr.AddReference('System.Data')
 
 import System
 from System import TimeSpan, Guid
-from System.IO import File, Directory, MemoryStream
+from System.IO import File, MemoryStream
 from System.ComponentModel import BackgroundWorker
 from System.Timers import Timer
 from System.Collections.Generic import List
 from System.Threading import Mutex, AbandonedMutexException
 from System.Threading import Thread
-from System.Threading.Thread import Sleep
 from System.Drawing import Point, Color, Size, Image, Font, ContentAlignment
 from System.Windows.Forms import (
     Application, Button, Form, BorderStyle, FormBorderStyle, Cursor, Cursors,
@@ -46,19 +45,21 @@ SCRIPT_VERSION = '1.6.2'
 COLOR_NORMAL = 76
 COLOR_WARN = 44
 COLOR_ERROR = 33
-BACKGROUND = Directory.GetCurrentDirectory() + "\\scripts\\images\\loot.png"
-IMG_HAND = Directory.GetCurrentDirectory() + "\\scripts\\images\\hand.png"
-IMG_PICK = Directory.GetCurrentDirectory() + "\\scripts\\images\\pick.png"
-IMG_CLOSE = Directory.GetCurrentDirectory() + "\\scripts\\images\\close.png"
-IMG_CUT = Directory.GetCurrentDirectory() + "\\scripts\\images\\cut.png"
-IMG_HIDDEN = Directory.GetCurrentDirectory() + "\\scripts\\images\\hidden.png"
-IMG_JEWEL = Directory.GetCurrentDirectory() + "\\scripts\\images\\jewel.png"
-IMG_COIN = Directory.GetCurrentDirectory() + "\\scripts\\images\\coin.png"
-IMG_BAG = Directory.GetCurrentDirectory() + "\\scripts\\images\\bag.png"
-IMG_REDSKULL = Directory.GetCurrentDirectory() + "\\scripts\\images\\redskull.png"
-IMG_SKULL = Directory.GetCurrentDirectory() + "\\scripts\\images\\skull.png"
-FILE_LOOT = Directory.GetCurrentDirectory() + "\\loot.txt"
-FILE_DEBUG = Directory.GetCurrentDirectory() + "\\debug.txt"
+_SCRIPT_DIR = Misc.CurrentScriptDirectory()
+_IMG_DIR = os.path.join(_SCRIPT_DIR, "Images")
+BACKGROUND = os.path.join(_IMG_DIR, "loot.png")
+IMG_HAND = os.path.join(_IMG_DIR, "hand.png")
+IMG_PICK = os.path.join(_IMG_DIR, "pick.png")
+IMG_CLOSE = os.path.join(_IMG_DIR, "close.png")
+IMG_CUT = os.path.join(_IMG_DIR, "cut.png")
+IMG_HIDDEN = os.path.join(_IMG_DIR, "hidden.png")
+IMG_JEWEL = os.path.join(_IMG_DIR, "jewel.png")
+IMG_COIN = os.path.join(_IMG_DIR, "coin.png")
+IMG_BAG = os.path.join(_IMG_DIR, "bag.png")
+IMG_REDSKULL = os.path.join(_IMG_DIR, "redskull.png")
+IMG_SKULL = os.path.join(_IMG_DIR, "skull.png")
+FILE_LOOT = os.path.join(_SCRIPT_DIR, "loot.txt")
+FILE_DEBUG = os.path.join(_SCRIPT_DIR, "debug.txt")
 LOADED_IMG_REDSKULL = None
 LOADED_IMG_SKULL = None
 MSG_EMPTY = 'Corpse is empty, use Cut button to harvest materials or Close'
@@ -87,7 +88,7 @@ MUTEX_NAME = Guid.NewGuid()
 MUTEX = Mutex(MUTEX_NAME)
 
 # do not enable this unless you are debugging
-DEBUG = False
+DEBUG = True
 
 # word fix patterns I know about
 WORD_FIXES = {
@@ -326,11 +327,11 @@ class LootForm(Form):
         try:
 
             self.ShownInTaskbar = True
-            self.FormBorderStyle = System.Windows.Forms.FormBorderStyle. None
+            self.FormBorderStyle = getattr(System.Windows.Forms.FormBorderStyle, 'None')
             self.SetStyle(ControlStyles.SupportsTransparentBackColor, True)
             self.BackColor = Color.FromArgb(0, 0, 1)
             self.ForeColor = Color.FromArgb(231, 231, 231)
-            self.Size = Size(280, 340)
+            self.Size = Size(420, 340)
             self.Text = '{0} - v{1}'.format(SCRIPT_NAME, SCRIPT_VERSION)
             self.TopMost = True
             self.MinimizeBox = False
@@ -339,8 +340,8 @@ class LootForm(Form):
             self.DT.Columns.Add('Item', System.Type.GetType("System.Object"))
             self.DT.Columns.Add('Loot?', System.Type.GetType("System.Boolean"))
             self.DT.Columns.Add('Name', clr.GetClrType(str))
-            self.DT.Columns.Add('Always',
-                                System.Type.GetType("System.Boolean"))
+            self.DT.Columns.Add('Always', System.Type.GetType("System.Boolean"))
+            self.DT.Columns.Add('Props', clr.GetClrType(str))
 
             # Data binding
             self.BS.DataSource = self.DT
@@ -541,6 +542,9 @@ class LootForm(Form):
             self._worker.WorkerSupportsCancellation = True;
             self._worker.RunWorkerAsync();
 
+            # wire up form closing to shut down the worker cleanly
+            self.FormClosing += self.Form_FormClosing
+
             # hide on startup
             self.Opacity = 0
             self.ShowInTaskbar = False
@@ -567,26 +571,27 @@ class LootForm(Form):
         self.DataGrid.RowsDefaultCellStyle.ForeColor = Color.White
         self.DataGrid.EnableHeadersVisualStyles = False
         self.DataGrid.ColumnHeadersDefaultCellStyle.BackColor = Color.Black
-        self.DataGrid.CellBorderStyle = DataGridViewCellBorderStyle. None
-        self.DataGrid.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle. None
-        self.DataGrid.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle. None
-        self.DataGrid.AdvancedCellBorderStyle.Left = DataGridViewAdvancedCellBorderStyle. None
-        self.DataGrid.AdvancedCellBorderStyle.Right = DataGridViewAdvancedCellBorderStyle. None
+        self.DataGrid.CellBorderStyle = getattr(DataGridViewCellBorderStyle, 'None')
+        self.DataGrid.RowHeadersBorderStyle = getattr(DataGridViewHeaderBorderStyle, 'None')
+        self.DataGrid.ColumnHeadersBorderStyle = getattr(DataGridViewHeaderBorderStyle, 'None')
+        self.DataGrid.AdvancedCellBorderStyle.Left = getattr(DataGridViewAdvancedCellBorderStyle, 'None')
+        self.DataGrid.AdvancedCellBorderStyle.Right = getattr(DataGridViewAdvancedCellBorderStyle, 'None')
         self.DataGrid.AutoGenerateColumns = True
-        self.DataGrid.BorderStyle = BorderStyle. None
+        self.DataGrid.BorderStyle = getattr(BorderStyle, 'None')
         self.DataGrid.ForeColor = Color.White
         self.DataGrid.Location = Point(40, 60)
-        self.DataGrid.Width = 200
+        self.DataGrid.Width = 340
         self.DataGrid.Height = 180
         self.DataGrid.AllowUserToResizeColumns = False
         self.DataGrid.AllowUserToResizeRows = False
         self.DataGrid.AllowUserToAddRows = False
-        self.DataGrid.BorderStyle = BorderStyle. None
+        self.DataGrid.BorderStyle = getattr(BorderStyle, 'None')
         self.DataGrid.DefaultCellStyle.Font = Font("Tahoma", 9)
-        self.DataGrid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode. None
+        self.DataGrid.AutoSizeColumnsMode = getattr(DataGridViewAutoSizeColumnsMode, 'None')
         self.DataGrid.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing
         self.DataGrid.CellMouseEnter += self.Form_DataGrid_MouseEnter
         self.DataGrid.CellContentClick += self.CellClick
+        self.DataGrid.CellClick += self.CellClick
         self.DataGrid.SelectionChanged += self.SelectionChanged
         self.DataGrid.CellPainting += self.Form_DataGrid_CellPaint
         self.DataGrid.Visible = False
@@ -660,7 +665,7 @@ class LootForm(Form):
                 except Exception as e:
                     _debug(
                         "Caught exception in LootForm.[Worker].__start : {0} - {1}".
-                        format(type(ex), ex))
+                        format(type(e), e))
 
                 finally:
                     _mutex.ReleaseMutex()
@@ -715,6 +720,7 @@ class LootForm(Form):
             self.UpdateWeight()
 
             # process next corpse if not viewing one
+            _debug("__update: Corpse={0} Loaded={1} IsInnocent={2}".format(self.Corpse, self.Loaded, self.IsInnocent))
             if self.Corpse == None:
                 
                 self.Corpse = self.CM.GetNext()
@@ -729,23 +735,33 @@ class LootForm(Form):
                 # if we got valid corpse
                 if self.Corpse != None:
             
-                    # if player visible, load it
-                    if Player.Visible:
-                        self.LoadCorpse()
-                        
+                    _debug("__update: calling LoadCorpse on {0}".format(self.Corpse))
+                    self.LoadCorpse()
                     self.UpdateViewState()
                 
-            # player is viewing an invalid corpse
+            # player is viewing a corpse that fell out of the scanner range
             elif not self.CM.Contains(self.Corpse):
-                
-                self.Corpse = None
-                self.UpdateViewState()
 
-            # player is visible and corpse wasn`t loaded 
-            # (handles case where player was hidden but 
-            # becomes visible at corpse)
-            elif Player.Visible and not self.Loaded and not self.IsInnocent:
+                if self.Loaded:
+                    # Corpse already loaded and shown — keep it visible until
+                    # it truly despawns; the scanner range is too small to keep
+                    # it reliably once the player moves a couple tiles.
+                    still_exists = Items.FindBySerial(self.Corpse.Serial)
+                    if still_exists is None:
+                        _debug("__update: corpse despawned, resetting")
+                        self.Corpse = None
+                        self.UpdateViewState()
+                    else:
+                        _debug("__update: corpse out of scan range but still exists, keeping")
+                else:
+                    _debug("__update: corpse no longer in range, resetting")
+                    self.Corpse = None
+                    self.UpdateViewState()
+
+            # corpse not yet loaded
+            elif not self.Loaded and not self.IsInnocent:
                 
+                _debug("__update: reloading corpse Loaded={0}".format(self.Loaded))
                 self.LoadCorpse()
                 self.UpdateViewState()
 
@@ -1010,16 +1026,33 @@ class LootForm(Form):
             else:
                 _debug("Loading {0} items into table".format(len(contents)))
                 for item in contents:
-                    if item.Amount > 1:
-                        self.DT.Rows.Add(item, self.SM.IsAlwaysLoot(
-                            item.ItemID), "{0} ({1})".format(
-                                self.Sanitize(item.Name), item.Amount),
-                                         self.SM.IsAlwaysLoot(item.ItemID))
+                    # Open the parent container so the client has item data,
+                    # then single-click to request the property packet, then
+                    # wait — same approach that reliably works in inspect_item.
+                    if item.Container and item.Container != -1:
+                        parent = Items.FindBySerial(item.Container)
+                        if parent is not None:
+                            Items.UseItem(parent)
+                            Misc.Pause(800)
+                    Items.SingleClick(item)
+                    Misc.Pause(600)
+                    Items.WaitForProps(item, 4000)
+                    fresh = Items.FindBySerial(item.Serial)
+                    if fresh is not None:
+                        item = fresh
+                    # build inline property summary
+                    prop_lines = Items.GetPropStringList(item.Serial)
+                    if prop_lines and len(prop_lines) > 1:
+                        # skip first line (item name) and join the rest as a compact one-liner
+                        props_str = "  ".join([str(p).strip() for p in prop_lines[1:] if p and str(p).strip()])
                     else:
-                        self.DT.Rows.Add(item, self.SM.IsAlwaysLoot(
-                            item.ItemID), "{0}".format(
-                                self.Sanitize(item.Name)),
-                                         self.SM.IsAlwaysLoot(item.ItemID))
+                        props_str = ""
+                    if item.Amount > 1:
+                        name_str = "{0} ({1})".format(self.Sanitize(item.Name), item.Amount)
+                    else:
+                        name_str = "{0}".format(self.Sanitize(item.Name))
+                    self.DT.Rows.Add(item, self.SM.IsAlwaysLoot(item.ItemID),
+                                     name_str, self.SM.IsAlwaysLoot(item.ItemID), props_str)
             _debug(self.DT.Rows.ToString())
         except Exception as e:
             _debug("Caught exception in LootForm.LoadDataTable : {0}".format(
@@ -1069,8 +1102,8 @@ class LootForm(Form):
                             self.lblMsg.Visible = True
                             self.lblMsg.Text = MSG_INNOCENT
 
-                        # if player hidden, show warning
-                        elif not Player.Visible:
+                        # if player is a ghost, show warning
+                        elif Player.IsGhost:
                             self.btnOpen.Visible = True
                             self.lblMsg.Text = MSG_HIDDEN
                             self.lblMsg.Visible = True
@@ -1155,15 +1188,17 @@ class LootForm(Form):
             self.DataGrid.Columns[0].Width = -1
             self.DataGrid.Columns[0].Visible = False
             self.DataGrid.Columns[1].Width = 30
-            self.DataGrid.Columns[
-                2].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
+            self.DataGrid.Columns[2].Width = 100
             self.DataGrid.Columns[3].Width = 25
+            self.DataGrid.Columns[4].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill
 
         for column in self.DataGrid.Columns:
             column.SortMode = DataGridViewColumnSortMode.NotSortable
 
         for i in range(self.DataGrid.RowCount):
             self.DataGrid.Rows[i].Cells[2].ReadOnly = True
+            if self.DataGrid.ColumnCount > 4:
+                self.DataGrid.Rows[i].Cells[4].ReadOnly = True
 
         for i in range(self.DT.Rows.Count):
 
@@ -1173,9 +1208,15 @@ class LootForm(Form):
             if self.DT.Rows[i][1] == True:
                 self.DataGrid.Rows[i].Cells[2].Style.BackColor = Color.SaddleBrown
                 self.DataGrid.Rows[i].Cells[2].Style.ForeColor = Color.White
+                if self.DataGrid.ColumnCount > 4:
+                    self.DataGrid.Rows[i].Cells[4].Style.BackColor = Color.SaddleBrown
+                    self.DataGrid.Rows[i].Cells[4].Style.ForeColor = Color.White
             else:
                 self.DataGrid.Rows[i].Cells[2].Style.BackColor = Color.Black
                 self.DataGrid.Rows[i].Cells[2].Style.ForeColor = Color.White
+                if self.DataGrid.ColumnCount > 4:
+                    self.DataGrid.Rows[i].Cells[4].Style.BackColor = Color.Black
+                    self.DataGrid.Rows[i].Cells[4].Style.ForeColor = Color.Gray
 
         self.DataGrid.Refresh()
 
@@ -1282,7 +1323,15 @@ class LootForm(Form):
         _success = False
         try:
             assert item != None and item.Serial > -1, "A valid item was passed to function"
-            
+
+            # Re-fetch a fresh proxy by serial — the stored Item object goes
+            # stale between ticks and causes NullReferenceExceptions.
+            fresh = Items.FindBySerial(item.Serial)
+            if fresh is None:
+                _debug("Item no longer exists (already looted or despawned)")
+                return True
+            item = fresh
+
             # range check corpse
             if self.RangeCheckCorpse() == False:
                _debug("Corpse is no longer in range")
@@ -1300,8 +1349,8 @@ class LootForm(Form):
                 
                 Journal.Clear()
 
-                # request move
-                Items.Move(item, self.GetLootBag(), 0)
+                # request move (-1 = move full stack)
+                Items.Move(item, self.GetLootBag(), -1)
                 Misc.Pause(100)
 
                 if Journal.Search("must wait"):
@@ -1315,7 +1364,7 @@ class LootForm(Form):
             for x in range(1, 31):
 
                 # use Thread.Sleep here not Misc.Pause
-                Sleep(100)
+                Thread.Sleep(100)
 
                 # stackable items bug workaround
                 search = Items.FindBySerial(item.Serial)
@@ -1506,8 +1555,8 @@ class LootForm(Form):
                 self.DataGrid.CurrentCell = None
                 self.UpdateDataGrid()
 
-            # Item clicked; retrieve it
-            elif (args.ColumnIndex == 2 and args.RowIndex > -1):
+            # Item name or props clicked; retrieve it
+            elif (args.ColumnIndex in (2, 4) and args.RowIndex > -1):
                 self.GetSingleItem(args.RowIndex)
 
         except Exception as e:
@@ -1555,10 +1604,28 @@ class LootForm(Form):
                 self.DataGrid.Cursor = Cursors.Hand
             elif args.ColumnIndex == 2 and args.RowIndex > -1:
                 self.DataGrid.Cursor = Cursors.Hand
+                # show item properties as tooltip on name column hover
+                try:
+                    row = args.RowIndex
+                    if row < self.DT.Rows.Count:
+                        item = self.DT.Rows[row][0]
+                        if item is not None:
+                            serial = item.Serial
+                            prop_list = Items.GetPropStringList(serial)
+                            _debug("Tooltip: serial={0} props={1}".format(serial, prop_list))
+                            if prop_list:
+                                text = "\n".join([str(p) for p in prop_list if p])
+                            else:
+                                fresh = Items.FindBySerial(serial)
+                                text = fresh.Name if fresh else str(serial)
+                            self.ToolTip.Show(text, self.DataGrid, args.Location.X + 15, args.Location.Y, 5000)
+                        else:
+                            self.ToolTip.SetToolTip(self.DataGrid, "")
+                except Exception as ex:
+                    _debug("Tooltip exception: {0}".format(ex))
             else:
                 self.DataGrid.Cursor = Cursors.Default
-
-            self.DataGrid.Refresh()
+                self.ToolTip.SetToolTip(self.DataGrid, "")
 
         except Exception as e:
             _debug("Caught exception in Form_DataGrid_MouseEnter : {0}".format(
@@ -1660,6 +1727,10 @@ class LootForm(Form):
         
     def Form_FormClosing(self, sender, e):
         _debug("FormClosing")
+        try:
+            self._worker.CancelAsync()
+        except Exception:
+            pass
 
     ##########
     # Event handler for user pressing Close on a corpse
@@ -1938,18 +2009,31 @@ try:
         LOADED_IMG_SKULL = Image_From_File(IMG_SKULL)
         LOADED_IMG_REDSKULL = Image_From_File(IMG_REDSKULL)
         form = LootForm()
-        Application.Run(form)
+        form.Show()
+
+        # Use DoEvents loop instead of Application.Run so that Misc.Pause
+        # can be interrupted by the Razor Enhanced Stop button.
+        while not form.IsDisposed:
+            Application.DoEvents()
+            Misc.Pause(50)
         
     except Exception as ex:
         _debug("Caught Exception in Script : {0}".format(str(ex)))
 
     finally:
 
-        form._worker.CancelAsync()
-        form.Close()
+        try:
+            if not form.IsDisposed:
+                form.Close()
+        except Exception:
+            pass
+        try:
+            form._worker.CancelAsync()
+        except Exception:
+            pass
         _debug("Script.Stop")
         
 except Exception as e:
-    _debug("Caught outer Exception in Script : {0}".format(str(ex)))
+    _debug("Caught outer Exception in Script : {0}".format(str(e)))
     
     

@@ -1,0 +1,137 @@
+{
+  "last_updated": "2026-04-04T23:02:25",
+  "runebooks": {
+    "0x4002D1D9": {
+      "serial_dec": 1073926617,
+      "max_charges": 18,
+      "runes": [
+        {
+          "coordinate": "47o 17'N, 139o 46'W",
+          "has_location": true,
+          "slot": 0,
+          "gate_button": 98,
+          "name": "glow mage shop"
+        },
+        {
+          "coordinate": "67o 24'N, 133o 27'W",
+          "has_location": true,
+          "slot": 1,
+          "gate_button": 99,
+          "name": "glow mages pap"
+        },
+        {
+          "coordinate": "44o 54'N, 142o 44'W",
+          "has_location": true,
+          "slot": 2,
+          "gate_button": 100,
+          "name": "alch"
+        },
+        {
+          "coordinate": "83o 13'S, 152o 47'E",
+          "has_location": true,
+          "slot": 3,
+          "gate_button": 101,
+          "name": "bank"
+        },
+        {
+          "coordinate": "76o 59'S, 151o 56'E",
+          "has_location": true,
+          "slot": 4,
+          "gate_button": 102,
+          "name": "have mage"
+        },
+        {
+          "coordinate": null,
+          "has_location": false,
+          "slot": 5,
+          "gate_button": 103,
+          "name": "ice dungeon"
+        },
+        {
+          "coordinate": "98o 20'N, 13o 46'W",
+          "has_location": true,
+          "slot": 6,
+          "gate_button": 104,
+          "name": "home"
+        },
+        {
+          "coordinate": "96o 14'N, 22o 34'W",
+          "has_location": true,
+          "slot": 7,
+          "gate_button": 105,
+          "name": "have mage"
+        },
+        {
+          "coordinate": "45o 21'S, 46o 28'W",
+          "has_location": true,
+          "slot": 8,
+          "gate_button": 106,
+          "name": "skara mage"
+        },
+        {
+          "coordinate": "5o 58'N, 11o 44'E",
+          "has_location": true,
+          "slot": 9,
+          "gate_button": 107,
+          "name": "brit mage"
+        }
+      ],
+      "name": "Runebook",
+      "serial_hex": "0x4002D1D9",
+      "charges": 0,
+      "gate_button_formula": "button = 98 + slot_index"
+    },
+    "0x40062D66": {
+      "serial_dec": 1074146662,
+      "serial_hex": "0x40062D66",
+      "name": "Runebook",
+      "max_charges": 16,
+      "charges": 0,
+      "gate_button_formula": "button = 100 + slot_index",
+      "runes": [
+        {
+          "has_location": true,
+          "name": "dungeon shame entrance",
+          "coordinate": "5o 16'N, 57o 1'W",
+          "gate_button": 100,
+          "slot": 0
+        },
+        {
+          "has_location": true,
+          "name": "teleports",
+          "coordinate": "97o 54'N, 19o 53'W",
+          "gate_button": 101,
+          "slot": 1
+        },
+        {
+          "has_location": true,
+          "name": "orc cave",
+          "coordinate": "17o 8'N, 21o 30'W",
+          "gate_button": 102,
+          "slot": 2
+        },
+        {
+          "has_location": true,
+          "name": "fan dancer",
+          "coordinate": "125o 30'N, 24o 2'W",
+          "gate_button": 103,
+          "slot": 3
+        },
+        {
+          "has_location": false,
+          "name": "haven mines",
+          "coordinate": null,
+          "gate_button": 104,
+          "slot": 4
+        },
+        {
+          "has_location": true,
+          "name": "bank",
+          "coordinate": "83o 13'S, 152o 47'E",
+          "gate_button": 105,
+          "slot": 5
+        }
+      ]
+    }
+  }
+}

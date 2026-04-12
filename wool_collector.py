@@ -142,10 +142,22 @@ def MoveToSheep( animal, maxRange = 1, timeoutMs = 15000 ):
         fresh = Mobiles.FindBySerial( animal.Serial )
         if fresh is None:
             return False
-        pos              = fresh.Position
+        pos = fresh.Position
+        # Path to the adjacent tile nearest to the player rather than the
+        # sheep's exact tile — mobiles occupy their tile so routing directly
+        # to it causes the pathfinder to stall immediately.
+        px, py = Player.Position.X, Player.Position.Y
+        best_x, best_y = pos.X, pos.Y
+        best_dist = 9999
+        for dx, dy in ( (1,0), (-1,0), (0,1), (0,-1) ):
+            tx, ty = pos.X + dx, pos.Y + dy
+            d = abs( tx - px ) + abs( ty - py )
+            if d < best_dist:
+                best_dist = d
+                best_x, best_y = tx, ty
         route            = PathFinding.Route()
-        route.X          = pos.X
-        route.Y          = pos.Y
+        route.X          = best_x
+        route.Y          = best_y
         route.DebugMessage = False
         route.StopIfStuck  = False
         PathFinding.Go( route )
@@ -157,10 +169,15 @@ def MoveToSheep( animal, maxRange = 1, timeoutMs = 15000 ):
     Timer.Create( 'moveToSheep_timeout', timeoutMs )
     lastPos      = Player.Position
     stuckMs      = 0
-    STUCK_LIMIT  = 3000   # re-issue path after 3 s of no movement
-    POLL_MS      = 150
+    stuckRetries = 0
+    STUCK_LIMIT  = 1500   # re-issue path after 1.5 s of no movement
+    MAX_RETRIES  = 3      # give up after 3 failed re-issues (mob blocking path)
+    POLL_MS      = 50
 
     while Timer.Check( 'moveToSheep_timeout' ):
+        if Player.IsGhost:
+            return False
+
         fresh = Mobiles.FindBySerial( animal.Serial )
         if fresh is None:
             return False
@@ -172,11 +189,15 @@ def MoveToSheep( animal, maxRange = 1, timeoutMs = 15000 ):
             stuckMs += POLL_MS
             if stuckMs >= STUCK_LIMIT:
                 stuckMs = 0
+                stuckRetries += 1
+                if stuckRetries >= MAX_RETRIES:
+                    return False   # path is permanently blocked (mob on route)
                 if not _go():
                     return False
         else:
-            stuckMs = 0
-            lastPos = curPos
+            stuckMs      = 0
+            stuckRetries = 0
+            lastPos      = curPos
 
         Misc.Pause( POLL_MS )
 
@@ -239,36 +260,67 @@ def CollectWool():
 
 # ── Activity 2: Use Spinning Wheel ────────────────────────────────────────────
 
+def PromptSpinningWheels():
+    '''
+    Prompts the player to target spinning wheels one at a time.
+    Target yourself to finish adding wheels and return the list of serials.
+    '''
+    wheels = []
+    Misc.SendMessage( 'Target each spinning wheel, then target YOURSELF when done.', colors[ 'cyan' ] )
+    while True:
+        serial = Target.PromptTarget( 'Target spinning wheel #%d  (target yourself to finish)' % ( len( wheels ) + 1 ) )
+        if serial == 0:
+            Misc.SendMessage( 'No target — stopping wheel selection.', colors[ 'yellow' ] )
+            break
+        if serial == Player.Serial:
+            Misc.SendMessage( 'Done selecting wheels. %d wheel(s) registered.' % len( wheels ), colors[ 'green' ] )
+            break
+        if serial in wheels:
+            Misc.SendMessage( 'That wheel is already added, skipping.', colors[ 'yellow' ] )
+            continue
+        wheels.append( serial )
+        Misc.SendMessage( 'Wheel #%d added (0x%08X). Target another or target yourself to finish.' % ( len( wheels ), serial ), colors[ 'cyan' ] )
+    return wheels
+
+
 def UseSpinningWheel():
     '''
-    Spins all raw wool in inventory into thread using a spinning wheel.
-    Waits for the wheel to finish each batch before moving to the next.
+    Spins all raw wool in inventory into thread using one or more spinning wheels.
+    Prompts the player to target each wheel; target yourself to finish adding wheels.
+    Cycles through wheels round-robin until all wool is spun.
     '''
     if Items.FindByID( WOOL_ID, -1, Player.Backpack.Serial ) is None:
         Misc.SendMessage( 'No wool in your inventory!', colors[ 'red' ] )
         return
 
-    Misc.SendMessage( 'Target the spinning wheel...', colors[ 'cyan' ] )
-    wheelSerial = Target.PromptTarget( 'Target the spinning wheel' )
-    if wheelSerial == 0:
-        Misc.SendMessage( 'No target selected. Aborting.', colors[ 'red' ] )
+    wheels = PromptSpinningWheels()
+    if not wheels:
+        Misc.SendMessage( 'No wheels selected. Aborting.', colors[ 'red' ] )
         return
 
-    Misc.SendMessage( 'Spinning wool into thread...', colors[ 'green' ] )
+    Misc.SendMessage( 'Spinning wool into thread across %d wheel(s)...' % len( wheels ), colors[ 'green' ] )
 
     while True:
-        woolItem = Items.FindByID( WOOL_ID, -1, Player.Backpack.Serial )
-        if woolItem is None:
+        # Feed one wool to each wheel in rapid succession, then wait 3 s for
+        # all wheels to finish their animation before the next round.
+        fed = 0
+        for wheelSerial in wheels:
+            woolItem = Items.FindByID( WOOL_ID, -1, Player.Backpack.Serial )
+            if woolItem is None:
+                break
+            Items.UseItem( woolItem )
+            Target.WaitForTarget( 3000, False )
+            Target.TargetExecute( wheelSerial )
+            Misc.Pause( 800 )
+            fed += 1
+
+        if fed == 0:
             break
 
+        # Wait for the first completion message from any wheel, then proceed.
+        # Fall back to 8 s timeout if no message arrives.
         Journal.Clear()
-        Items.UseItem( woolItem )
-        Target.WaitForTarget( 3000, False )
-        Target.TargetExecute( wheelSerial )
-        Misc.Pause( 300 )
-
-        # Wait for the wheel to finish spinning before the next batch
-        Timer.Create( 'spin_timeout', 15000 )
+        Timer.Create( 'spin_timeout', 8000 )
         while Timer.Check( 'spin_timeout' ):
             if ( Journal.Search( 'You add' ) or
                  Journal.Search( 'thread' ) or
@@ -277,9 +329,7 @@ def UseSpinningWheel():
                  Journal.Search( 'balls of yarn' ) or
                  Journal.Search( 'yarn' ) ):
                 break
-            Misc.Pause( 50 )
-
-        Misc.Pause( 300 )
+            Misc.Pause( 100 )
 
     yarn = Items.FindByID( YARN_ID, -1, Player.Backpack.Serial )
     yarnCount = yarn.Amount if yarn is not None else 0

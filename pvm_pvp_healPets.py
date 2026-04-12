@@ -70,7 +70,7 @@ def HealPets():
     
     petFilter = Mobiles.Filter()
     petFilter.RangeMin = 0
-    petFilter.RangeMax = 1
+    petFilter.RangeMax = 2
     petFilter.IsHuman = 0
     petFilter.IsGhost = 0
     petFilter.Friend = 1

@@ -1,4 +1,4 @@
-# Razor Enhanced API — Classification & Patterns Guide
+﻿# Razor Enhanced API — Classification & Patterns Guide
 
 A reference for the scripting patterns used throughout this project.  
 Organized by API class, interaction category, and common idioms seen in scripts like `mining.py`, `inscription_fill_spellbook.py`, and others.
@@ -28,6 +28,8 @@ Organized by API class, interaction category, and common idioms seen in scripts 
    - [Category 6 — Spell Casting](#category-6--spell-casting)
    - [Category 7 — Timing & Loop Control](#category-7--timing--loop-control)
    - [Category 8 — World / Map Lookup](#category-8--world--map-lookup)
+   - [Category 9 — Party Chat Command Dispatch](#category-9--party-chat-command-dispatch)
+   - [Category 9 — Party Chat Command Dispatch](#category-9--party-chat-command-dispatch)
 4. [Crafting Gump Layout](#crafting-gump-layout)
 5. [Known Item IDs Cheat Sheet](#known-item-ids-cheat-sheet)
 6. [Common Gotchas](#common-gotchas)
@@ -76,7 +78,10 @@ Player.SkillValue("Inscription")  # returns float (0.0–120.0)
 # ── Actions ────────────────────────────────────────────────────────────────
 Player.UseSkill("Meditation")   # trigger a skill use (meditation, etc.)
 Player.HeadMessage(color, msg)  # display overhead message above character
-Player.ChatSay(msg)             # say something in chat / trigger commands
+Player.ChatSay(color, msg)      # say something in public chat
+Player.ChatParty(msg)           # send a message to party chat (no color arg)
+Player.IsGhost                  # bool — is the player a ghost?
+Player.Position.X, Player.Position.Y, Player.Position.Z   # current tile
 ```
 
 ---
@@ -124,20 +129,30 @@ Find and inspect characters (NPCs, monsters, other players).
 
 ```python
 mobile = Mobiles.FindBySerial(serial)
-
-mobile.Serial, mobile.Name, mobile.Hue
-mobile.Hits, mobile.HitsMax
-mobile.IsDead, mobile.IsWarMode
-mobile.Backpack        # Item — their pack (if accessible)
+IsGhost          # bool — is a ghost?
+mobile.IsHuman          # bool — humanoid body?
+mobile.Backpack         # Item — their pack (if accessible)
 mobile.X, mobile.Y, mobile.Z
 
 # ── Filter-based search ────────────────────────────────────────────────────
 mf = Mobiles.Filter()
 mf.Enabled   = True
 mf.RangeMax  = 10
-mf.IsHuman   = False
-mf.Friend    = True    # filter to friends / enemies
+mf.IsHuman   = 1        # 1 = only humans, 0 = exclude humans
+mf.IsGhost   = 1        # 1 = only ghosts (body IDs 402,403,607,608,694,695,970)
+mf.Friend    = 1        # 1 = friends only
 list_of_mobs = Mobiles.ApplyFilter(mf)
+
+nearest = Mobiles.Select(list_of_mobs, 'Nearest')   # also: Farthest, Weakest, Strongest───────────────────────────────────────
+mf = Mobiles.Filter()
+mf.Enabled   = True
+mf.RangeMax  = 10
+mf.IsHuman   = 1        # 1 = only humans, 0 = exclude humans
+mf.IsGhost   = 1        # 1 = only ghosts (body IDs 402,403,607,608,694,695,970)
+mf.Friend    = 1        # 1 = friends only
+list_of_mobs = Mobiles.ApplyFilter(mf)
+
+nearest = Mobiles.Select(list_of_mobs, 'Nearest')   # also: Farthest, Weakest, Strongest
 ```
 
 ---
@@ -150,8 +165,13 @@ Manage the UO target cursor, including prompting the user to click something.
 # ── Player-prompted targeting ──────────────────────────────────────────────
 serial = Target.PromptTarget("Click the item or mobile")
 # Blocks until the player clicks. Returns the serial (int) of the selection,
-# or None if cancelled.
-# Then: obj = Items.FindBySerial(serial)  OR  Mobiles.FindBySerial(serial)
+# or None if cancelled., noWarn)   # noWarn=True suppresses cursor flash
+Target.WaitForTarget(timeoutMs)           # same, noWarn defaults to False
+Target.Cancel()                           # cancel an active target prompt
+
+# ── Targeting a mobile directly ──────────────────────────────────────────
+Target.WaitForTarget(4000, False)
+Target.TargetExecute(some_mobile)         # pass Mobile object directly
 
 # ── Scripted targeting (no player interaction) ─────────────────────────────
 Target.TargetExecute(x, y, z, tile_id)    # target a map tile directly
@@ -159,8 +179,13 @@ Target.SetLast(serial)                     # pre-set the last-used target
 Target.Last()                              # returns last targeted serial
 
 # ── Waiting for the cursor ─────────────────────────────────────────────────
-Target.WaitForTarget(timeoutMs)           # waits until target cursor appears
+Target.WaitForTarget(timeoutMs, noWarn)   # noWarn=True suppresses cursor flash
+Target.WaitForTarget(timeoutMs)           # same, noWarn defaults to False
 Target.Cancel()                           # cancel an active target prompt
+
+# ── Targeting a mobile directly ──────────────────────────────────────────
+Target.WaitForTarget(4000, False)
+Target.TargetExecute(some_mobile)         # pass Mobile object directly
 ```
 
 ---
@@ -177,7 +202,25 @@ found = Gumps.WaitForGump(gumpID, timeoutMs)   # returns bool
 is_open = Gumps.HasGump()           # any gump open?
 
 # ── Interacting ───────────────────────────────────────────────────────────
-Gumps.SendAction(gumpID, buttonID)  # click a button
+Gumps.SendAction(gumpID, buttonID)  # click 
+
+current_id = Gumps.CurrentGump()    # returns gump ID of the most recent gump (.NET Int32)
+                                    # always cast: int(Gumps.CurrentGump()) before json/math
+Gumps.CloseGump(gumpID)             # close a gump by ID
+lines = Gumps.LastGumpGetLineList() # List[str] of all text lines on the current gump
+
+# ── Runebook gump ──────────────────────────────────────────────────────────
+# GroupID 89 (confirmed on OSI-derivative shards).
+# Gate Travel button formula: button = BASE + slot_index  (0-based, 16 slots)
+#   BASE is SHARD-SPECIFIC -- must be determined by in-game testing.
+#   98 is NOT safe to assume; confirmed 100 on the shard used in this project.
+# Line structure (115 lines for a full 16-rune book):
+#   Lines 0..charges_anchor-1 : button labels
+#   "Charges" anchor        : search dynamically with enumerate()
+#   anchor+2, anchor+3      : current_charges, max_charges  (as strings)
+#   anchor+4..anchor+19     : 16 rune names positional ("Empty" for unused)
+#   anchor+20+              : name+coord pairs (2 lines per filled, 1 "Empty" per unused)
+# Gumps.LastGumpSerial() and Gumps.LastGumpID() do NOT exist at runtime -- use CurrentGump().
 
 # Advanced: click a button with switch states and text entry
 Gumps.SendAdvancedAction(
@@ -190,8 +233,25 @@ Gumps.SendAdvancedAction(
 # ── Reading gump data ──────────────────────────────────────────────────────
 gd = Gumps.GetGumpData(gumpID)
 gd.buttonid      # last button pressed
-gd.text          # list of text field values
-gd.switches      # list of active switch IDs
+found = Journal.SearchByType("phrase", "Regular")  # filter by entry type
+                                     # types: "Regular", "System", "Label"
+
+count = Journal.GetLineCount()       # total lines in current buffer (int)
+entry = Journal.GetJournalEntry(i)   # entry object at 0-based index i
+                                     # entry.Text (str), entry.Name (str, speaker)
+lines = Journal.GetTextByType("Regular")   # List[str] of matching lines
+
+# ── Common usage pattern ───────────────────────────────────────────────────
+Journal.Clear()
+# ... trigger action that produces a journal message ...
+Misc.Pause(500)
+if Journal.Search("You fail"):
+    # handle failure
+```
+
+> `Journal.Search` is **case-sensitive** and does a substring match.
+> `Journal.GetJournalEntry` may return `None` -- always null-check.
+> Party chat entries appear in the regular journal with `entry.Name` set to the speaker's name.
 ```
 
 ---
@@ -204,6 +264,20 @@ Read text that has been printed to the UO client journal (chat, system messages)
 Journal.Clear()                      # clear the journal buffer (reset baseline)
 found = Journal.Search("phrase")     # True if "phrase" appears anywhere in buffer
 found = Journal.SearchByName("Jake", "phrase")  # from a specific speaker
+found = Journal.SearchByType("phrase", "Regular")  # filter by entry type
+                                     # types: "Regular", "System", "Label"
+
+# ⚠ Journal.GetLineCount() does NOT exist at runtime (stub only) -- AttributeError.
+# ⚠ Journal.GetJournalEntry(i) IGNORES the index argument at runtime.
+#   It always returns the full List[JournalEntry] regardless of what i you pass.
+#   Correct pattern:
+entries = Journal.GetJournalEntry(0)   # returns List[JournalEntry] (index is ignored)
+if entries:
+    for entry in entries:
+        # entry.Text (str), entry.Name (str, speaker name or '' for system/echo)
+        pass
+
+lines = Journal.GetTextByType("Regular")   # List[str] of matching lines
 
 # ── Common usage pattern ───────────────────────────────────────────────────
 Journal.Clear()
@@ -214,6 +288,9 @@ if Journal.Search("You fail"):
 ```
 
 > `Journal.Search` is **case-sensitive** and does a substring match.
+> Party chat entries appear in the regular journal with `entry.Name` set to the speaker's name.
+> Own `Player.ChatParty()` echoes arrive with an **empty** `entry.Name` -- not the player's name.
+> Always guard with `if not entry.Name or entry.Name.lower() == Player.Name.lower(): continue`.
 
 ---
 
@@ -521,6 +598,85 @@ else:
 
 ---
 
+### Category 9 — Party Chat Command Dispatch
+
+Used in: `util_gatekeeper.py`
+
+Party chat messages appear in the journal like any other speech.  `Journal.GetJournalEntry(0)` returns the **full** `List[JournalEntry]` at runtime (the index argument is ignored). `Journal.GetLineCount()` does **not** exist at runtime -- do not use a watermark approach. Instead, call `Journal.Clear()` at the end of each poll cycle.
+
+**Working poll pattern** (confirmed at runtime):
+```python
+Journal.Clear()   # clear at startup
+
+while not Player.IsGhost:
+    entries = Journal.GetJournalEntry(0)   # always returns full List[JournalEntry]
+    found_cmd = None
+    found_arg = None
+    if entries:
+        for entry in entries:
+            # Own ChatParty echoes have empty Name; other players always have Name set.
+            if not entry.Name or entry.Name.lower() == Player.Name.lower():
+                continue
+            cmd = entry.Text.strip().lower()
+            if cmd.startswith('gate '):
+                found_cmd = 'gate'
+                found_arg = cmd[5:].strip()
+                break   # one command per cycle
+            elif cmd == 'rez':
+                found_cmd = 'rez'
+                break
+    Journal.Clear()   # consume; prevents replay on next cycle
+    if found_cmd == 'gate' and found_arg:
+        HandleGate(found_arg)
+    elif found_cmd == 'rez':
+        HandleRez()
+    Misc.Pause(300)
+```
+
+**CRITICAL -- reply message must not start with a command prefix**:
+```python
+# BAD  -- 'Gate opened to bank.' starts with 'gate ', causing self-trigger next cycle
+Player.ChatParty('Gate opened to bank.')
+
+# GOOD -- prefix with 'Gatekeeper:' so it splits past the command keyword
+Player.ChatParty('Gatekeeper: opened gate to bank.')
+```
+
+**Sending party chat**:
+```python
+Player.ChatParty('Gatekeeper: online.')   # no color argument
+```
+
+**Ghost filter for rez target**:
+```python
+ghostFilter          = Mobiles.Filter()
+ghostFilter.Enabled  = True
+ghostFilter.IsGhost  = 1
+ghostFilter.IsHuman  = 1
+ghostFilter.RangeMax = 5
+ghosts = Mobiles.ApplyFilter(ghostFilter)
+if ghosts and len(ghosts) > 0:
+    ghost = Mobiles.Select(ghosts, 'Nearest')
+    Spells.CastMagery('Resurrection')
+    Target.WaitForTarget(4000, False)
+    Target.TargetExecute(ghost)
+    # wait for accept
+    waited = 0
+    while ghost.IsGhost and waited < 30000:
+        Misc.Pause(500)
+        waited += 500
+```
+
+**IronPython / .NET integer gotcha**:
+```python
+# Gumps.CurrentGump() and Target.PromptTarget() return .NET Int32.
+# Python's json module cannot serialize them -- always cast first:
+serial_int = int(Target.PromptTarget('Click runebook'))
+gump_int   = int(Gumps.CurrentGump())
+```
+
+---
+
 ## Crafting Gump Layout
 
 ```
@@ -583,3 +739,12 @@ For **inscription** the categories are the 8 magic circles; items are the spells
 | Meditation ignored | Gump closed mid-cast / skill not on cooldown | Close gump first; call `Player.UseSkill("Meditation")` only after |
 | Spellbook `Contains` is empty | Spellbook stores spells as flags, not scroll items | Craft all scrolls when target is a spellbook; skip the existing-check or test per shard |
 | Journal.Search misses a message | Phrase case mismatch or journal was not cleared | Always `Journal.Clear()` before the action; match exact server phrasing |
+| `json.dump` raises `TypeError` on serial / gump ID | RE returns `.NET Int32`, not Python `int` | Wrap with `int()`: `int(Target.PromptTarget(...))`, `int(Gumps.CurrentGump())` |
+| `AttributeError: LastGumpSerial` or `LastGumpID` | Those methods exist in the stubs but not at runtime | Use `Gumps.CurrentGump()` instead |
+| Party chat command re-triggers own handler | Own `ChatParty()` echoes arrive with **empty** `entry.Name`, not the player's name | Guard: `if not entry.Name or entry.Name.lower() == Player.Name.lower(): continue` |
+| Party chat reply triggers the same handler (e.g. "Gate opened to bank.") | Reply string starts with a command keyword -- parsed as a new command next cycle | Prefix replies: `'Gatekeeper: opened gate to bank.'` -- the `': '` split in `NormalizeText` strips the prefix, leaving a non-command string |
+| `AttributeError: Journal` object has no attribute `GetLineCount` | `Journal.GetLineCount()` exists in stubs but **does not exist at runtime** | Remove all uses; use `Journal.Clear()` + `Journal.GetJournalEntry(0)` instead |
+| `Journal.GetJournalEntry(i)` returns a list, not a single entry | The index argument is **ignored at runtime**; always returns full `List[JournalEntry]` | Call as `entries = Journal.GetJournalEntry(0)` then `for entry in entries:` |
+| Runebook gate button fires wrong rune (off by N slots) | `GATE_BUTTON_BASE` constant is shard-specific and must be calibrated | Test slot 0 in-game; if it fires the wrong rune, adjust the base. This shard uses 100 (not 98). |
+| Sextant-to-tile conversion sends extractor to wrong rune | Generic `MAP_WIDTH / 360` formula does not match this shard's projection | Calibrate from two known rune tiles; derive `X_ORIGIN`, `X_SCALE`, `Y_ORIGIN`, `Y_SCALE` constants instead of using MAP_WIDTH/HEIGHT ratios |
+| `Mobiles.ApplyFilter` returns no ghosts | Default filter has `IsGhost = 0` (exclude ghosts) | Explicitly set `mf.IsGhost = 1` |

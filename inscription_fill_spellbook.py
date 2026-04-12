@@ -1,60 +1,62 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # inscription_fill_spellbook.py
 # ─────────────────────────────────────────────────────────────────────────────
-# Automates filling a spellbook or container with inscribed scrolls.
+# Two modes, chosen at startup via a numbered chat prompt:
 #
-# Features:
-#   - Prompts the player to target a destination (spellbook or container).
-#   - Scans the destination to determine which scrolls are already present.
-#   - Optionally pulls blank scrolls and reagents from a configured source chest.
-#   - Navigates the inscription crafting gump to craft each missing scroll.
-#   - Meditates automatically when mana drops below the configured threshold.
-#   - Moves each completed scroll into the destination as it is created.
-#   - Supports Magery (all 8 circles, 64 spells) and a Spellweaving stub.
+#   1) CRAFT — craft 1 of every magery scroll, move each one to the scroll chest
+#   2) FILL  — drag scrolls from the scroll chest into a targeted spellbook
 #
-# Config: edit the `cfg` class near the top of this file.
+# No spellbook-content detection is attempted — FILL simply tries to add every
+# scroll from the chest.  Duplicates are harmlessly rejected by the server.
+#
+# Craft-success detection uses a mana comparison: if mana drops after the gump
+# click the server accepted and consumed the inscription attempt; if mana is
+# unchanged the craft failed (missing reagents / blank scrolls / etc.).
+#
+# Config: set cfg.scroll_container_serial once your scroll chest is placed.
 #
 # Gump NOTE:
-#   Uses the standard RunUO/ServUO crafting gump (ID 949095101).
-#   Circles are treated as top-level categories.  Button layout:
-#     Left  panel  (circles): 1, 8, 15, 22, 29, 36, 43, 50
-#     Right panel  (spells):  2, 9, 16, 23, 30, 37, 44, 51
+#   Left  panel  (circles): 1, 8, 15, 22, 29, 36, 43, 50
+#   Right panel  (spells):  2, 9, 16, 23, 30, 37, 44, 51
 #   Adjust CIRCLE_BTNS / SPELL_BTN_FIRST / SPELL_BTN_STEP if your shard
-#   uses a different layout.
+#   uses a different button layout.
 # ─────────────────────────────────────────────────────────────────────────────
 
 # IDE IntelliSense only – never executes inside Razor Enhanced
 if False:
     from razorenhanced_stubs import *
 
+import datetime
+import os
+import time
+from Scripts.utilities.items import FindItem as _FindItem
+
 # ─────────────────────────────────────────────────────────────────────────────
-# Config
+# Config — edit this block
 # ─────────────────────────────────────────────────────────────────────────────
 class cfg:
-    # Crafting skill mode: "magery"  |  "spellweaving"
-    mode = "magery"
+    # ── Scroll chest ──────────────────────────────────────────────────────────
+    # Serial of the container used as the scroll depot:
+    #   CRAFT mode  → crafted scrolls are moved HERE after each successful craft
+    #   FILL  mode  → scrolls are pulled FROM HERE into the target spellbook
+    # Set this once your chest is placed.  e.g.  scroll_container_serial = 0x4012ABCD
+    scroll_container_serial = 0x400F3F52
 
-    # ---- Timing (milliseconds) ----
-    craft_delay       = 2000   # wait after clicking a spell button to craft
-    gump_open_delay   = 1500   # timeout while waiting for the crafting gump
-    item_move_delay   = 700    # pause between Items.Move calls
-    meditate_poll_ms  = 500    # polling interval while waiting for mana
-    circle_switch_ms  = 500    # pause after clicking a circle (category) button
+    # ── Timing (milliseconds) ─────────────────────────────────────────────────
+    craft_delay        = 4000   # wait after clicking a spell button to craft
+    gump_open_delay    = 3000   # timeout waiting for the crafting gump
+    item_move_delay    = 2000   # pause between Items.Move calls
+    circle_switch_ms   = 1200   # pause after switching circles in the craft gump
+    action_pause_ms    = 800    # general inter-action breathing room
+    post_craft_settle  = 1200   # extra pause before searching for crafted scroll
 
-    # ---- Mana management ----
+    # ── Mana management ───────────────────────────────────────────────────────
     meditate_threshold = 40     # meditate when mana falls below this value
+    meditate_poll_ms   = 500    # polling interval while waiting for mana
     mana_wait_timeout  = 90000  # max ms to wait for full mana (90 s)
 
-    # ---- Source container for materials (optional) ----
-    # Set to the integer serial of a chest / bag that holds blank scrolls
-    # and reagents.  Set to None to skip the material-pull step.
-    material_source_serial = None
-
-    # ---- Spell filter (optional) ----
-    # Restrict crafting to a specific subset of spells.
-    # Example: spell_filter = ["Heal", "Cure", "Mark", "Recall"]
-    # Set to None to craft all spells for the chosen mode.
-    spell_filter = None
+    # ── Logging ───────────────────────────────────────────────────────────────
+    log_file = r'C:\Users\sethb\apps\razor-enhanced\inscription_fill_spellbook.log'
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -64,10 +66,10 @@ class cfg:
 # Scribe's pen (inscription tool).  0x0FBF is standard; some shards use 0x0FBE.
 SCRIBE_PEN_IDS  = [0x0FBF, 0x0FBE]
 
-# Spellbook graphic – used to distinguish a spellbook from a generic container.
-SPELLBOOK_IDS   = [0x0EFA]
+# Spellbook graphic IDs.
+SPELLBOOK_IDS   = {0x0EFA, 0x0EFF}
 
-# Blank scroll – one required per inscription attempt.
+# Blank scroll.
 BLANK_SCROLL_ID = 0x0E34
 
 # ─── Reagent item IDs ────────────────────────────────────────────────────────
@@ -199,26 +201,53 @@ MAGERY_SCROLLS = [
 # enabling cfg.mode = "spellweaving".
 SPELLWEAVING_SCROLLS = []   # TODO: populate per shard
 
+# Fast lookup: spell name (lowercase) -> scroll item ID.
+# Used when checking a real spellbook via item properties.
+_SPELL_NAME_TO_ID = {name.lower(): sid for name, _c, sid, _r in MAGERY_SCROLLS}
+
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Journal result phrases
-# ─────────────────────────────────────────────────────────────────────────────
-CRAFT_SUCCESS_PHRASES = [
-    "You create the scroll",
-    "You inscribe",
-    "You create the item",
+# Pen-wore-out journal phrases — still needed to handle tool breakage.
+TOOL_WORN_PHRASES = [
+    "You have worn out your tool",
+    "worn out your",
 ]
 
-CRAFT_FAIL_PHRASES = [
-    "failed to create",
-    "You don't have enough",
-    "not enough",
-    "insufficient",
-    "You lack",
-    "You do not have",
-    "That item cannot",
-    "no blank scrolls",
-]
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Startup prompt  (borrowed from skill_TamingBot.py)
+# ─────────────────────────────────────────────────────────────────────────────
+
+def Prompt(question, options, timeout=30):
+    """
+    Displays numbered options in chat and waits up to `timeout` seconds for
+    the player to type one of the option numbers (just the digit, e.g. "1").
+    Returns the 1-based choice; defaults to 1 on timeout.
+    """
+    CYAN   = 0x59
+    YELLOW = 0x35
+    Misc.SendMessage('──────────────────────────────', CYAN)
+    Misc.SendMessage(question, CYAN)
+    for i, opt in enumerate(options, 1):
+        Misc.SendMessage('  %d) %s' % (i, opt), CYAN)
+    Misc.SendMessage('Type your choice number in chat now.', CYAN)
+    # Pause so the SendMessage lines settle into the journal, then clear so
+    # only the player's reply triggers a match.
+    Misc.Pause(600)
+    Journal.Clear()
+    Misc.Pause(200)
+    Journal.Clear()
+    deadline = time.time() + timeout
+    while time.time() < deadline:
+        for i in range(1, len(options) + 1):
+            if Journal.SearchByName(str(i), Player.Name):
+                Journal.Clear()
+                Misc.Pause(300)
+                Misc.SendMessage('> %d) %s' % (i, options[i - 1]), YELLOW)
+                return i
+        Misc.Pause(200)
+    Misc.SendMessage('No response — defaulting to option 1', YELLOW)
+    return 1
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -227,6 +256,13 @@ CRAFT_FAIL_PHRASES = [
 
 def log(msg, color=0x3F):
     Misc.SendMessage("[INSCRIBE] %s" % msg, color)
+    if cfg.log_file:
+        try:
+            ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open(cfg.log_file, 'a', encoding='utf-8') as _lf:
+                _lf.write("%s  %s\n" % (ts, msg))
+        except Exception as _e:
+            Misc.SendMessage("[INSCRIBE] log write failed: %s" % _e, 0x25)
 
 
 def journal_contains_any(phrases):
@@ -237,7 +273,7 @@ def journal_contains_any(phrases):
 
 
 def find_inscription_tool():
-    """Returns the first inscription pen in the player backpack, or None."""
+    """Returns the first inscription pen in the backpack, or None."""
     for pen_id in SCRIBE_PEN_IDS:
         item = Items.FindByID(pen_id, -1, Player.Backpack.Serial)
         if item is not None:
@@ -245,21 +281,28 @@ def find_inscription_tool():
     return None
 
 
-def get_existing_scroll_ids(dest):
-    """Returns a set of scroll ItemIDs already inside dest.Contains."""
-    try:
-        return set(item.ItemID for item in dest.Contains)
-    except Exception:
-        return set()
+def get_scroll_container():
+    """
+    Fetches the scroll chest and opens it so Razor Enhanced caches its contents.
+    Returns the Item object, or None on failure.
+    """
+    if cfg.scroll_container_serial is None:
+        log("cfg.scroll_container_serial is not set — edit the script.", 0x25)
+        return None
+    chest = Items.FindBySerial(cfg.scroll_container_serial)
+    if chest is None:
+        log("Scroll chest (0x%X) not found. Are you in range?" % cfg.scroll_container_serial, 0x25)
+        return None
+    Items.UseItem(chest)
+    Misc.Pause(1500)
+    return Items.FindBySerial(cfg.scroll_container_serial)
 
 
 def meditate_until_full():
-    """Triggers Meditation and waits until mana is fully restored."""
+    """Meditates until mana is fully restored (or the timeout elapses)."""
     if Player.Mana >= Player.ManaMax:
         return
     log("Mana %d/%d — meditating..." % (Player.Mana, Player.ManaMax), 0x35)
-    Journal.Clear()
-    # Player.UseSkill is the RE API call.  Some shards may need Misc.UseSkill.
     Player.UseSkill("Meditation")
     waited = 0
     while Player.Mana < Player.ManaMax and waited < cfg.mana_wait_timeout:
@@ -269,229 +312,119 @@ def meditate_until_full():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Material calculation and pulling
-# ─────────────────────────────────────────────────────────────────────────────
-
-def calculate_materials(needed_scrolls):
-    """
-    Returns (blank_count, reagent_map) for all scrolls to be crafted.
-    reagent_map = { reagent_item_id: total_count_needed }
-    """
-    blank_count = len(needed_scrolls)
-    reagent_map = {}
-    for _name, _circle, _sid, reagents in needed_scrolls:
-        for rid in reagents:
-            reagent_map[rid] = reagent_map.get(rid, 0) + 1
-    return blank_count, reagent_map
-
-
-def pull_materials(source_serial, blank_count, reagent_map):
-    """Moves blank scrolls and reagents from the source container to backpack."""
-    source = Items.FindBySerial(source_serial)
-    if source is None:
-        log("Material source container not found (serial 0x%X). Skipping pull." % source_serial, 0x25)
-        return
-
-    bp = Player.Backpack
-
-    # ── Pull blank scrolls ────────────────────────────────────────────────────
-    needed_blanks = blank_count
-    for item in list(source.Contains):
-        if item.ItemID != BLANK_SCROLL_ID or needed_blanks <= 0:
-            continue
-        pull = min(item.Amount, needed_blanks)
-        Items.Move(item, bp, pull)
-        Misc.Pause(cfg.item_move_delay)
-        needed_blanks -= pull
-
-    if needed_blanks > 0:
-        log("Warning: short %d blank scroll(s) in source." % needed_blanks, 0x25)
-
-    # ── Pull reagents ─────────────────────────────────────────────────────────
-    for rid, amount in reagent_map.items():
-        needed = amount
-        for item in list(source.Contains):
-            if item.ItemID != rid or needed <= 0:
-                continue
-            pull = min(item.Amount, needed)
-            Items.Move(item, bp, pull)
-            Misc.Pause(cfg.item_move_delay)
-            needed -= pull
-        if needed > 0:
-            log("Warning: short %d of reagent 0x%04X." % (needed, rid), 0x25)
-
-    log("Material pull complete.", 0x40)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
 # Gump management
 # ─────────────────────────────────────────────────────────────────────────────
 
 def open_craft_gump(tool):
-    """Double-clicks the inscription pen and waits for the crafting gump."""
+    """Uses the inscription pen and waits for the crafting gump."""
+    global CRAFT_GUMP_ID
     Journal.Clear()
     Items.UseItem(tool)
     if Gumps.WaitForGump(CRAFT_GUMP_ID, cfg.gump_open_delay):
+        return True
+    if Gumps.HasGump():
+        actual_id = int(Gumps.CurrentGump())
+        log("Gump ID %d detected (expected %d) — updating." % (actual_id, CRAFT_GUMP_ID), 0x53)
+        CRAFT_GUMP_ID = actual_id
         return True
     log("Crafting gump did not open. Check that this is the right tool.", 0x25)
     return False
 
 
 def close_craft_gump():
-    """Closes the crafting gump via the Exit button."""
     Gumps.SendAction(CRAFT_GUMP_ID, GUMP_BTN_EXIT)
-    Misc.Pause(300)
+    Misc.Pause(cfg.action_pause_ms)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Scroll crafting
+# Scroll crafting — mana-drop success detection
 # ─────────────────────────────────────────────────────────────────────────────
-
-def _build_craft_plan(source_list, needed_scrolls):
-    """
-    Pre-computes the right-panel button ID for each scroll that needs crafting.
-
-    Returns a list of tuples:
-        (spell_name, circle, scroll_id, spell_gump_btn)
-    """
-    # Build per-circle slot lookup: spell_name -> slot index (0-based)
-    circle_slot = {}
-    for circle_num in range(1, 9):
-        for slot, entry in enumerate(s for s in source_list if s[1] == circle_num):
-            circle_slot[entry[0]] = slot
-
-    plan = []
-    for spell_name, circle, scroll_id, _reagents in needed_scrolls:
-        slot     = circle_slot.get(spell_name, 0)
-        gump_btn = SPELL_BTN_FIRST + slot * SPELL_BTN_STEP
-        plan.append((spell_name, circle, scroll_id, gump_btn))
-    return plan
-
 
 def craft_one_scroll(spell_name, circle, spell_btn, current_circle):
     """
-    Issues the gump clicks to craft one scroll.
+    Clicks the gump to craft one scroll.
 
-    Returns (result_str, current_circle_after):
-        result_str: "success" | "fail" | "no_gump"
+    Success is determined by mana comparison: if Player.Mana drops after the
+    craft click, the server consumed mana and accepted the inscription attempt.
+    No journal parsing is needed or used.
+
+    Returns ("success" | "fail" | "no_gump", new_current_circle).
     """
-    # Switch to the correct circle if the gump isn't already on it
     if circle != current_circle:
         Gumps.SendAction(CRAFT_GUMP_ID, CIRCLE_BTNS[circle])
         Misc.Pause(cfg.circle_switch_ms)
         current_circle = circle
 
-    # Click the spell slot to begin crafting
-    Journal.Clear()
+    Misc.Pause(cfg.action_pause_ms)
+    mana_before = Player.Mana
     Gumps.SendAction(CRAFT_GUMP_ID, spell_btn)
     Misc.Pause(cfg.craft_delay)
 
-    # Confirm the gump is still open
     if not Gumps.HasGump():
         return "no_gump", current_circle
 
-    if journal_contains_any(CRAFT_FAIL_PHRASES):
-        log("Craft failed for '%s'. Check reagents / blanks / mana." % spell_name, 0x25)
-        return "fail", current_circle
+    if Player.Mana < mana_before:
+        return "success", current_circle
 
-    # Treat as success if success phrase found, or if no failure phrase found
-    # (some servers don't print explicit success messages).
-    return "success", current_circle
+    log("'%s': mana %d→%d (no drop) — craft failed." % (spell_name, mana_before, Player.Mana), 0x35)
+    return "fail", current_circle
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Main
+# Mode 1 — CRAFT
 # ─────────────────────────────────────────────────────────────────────────────
 
-def main():
-    # ── 1. Find the inscription pen ───────────────────────────────────────────
+def mode_craft():
+    """
+    Crafts 1 of every magery scroll and moves each one to the scroll chest.
+
+    Each spell button in the crafting gump is clicked.  After each attempt the
+    backpack is checked for the newly created scroll — if found it is moved to
+    cfg.scroll_container_serial.  No mana comparison is used.
+    """
+    chest = get_scroll_container()
+    if chest is None:
+        return
+
     tool = find_inscription_tool()
     if tool is None:
         log("No inscription pen found in backpack. Stopping.", 0x25)
         return
 
-    # ── 2. Prompt for destination ─────────────────────────────────────────────
-    log("Target the spellbook or container to fill...", 0x53)
-    dest_serial = Target.PromptTarget("Select destination spellbook or container:", 0x004F)
-    if dest_serial is None:
-        log("No target selected. Stopping.", 0x25)
-        return
+    # Pre-compute the right-panel gump button for each spell (0-based slot
+    # within its circle maps to a fixed button index).
+    circle_slot = {}
+    for circle_num in range(1, 9):
+        for slot, entry in enumerate(s for s in MAGERY_SCROLLS if s[1] == circle_num):
+            circle_slot[entry[0]] = slot
 
-    dest = Items.FindBySerial(dest_serial)
-    if dest is None:
-        log("Could not locate targeted item. Stopping.", 0x25)
-        return
-
-    is_spellbook = dest.ItemID in SPELLBOOK_IDS
-    dest_label   = "spellbook" if is_spellbook else "container"
-    log("Destination: %s (serial 0x%X)." % (dest_label, dest.Serial), 0x40)
-
-    # ── 3. Select the scroll data for the configured mode ─────────────────────
-    source_list = MAGERY_SCROLLS if cfg.mode == "magery" else SPELLWEAVING_SCROLLS
-    if not source_list:
-        log("No scroll data available for mode '%s'. Stopping." % cfg.mode, 0x25)
-        return
-
-    # Apply optional spell filter
-    if cfg.spell_filter is not None:
-        filter_set  = set(cfg.spell_filter)
-        source_list = [s for s in source_list if s[0] in filter_set]
-
-    # ── 4. Determine which scrolls are still missing from the destination ──────
-    existing_ids = get_existing_scroll_ids(dest)
-    needed       = [s for s in source_list if s[2] not in existing_ids]
-
-    if not needed:
-        log("Destination already contains all requested scrolls. Done.", 0x40)
-        return
-
-    log("Need to craft %d scroll(s)." % len(needed), 0x40)
-
-    # ── 5. Pull materials from source chest (if configured) ───────────────────
-    if cfg.material_source_serial:
-        blank_count, reagent_map = calculate_materials(needed)
-        log("Pulling %d blank scroll(s) and reagents from source..." % blank_count, 0x40)
-        pull_materials(cfg.material_source_serial, blank_count, reagent_map)
-        Misc.Pause(1000)
-
-    # ── 6. Meditate to full before starting if mana is low ────────────────────
     if Player.Mana < cfg.meditate_threshold:
         meditate_until_full()
-
-    # ── 7. Pre-compute gump buttons for the craft plan ────────────────────────
-    craft_plan = _build_craft_plan(source_list, needed)
-
-    # ── 8. Open the crafting gump ─────────────────────────────────────────────
-    tool = find_inscription_tool()   # refresh reference in case it moved
-    if tool is None:
-        log("Inscription pen not found. Stopping.", 0x25)
-        return
 
     if not open_craft_gump(tool):
         return
 
-    # ── 9. Craft each scroll ──────────────────────────────────────────────────
-    current_circle = None   # tracks which circle the gump is currently showing
-    crafted = 0
-    failed  = 0
+    current_circle = None
+    gump_open      = True
+    crafted = failed = 0
 
-    for spell_name, circle, scroll_id, spell_btn in craft_plan:
+    for spell_name, circle, scroll_id, _reagents in MAGERY_SCROLLS:
+        spell_btn = SPELL_BTN_FIRST + circle_slot[spell_name] * SPELL_BTN_STEP
 
-        # ── Mana check: close gump, meditate, reopen ──────────────────────────
+        # ── Mana gate: close gump, meditate, reopen ───────────────────────────
         if Player.Mana < cfg.meditate_threshold:
-            close_craft_gump()
+            if gump_open:
+                close_craft_gump()
+                gump_open = False
             meditate_until_full()
-
-            # Refresh the pen reference – it may have been used up
             tool = find_inscription_tool()
             if tool is None:
-                log("Ran out of inscription pens. Stopping.", 0x25)
+                log("No inscription pen after meditation. Stopping.", 0x25)
                 break
-
             if not open_craft_gump(tool):
                 break
-
-            current_circle = None   # gump reopened; circle state is unknown
+            gump_open      = True
+            current_circle = None
 
         # ── Attempt the craft ─────────────────────────────────────────────────
         result, current_circle = craft_one_scroll(
@@ -499,26 +432,119 @@ def main():
         )
 
         if result == "no_gump":
+            gump_open = False
+            if journal_contains_any(TOOL_WORN_PHRASES):
+                log("Scribe's pen wore out — finding a replacement...", 0x35)
+                # The craft that broke the pen may have succeeded; check backpack.
+                Misc.Pause(cfg.post_craft_settle)
+                scroll = _FindItem(scroll_id, Player.Backpack)
+                if scroll is not None:
+                    Items.Move(scroll, chest, 1)
+                    Misc.Pause(cfg.item_move_delay)
+                    log("Crafted '%s' → chest (pen change)." % spell_name, 0x40)
+                    crafted += 1
+                tool = find_inscription_tool()
+                if tool is None:
+                    log("No more pens in backpack. Stopping.", 0x25)
+                    break
+                if not open_craft_gump(tool):
+                    break
+                gump_open      = True
+                current_circle = None
+                continue
             log("Crafting gump closed unexpectedly. Stopping.", 0x25)
             break
 
-        if result == "success":
+        # result == "ok" — check backpack; presence of scroll confirms success.
+        Misc.Pause(cfg.post_craft_settle)
+        scroll = _FindItem(scroll_id, Player.Backpack)
+        if scroll is not None:
             crafted += 1
-            # Find the freshly crafted scroll in the backpack and send to dest
-            scroll = Items.FindByID(scroll_id, -1, Player.Backpack.Serial)
-            if scroll is not None:
-                Items.Move(scroll, dest, 1)
-                Misc.Pause(cfg.item_move_delay)
-                log("Crafted '%s' → %s." % (spell_name, dest_label), 0x40)
-            else:
-                log("Scroll for '%s' not found in backpack after craft." % spell_name, 0x35)
+            Items.Move(scroll, chest, 1)
+            Misc.Pause(cfg.item_move_delay)
+            log("Crafted '%s' -> chest." % spell_name, 0x40)
         else:
             failed += 1
+            log("'%s': scroll not found after craft — reagents/blanks missing or skill fail." % spell_name, 0x35)
 
-    # ── 10. Close the gump and report ─────────────────────────────────────────
-    close_craft_gump()
-    log("Done.  Crafted: %d   Failed: %d" % (crafted, failed), 0x40)
+    if gump_open:
+        close_craft_gump()
+
+    log("CRAFT done.  Crafted: %d   Failed: %d" % (crafted, failed), 0x40)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Mode 2 — FILL
+# ─────────────────────────────────────────────────────────────────────────────
+
+def mode_fill():
+    """
+    Drags scrolls from the scroll chest into a targeted spellbook.
+
+    No spell detection is attempted — every scroll in MAGERY_SCROLLS is looked
+    up in the chest and dragged to the book.  Duplicates are harmlessly
+    rejected by the server, so it is safe to run multiple times.
+    """
+    chest = get_scroll_container()
+    if chest is None:
+        return
+
+    log("Target the spellbook to fill...", 0x53)
+    dest_serial = Target.PromptTarget("Select destination spellbook:", 0x004F)
+    if dest_serial is None:
+        log("No target selected. Stopping.", 0x25)
+        return
+
+    dest = Items.FindBySerial(dest_serial)
+    if dest is None or dest.ItemID not in SPELLBOOK_IDS:
+        log("Target is not a recognised spellbook. Stopping.", 0x25)
+        return
+
+    log("Filling spellbook 0x%X from chest 0x%X..." % (dest.Serial, chest.Serial), 0x40)
+
+    moved = missing = 0
+    for spell_name, _circle, scroll_id, _reagents in MAGERY_SCROLLS:
+        scroll = _FindItem(scroll_id, chest)
+        if scroll is not None:
+            Items.Move(scroll, dest, 1)
+            Misc.Pause(cfg.item_move_delay)
+            log("Added '%s' -> spellbook." % spell_name, 0x40)
+            moved += 1
+        else:
+            Misc.Pause(300)
+            log("'%s' (0x%04X) not in chest." % (spell_name, scroll_id), 0x35)
+            missing += 1
+
+    log("FILL done.  Added: %d   Missing from chest: %d" % (moved, missing), 0x40)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Entry point
+# ─────────────────────────────────────────────────────────────────────────────
+
+def main():
+    if cfg.log_file:
+        try:
+            ts = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            with open(cfg.log_file, 'a', encoding='utf-8') as _lf:
+                _lf.write("\n" + "=" * 60 + "\n")
+                _lf.write("  RUN START  %s\n" % ts)
+                _lf.write("=" * 60 + "\n")
+        except Exception:
+            pass
+
+    choice = Prompt(
+        "INSCRIPTION — SELECT MODE:",
+        [
+            "CRAFT — craft 1 of every magery scroll → scroll chest",
+            "FILL  — move scrolls from chest → targeted spellbook",
+        ]
+    )
+
+    if choice == 1:
+        mode_craft()
+    else:
+        mode_fill()
+
+
 main()
