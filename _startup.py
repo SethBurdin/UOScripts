@@ -1,3 +1,8 @@
+import sys, os
+_d = os.path.dirname(os.path.abspath(__file__))
+if _d not in sys.path:
+    sys.path.insert(0, _d)
+
 if Player.Name == 'TheWarMage':
     Misc.SetSharedValue( 'reagentsBag', 0x4014BC93 )
 elif Player.Name == 'TheWarPhysician':
