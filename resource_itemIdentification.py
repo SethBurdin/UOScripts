@@ -5,6 +5,9 @@ sortItems = True
 
 itemIdentificationDelayMilliseconds = 500
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.items.armor import armor
 from glossary.items.shields import shields
 from glossary.items.weapons import weapons

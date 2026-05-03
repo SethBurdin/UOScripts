@@ -48,6 +48,9 @@ import datetime
 import os
 import time
 import random
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from utilities.items import FindItem as _FindItem
 # Import canonical gump menu mapping
 

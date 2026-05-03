@@ -17,6 +17,9 @@ except:
 
 from System.Collections.Generic import List
 from System import Int32
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.items.tools import tools
 from glossary.items.cloth import cloth
 from utilities.items import FindItem

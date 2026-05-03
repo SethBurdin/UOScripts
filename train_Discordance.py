@@ -17,6 +17,9 @@ debugMode                 = True    # set to False once outcome detection is wor
                                     # when True, unmatched journal lines are printed to chat
 
 from Scripts import config
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.items.instruments import FindInstrument
 from glossary.colors import colors
 from glossary.enemies import GetEnemies

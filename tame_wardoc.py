@@ -8,6 +8,9 @@ Description: Patrols a Wardoc spawn area, roaming between waypoints looking
 import json
 import os
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 from glossary.enemies import GetEnemies
 from utilities.mobiles import GetEmptyMobileList

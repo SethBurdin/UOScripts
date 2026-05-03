@@ -51,6 +51,9 @@ msgColor = 68
 self = Mobiles.FindBySerial( Player.Serial )
 
 from Scripts import config
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.items.armor import armor
 from glossary.items.clothing import clothingInTreasureChests
 from glossary.items.gems import gems

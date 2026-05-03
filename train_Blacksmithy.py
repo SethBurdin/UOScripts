@@ -7,6 +7,9 @@ Description: Trains Blacksmithy to its cap
 '''
 
 from Scripts import config
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.items.ores import ores
 from glossary.crafting.blacksmithing import blacksmithTools, FindBlacksmithTool, blacksmithCraftables
 from glossary.colors import colors

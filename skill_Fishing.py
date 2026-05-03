@@ -15,6 +15,9 @@ moveForwardBackward = False
 autoFightMacroName = 'cast_EnergyBolt.py'
 
 from Scripts import config
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 from glossary.items.containers import FindHatch
 from glossary.items.tools import tools

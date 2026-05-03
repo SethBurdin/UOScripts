@@ -6,6 +6,9 @@ Last Contribution By: TheWarDoctor95 - May 30, 2019
 Description: Uses the selected target to train Arms Lore to its cap
 '''
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 
 armsLoreTimerMilliseconds = 1200

@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.items.containers import FindTrashBarrel
 from glossary.items.miscellaneous import miscellaneous
 from glossary.crafting.cartography import cartographyTools, cartographyCraftables

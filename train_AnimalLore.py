@@ -6,6 +6,9 @@ Last Contribution By: TheWarDoctor95 - March 14, 2019
 Description: Uses the selected target to train Animal Lore to its cap
 '''
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 
 animalLoreTimerMilliseconds = 1200

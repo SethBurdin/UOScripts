@@ -9,6 +9,9 @@ containerWithBODs = Items.FindBySerial( containerWithBODsSerial )
 Items.UseItem( containerWithBODs )
 Misc.Pause( 700 )
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from utilities.items import FindItem, MoveItem
 
 blacksmithingBOD = FindItem( 0x14EF, containerWithBODs, 0x044E )

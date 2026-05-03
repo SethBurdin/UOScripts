@@ -12,6 +12,9 @@ provocationTimerMilliseconds = 10200
 
 from Scripts import config
 # from glossary.items.instruments import FindInstrument
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 from glossary.enemies import GetEnemies
 

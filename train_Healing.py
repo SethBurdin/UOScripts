@@ -7,6 +7,9 @@ Description: Uses bandages on a player's ghost to train Healing
 '''
 
 from config import targetClearDelayMilliseconds
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.items import FindBandage
 from glossary.colors import colors
 

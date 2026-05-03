@@ -15,6 +15,9 @@ numberOfRecallsToSaveFor = 0
 # This will vary depending on which shard you are on
 additionalShardCooldown = 900
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.spells import reagents, spells
 from utilities.items import FindNumberOfItems
 from glossary.colors import colors

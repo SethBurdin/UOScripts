@@ -8,6 +8,9 @@ Description: Trains Spirit Speak to its skill cap
 
 spiritSpeakTimerMilliseconds = 1200
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 
 def TrainSpiritSpeak():

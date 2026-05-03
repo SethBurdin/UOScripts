@@ -12,6 +12,9 @@ if False:
 import datetime
 import os
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.crafting.tailoring import tailoringCraftables
 from glossary.items.cloth import cloth
 

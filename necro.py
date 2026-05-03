@@ -1,6 +1,9 @@
 #rand = 0x0007F232
 #frand = 0x00055BB5
 #frand = 0x00017148
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
  
 #frand = Target.PromptTarget(, 0x0000)

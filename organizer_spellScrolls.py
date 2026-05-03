@@ -12,6 +12,9 @@ circleSixBag = 0x42024252
 circleSevenBag = 0x41ACDF7A
 circleEightBag = 0x41AD1D51
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.spells import spells
 from glossary.items.spellScrolls import spellScrolls
 spellScrollIDs = [ spellScrolls[ scroll ].itemID for scroll in spellScrolls ]

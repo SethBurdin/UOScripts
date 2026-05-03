@@ -12,6 +12,9 @@ houseTopLeftCornerY = 452
 houseBottomRightCornerX = 987
 houseBottomRightCornerY = 469
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from utilities.items import FindItem, MoveItem, FindNumberOfItems
 from glossary.items.reagents import reagents
 from glossary.colors import colors

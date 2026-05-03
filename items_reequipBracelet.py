@@ -3,6 +3,9 @@ Description: Repeatedly removes the bracelet and puts it back on.
     Useful for triggering on-equip effects (e.g. mana regeneration resets).
 '''
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from utilities.items import MoveItem
 from glossary.colors import colors
 from Scripts import config

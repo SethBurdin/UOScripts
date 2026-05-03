@@ -23,6 +23,9 @@ try:
 except Exception as _reload_err:
     Misc.SendMessage( '[PATROL] WARNING: tameables reload failed: %s' % str( _reload_err ), 1100 )
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 from utilities.mobiles import GetEmptyMobileList
 from Scripts import config

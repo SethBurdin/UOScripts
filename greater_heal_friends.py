@@ -1,4 +1,8 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from utilities.items import FindItem
+from utilities.mobiles import GetEmptyMobileList
 from glossary.colors import colors
 from System.Collections.Generic import List
 
@@ -60,9 +64,8 @@ def HealPets():
     petFilter.RangeMin = 0
     petFilter.RangeMax = 8
     
-    pets = Mobiles.ApplyFilter( petFilter )
-    # Explicitly filter out ghosts (should be redundant, but extra safe)
-    pets = [pet for pet in pets if not pet.IsGhost]
+    pets = GetEmptyMobileList(Mobiles)
+    pets.AddRange(Mobiles.ApplyFilter(petFilter))
     if len(pets) == 0:
         return
 
@@ -70,8 +73,8 @@ def HealPets():
 
     if petToHeal.Hits == petToHeal.HitsMax:
         petFilter.Poisoned = 1
-        pets = Mobiles.ApplyFilter(petFilter)
-        pets = [pet for pet in pets if not pet.IsGhost]
+        pets = GetEmptyMobileList(Mobiles)
+        pets.AddRange(Mobiles.ApplyFilter(petFilter))
         if len(pets) == 0:
             return
         else:
@@ -102,13 +105,10 @@ def BlessFriends():
     petFilter.RangeMin = 0
     petFilter.RangeMax = 8
 
-    pets = Mobiles.ApplyFilter( petFilter )
-    pets = [ pet for pet in pets if not pet.IsGhost ]
+    pets = GetEmptyMobileList(Mobiles)
+    pets.AddRange(Mobiles.ApplyFilter(petFilter))
 
     for pet in pets:
-        props = pet.GetProperties()
-        if props and any( 'Blessed' in str( p ) for p in props ):
-            continue
         Spells.CastMagery( 'Bless' )
         Target.WaitForTarget( 5000, False )
         Target.TargetExecute( pet )

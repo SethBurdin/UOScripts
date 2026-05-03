@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from utilities.items import FindItem, MoveItem
 from glossary.items.reagents import reagents
 from Scripts import config

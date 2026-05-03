@@ -6,6 +6,9 @@ Last Contribution By: TheWarDoctor95 - April 16, 2019
 Description: Uses the selected target to train Item Identification to its cap
 '''
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 
 itemIdentificationTimerMilliseconds = 1200

@@ -10,6 +10,9 @@ Description: Uses lockpicks on a non-GM tinker box and a GM tinker box to train
 lockpickingTimerMilliseconds = 4200
 hidingTimerMilliseconds = 10200
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 from glossary.items.tools import tools
 from utilities.items import FindItem

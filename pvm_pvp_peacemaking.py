@@ -13,6 +13,9 @@ Description: Uses the Peacemaking skill on nearby enemies.
 showTargets = True
 ## End of script options ##
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.items.instruments import FindInstrument
 from glossary.enemies import GetEnemyNotorieties, GetEnemies
 from utilities.mobiles import GetEmptyMobileList

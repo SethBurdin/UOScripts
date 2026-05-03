@@ -31,6 +31,9 @@ targetClearDelayMilliseconds = 100
 
 
 from glossary import items
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.enemies import GetEnemyNotorieties
 from glossary import spells
 from glossary import tameables

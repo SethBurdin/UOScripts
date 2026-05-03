@@ -13,6 +13,9 @@ import json
 import os
 import time
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 from utilities.mobiles import GetEmptyMobileList
 from Scripts import config

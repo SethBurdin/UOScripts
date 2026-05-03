@@ -1,4 +1,7 @@
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.items.ores import ores 
 from glossary.items.ingots import ingots
 from glossary.colors import colors

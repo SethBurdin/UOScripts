@@ -13,6 +13,9 @@ Beetle detection is automatic — no friending required.
     Set BEETLE_SERIAL to pin a specific beetle; leave 0 to auto-detect.
 '''
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 
 #  Config

@@ -8,6 +8,9 @@ Description: Trains Tracking to its skill cap
 
 trackingTimerMilliseconds = 10500
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 
 def TrainTracking():

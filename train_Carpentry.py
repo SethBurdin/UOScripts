@@ -6,6 +6,9 @@ Last Contribution By: TheWarDoctor95 - April 26, 2019
 Description: Trains Carpentry to its cap
 '''
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 from glossary.crafting.carpentry import FindCarpentryTool, carpentryCraftables
 from glossary.items.containers import FindTrashBarrel

@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.colors import colors
 
 bandages = Items.FindByID( 0x0E21, -1, Player.Backpack.Serial )

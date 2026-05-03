@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from glossary.crafting.craftable import Craftable
 from glossary.items.tools import tools
 from utilities.gumps import GumpSelection

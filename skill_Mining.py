@@ -1,3 +1,6 @@
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from utilities.items import FindItem, FindNumberOfItems, MoveItem
 from glossary.items.ores import ores
 from glossary.colors import colors
