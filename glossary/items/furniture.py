@@ -1,4 +1,4 @@
-from Scripts.utilities.items import items
+from utilities.items import items
 
 furniture = {
     'anvil': myItem( 'anvil', 0x0FB0, 0x0000, 'furniture', None ),

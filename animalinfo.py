@@ -1,7 +1,7 @@
-from Scripts.glossary import items
-from Scripts.glossary.enemies import GetEnemyNotorieties
-from Scripts.glossary import spells
-from Scripts.glossary import tameables
+from glossary import items
+from glossary.enemies import GetEnemyNotorieties
+from glossary import spells
+from glossary import tameables
 from System.Collections.Generic import List
 from System import Byte
 

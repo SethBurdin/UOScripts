@@ -1,8 +1,8 @@
 global ores
-from Scripts.glossary.items.ores import ores
-from Scripts.glossary.colors import colors
+from glossary.items.ores import ores
+from glossary.colors import colors
 from Scripts import config
-from Scripts.utilities.items import FindItem, FindNumberOfItems, MoveItem
+from utilities.items import FindItem, FindNumberOfItems, MoveItem
 
 
 global oretype

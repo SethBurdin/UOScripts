@@ -1,4 +1,4 @@
-from Scripts.glossary.items.moongates import FindMoongates
+from glossary.items.moongates import FindMoongates
 if Player.Name == 'Dextin Martin':
     Items.UseItem( 0x4052B274 )
     elif Player.Name == 'Flyintamez':

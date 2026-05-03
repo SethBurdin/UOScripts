@@ -9,8 +9,8 @@ Description: Uses the Peacemaking skill on the player to train Peacemaking to GM
 peacemakingTimerMilliseconds = 10200
 
 from System.Collections.Generic import List
-from Scripts.glossary.items.instruments import FindInstrument
-from Scripts.glossary.enemies import GetEnemyNotorieties, GetEnemies
+from glossary.items.instruments import FindInstrument
+from glossary.enemies import GetEnemyNotorieties, GetEnemies
 from Scripts import config
 
 

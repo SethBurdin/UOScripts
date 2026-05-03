@@ -22,9 +22,9 @@ Description: Wool Collector — complete wool-to-cloth pipeline.
 
 import time
 
-from Scripts.glossary.colors import colors
-from Scripts.glossary.items.tools import tools
-from Scripts.utilities.items import FindItem, MoveItem
+from glossary.colors import colors
+from glossary.items.tools import tools
+from utilities.items import FindItem, MoveItem
 from Scripts import config
 from System.Collections.Generic import List
 from System import Int32

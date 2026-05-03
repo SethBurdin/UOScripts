@@ -1,6 +1,6 @@
-from Scripts.utilities.gumps import GumpSelection
-from Scripts.glossary.items.tools import tools
-from Scripts.utilities.items import FindItem
+from utilities.gumps import GumpSelection
+from glossary.items.tools import tools
+from utilities.items import FindItem
 
 tailoringTools = [ tools[ 'sewing kit' ] ]
 

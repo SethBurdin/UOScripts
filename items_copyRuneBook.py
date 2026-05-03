@@ -7,8 +7,8 @@
 
 import re
 from Scripts import config
-from Scripts.glossary.colors import colors
-from Scripts.utilities.items import FindNumberOfItems
+from glossary.colors import colors
+from utilities.items import FindNumberOfItems
 
 def PromptRunebook( promptString ):
     runebookSerial = Target.PromptTarget( promptString )

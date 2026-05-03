@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem, FindItem
+from utilities.items import myItem, FindItem
 
 tools = {
     # Blacksmithing

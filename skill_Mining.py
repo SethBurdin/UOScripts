@@ -1,6 +1,6 @@
-from Scripts.utilities.items import FindItem, FindNumberOfItems, MoveItem
-from Scripts.glossary.items.ores import ores
-from Scripts.glossary.colors import colors
+from utilities.items import FindItem, FindNumberOfItems, MoveItem
+from glossary.items.ores import ores
+from glossary.colors import colors
 
 useMount = True
 usePetStorage = True

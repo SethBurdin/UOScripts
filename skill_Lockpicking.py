@@ -1,7 +1,7 @@
 from Scripts import config
-from Scripts.glossary.colors import colors
-from Scripts.glossary.items.tools import tools
-from Scripts.utilities.items import FindItem
+from glossary.colors import colors
+from glossary.items.tools import tools
+from utilities.items import FindItem
 
 def UseLockpicking():
     lockpicks = FindItem( tools[ 'lockpick' ].itemID, Player.Backpack )

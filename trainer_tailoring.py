@@ -12,8 +12,8 @@ if False:
 import datetime
 import os
 
-from Scripts.glossary.crafting.tailoring import tailoringCraftables
-from Scripts.glossary.items.cloth import cloth
+from glossary.crafting.tailoring import tailoringCraftables
+from glossary.items.cloth import cloth
 
 # ---------------------------------------------------------------------------
 # Config — edit this block

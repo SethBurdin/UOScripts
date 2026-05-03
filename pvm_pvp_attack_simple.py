@@ -11,8 +11,8 @@ if False:
     from razorenhanced_stubs import *
 
 from System.Collections.Generic import List
-from Scripts.glossary.enemies import GetEnemyNotorieties, GetEnemies
-from Scripts.utilities.mobiles import GetEmptyMobileList
+from glossary.enemies import GetEnemyNotorieties, GetEnemies
+from utilities.mobiles import GetEmptyMobileList
 
 def FindEnemy():
     '''

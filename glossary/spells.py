@@ -1,4 +1,4 @@
-from Scripts.glossary.items.reagents import reagents
+from glossary.items.reagents import reagents
 
 spellReagents = {
     # First Circle

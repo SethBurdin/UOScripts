@@ -29,7 +29,7 @@ import os
 import re
 import math
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 # ── Config ──────────────────────────────────────────────────────────────────────
 LOCATIONS_FILE   = os.path.join( os.path.dirname( __file__ ), 'runebook_locations.json' )

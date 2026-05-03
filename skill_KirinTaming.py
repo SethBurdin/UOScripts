@@ -7,9 +7,9 @@ Description: Patrols the Kirin/Unicorn spawn area in Ilshenar,
 import json
 import os
 
-from Scripts.glossary.colors import colors
-from Scripts.glossary.enemies import GetEnemies
-from Scripts.utilities.mobiles import GetEmptyMobileList
+from glossary.colors import colors
+from glossary.enemies import GetEnemies
+from utilities.mobiles import GetEmptyMobileList
 from Scripts import config
 from System.Collections.Generic import List
 from System import Int32

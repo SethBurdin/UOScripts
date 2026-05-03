@@ -1,7 +1,7 @@
-from Scripts.glossary.items.miscellaneous import miscellaneous
-from Scripts.glossary.items.ingots import ingots
-from Scripts.glossary.colors import colors
-from Scripts.utilities.items import FindItem, MoveItem
+from glossary.items.miscellaneous import miscellaneous
+from glossary.items.ingots import ingots
+from glossary.colors import colors
+from utilities.items import FindItem, MoveItem
 
 nameOfItemsToDeposit = [ 'gold coin' ]
 nameOfIngotsToDeposit = [ 'dull copper ingot', 'shadow iron ingot',

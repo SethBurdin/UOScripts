@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem
+from utilities.items import myItem
 
 statuettes = {
     'dread spider statuette': myItem( 'dread spider statuette', 0x25C4, 0x0000, 'statuette', 1 ),

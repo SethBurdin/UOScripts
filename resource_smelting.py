@@ -8,8 +8,8 @@ Description: Smelts all ore into ingots
 
 enableSmeltFromPet = True
 
-from Scripts.glossary.items.ores import ores
-from Scripts.glossary.colors import colors
+from glossary.items.ores import ores
+from glossary.colors import colors
 from Scripts import config
 
 messages = [

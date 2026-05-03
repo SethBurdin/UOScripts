@@ -8,7 +8,7 @@ Description: Trains Spirit Speak to its skill cap
 
 spiritSpeakTimerMilliseconds = 1200
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 def TrainSpiritSpeak():
     '''

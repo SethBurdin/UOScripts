@@ -1,11 +1,11 @@
-from Scripts.glossary.items.armor import armor
-from Scripts.glossary.items.gems import gems
-from Scripts.glossary.items.miscellaneous import miscellaneous
-from Scripts.glossary.items.shields import shields
-from Scripts.glossary.items.spellScrolls import spellScrolls
-from Scripts.glossary.items.weapons import weapons
-from Scripts.utilities.items import FindItem, MoveItem
-from Scripts.glossary.colors import colors
+from glossary.items.armor import armor
+from glossary.items.gems import gems
+from glossary.items.miscellaneous import miscellaneous
+from glossary.items.shields import shields
+from glossary.items.spellScrolls import spellScrolls
+from glossary.items.weapons import weapons
+from utilities.items import FindItem, MoveItem
+from glossary.colors import colors
 
 goldChest = 0x40100558
 

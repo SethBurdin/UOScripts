@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem
+from utilities.items import myItem
 
 potions = {
     'keg of greater strength potions': myItem( 'keg of greater strength potions', 0x1940, 0x03B8, 'potion', 1 ),

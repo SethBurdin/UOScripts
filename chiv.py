@@ -1,4 +1,4 @@
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
  
 #frand = Target.PromptTarget(, 0x0000)
 

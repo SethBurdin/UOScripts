@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem
+from utilities.items import myItem
 
 wood = {
     # Weights are set to None since the weight varies depending on the player's mining skill

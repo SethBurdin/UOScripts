@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem
+from utilities.items import myItem
 from System.Collections.Generic import List
 
 containers = {

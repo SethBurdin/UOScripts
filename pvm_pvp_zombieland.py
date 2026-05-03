@@ -1,4 +1,4 @@
-from Scripts.glossary.enemies import GetEnemyNotorieties
+from glossary.enemies import GetEnemyNotorieties
 
 def AttackEnemy():
     mobilesFilter = Mobiles.Filter()

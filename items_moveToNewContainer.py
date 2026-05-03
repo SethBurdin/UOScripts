@@ -1,4 +1,4 @@
-from Scripts.utilities.items import MoveItem
+from utilities.items import MoveItem
 from Scripts import config
 
 sourceBox = Target.PromptTarget( 'Select container to move items out of' )

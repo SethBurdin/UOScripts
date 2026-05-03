@@ -1,7 +1,7 @@
-from Scripts.glossary import items
-from Scripts.glossary.enemies import GetEnemyNotorieties
-from Scripts.glossary import spells
-from Scripts.glossary import tameables
+from glossary import items
+from glossary.enemies import GetEnemyNotorieties
+from glossary import spells
+from glossary import tameables
 from System.Collections.Generic import List
 from System import Byte
 
@@ -27,9 +27,9 @@ bandageBeingApplied = False
 
 
 from Scripts import config
-from Scripts.glossary.items.instruments import FindInstrument
-from Scripts.glossary.colors import colors
-from Scripts.glossary.enemies import GetEnemies
+from glossary.items.instruments import FindInstrument
+from glossary.colors import colors
+from glossary.enemies import GetEnemies
 
 
 

@@ -1,8 +1,8 @@
-from Scripts.glossary.items.containers import FindTrashBarrel
-from Scripts.glossary.items.miscellaneous import miscellaneous
-from Scripts.glossary.crafting.cartography import cartographyTools, cartographyCraftables
-from Scripts.glossary.colors import colors
-from Scripts.utilities.items import FindItem, FindNumberOfItems, MoveItem
+from glossary.items.containers import FindTrashBarrel
+from glossary.items.miscellaneous import miscellaneous
+from glossary.crafting.cartography import cartographyTools, cartographyCraftables
+from glossary.colors import colors
+from utilities.items import FindItem, FindNumberOfItems, MoveItem
 
 def FindTool( container ):
     '''

@@ -51,15 +51,15 @@ msgColor = 68
 self = Mobiles.FindBySerial( Player.Serial )
 
 from Scripts import config
-from Scripts.glossary.items.armor import armor
-from Scripts.glossary.items.clothing import clothingInTreasureChests
-from Scripts.glossary.items.gems import gems
-from Scripts.glossary.items.reagents import reagents
-from Scripts.glossary.items.shields import shields
-from Scripts.glossary.items.spellScrolls import spellScrolls
-from Scripts.glossary.items.weapons import weapons
-from Scripts.utilities.items import FindItem, MoveItem
-from Scripts.glossary.colors import colors
+from glossary.items.armor import armor
+from glossary.items.clothing import clothingInTreasureChests
+from glossary.items.gems import gems
+from glossary.items.reagents import reagents
+from glossary.items.shields import shields
+from glossary.items.spellScrolls import spellScrolls
+from glossary.items.weapons import weapons
+from utilities.items import FindItem, MoveItem
+from glossary.colors import colors
 
 def GetBag ( sharedValue, promptString ):
     if Misc.CheckSharedValue( sharedValue ):

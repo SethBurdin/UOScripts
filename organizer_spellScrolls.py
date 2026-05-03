@@ -12,10 +12,10 @@ circleSixBag = 0x42024252
 circleSevenBag = 0x41ACDF7A
 circleEightBag = 0x41AD1D51
 
-from Scripts.glossary.spells import spells
-from Scripts.glossary.items.spellScrolls import spellScrolls
+from glossary.spells import spells
+from glossary.items.spellScrolls import spellScrolls
 spellScrollIDs = [ spellScrolls[ scroll ].itemID for scroll in spellScrolls ]
-from Scripts.utilities.items import MoveItem
+from utilities.items import MoveItem
 
 for item in containerToSort.Contains:
     if item.ItemID in spellScrollIDs:

@@ -1,4 +1,4 @@
-from Scripts.utilities.items import MoveItem
+from utilities.items import MoveItem
 
 item = Player.GetItemOnLayer( 'LeftHand' )
 if item != None:

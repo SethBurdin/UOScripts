@@ -7,10 +7,10 @@ Description: Trains Blacksmithy to its cap
 '''
 
 from Scripts import config
-from Scripts.glossary.items.ores import ores
-from Scripts.glossary.crafting.blacksmithing import blacksmithTools, FindBlacksmithTool, blacksmithCraftables
-from Scripts.glossary.colors import colors
-from Scripts.utilities.items import FindItem, FindNumberOfItems, MoveItem
+from glossary.items.ores import ores
+from glossary.crafting.blacksmithing import blacksmithTools, FindBlacksmithTool, blacksmithCraftables
+from glossary.colors import colors
+from utilities.items import FindItem, FindNumberOfItems, MoveItem
 
 # Set to serial of bag or 'pet' for the mount that you are on
 # Set to None if you don't want to keep slayers

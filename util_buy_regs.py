@@ -13,7 +13,7 @@ Beetle detection is automatic — no friending required.
     Set BEETLE_SERIAL to pin a specific beetle; leave 0 to auto-detect.
 '''
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 #  Config
 VENDOR_RANGE       = 11     # tile radius to scan for NPCs

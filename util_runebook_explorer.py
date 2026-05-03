@@ -30,7 +30,7 @@ import json
 import os
 import datetime
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 RUNEBOOK_ITEM_ID = 0x22C5
 RUNEBOOK_GUMP_ID = 89

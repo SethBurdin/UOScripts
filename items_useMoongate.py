@@ -1,4 +1,4 @@
-from Scripts.glossary.items.moongates import FindMoongates
+from glossary.items.moongates import FindMoongates
 
 moongates = FindMoongates( Items )
 if len( moongates ) > 0:

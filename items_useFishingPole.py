@@ -1,5 +1,5 @@
-from Scripts.glossary.items.tools import tools
-from Scripts.utilities.items import FindItem
+from glossary.items.tools import tools
+from utilities.items import FindItem
 
 fishingPole = FindItem( tools[ 'fishing pole' ].itemID, Player.Backpack )
 

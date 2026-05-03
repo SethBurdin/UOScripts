@@ -8,9 +8,9 @@ Description: Patrols a Wardoc spawn area, roaming between waypoints looking
 import json
 import os
 
-from Scripts.glossary.colors import colors
-from Scripts.glossary.enemies import GetEnemies
-from Scripts.utilities.mobiles import GetEmptyMobileList
+from glossary.colors import colors
+from glossary.enemies import GetEnemies
+from utilities.mobiles import GetEmptyMobileList
 from Scripts import config
 # Name of the mob this script targets for taming and pet-kill logic.
 WARDOC_NAME = 'wardoc'

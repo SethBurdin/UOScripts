@@ -8,7 +8,7 @@ Description: Trains Tracking to its skill cap
 
 trackingTimerMilliseconds = 10500
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 def TrainTracking():
     '''

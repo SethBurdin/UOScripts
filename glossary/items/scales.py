@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem
+from utilities.items import myItem
 
 # Dragon scale IDs — standard ServUO/RunUO values.
 # Confirm each against in-game SingleClick if behaviour looks wrong on this shard.

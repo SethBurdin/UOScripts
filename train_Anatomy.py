@@ -6,7 +6,7 @@ Last Contribution By: TheWarDoctor95 - May 28, 2019
 Description: Uses the selected target to train Anatomy to its cap
 '''
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 anatomyTimerMilliseconds = 4200
 

@@ -1,5 +1,5 @@
-from Scripts.glossary.items.tools import tools
-from Scripts.utilities.items import myItem
+from glossary.items.tools import tools
+from utilities.items import myItem
 
 weapons = {
     # Bladed

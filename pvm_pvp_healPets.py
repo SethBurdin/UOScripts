@@ -1,5 +1,5 @@
-from Scripts.utilities.items import FindItem
-from Scripts.glossary.colors import colors
+from utilities.items import FindItem
+from glossary.colors import colors
 from System.Collections.Generic import List
 
 if Misc.ShardName() == 'UO Evolution':

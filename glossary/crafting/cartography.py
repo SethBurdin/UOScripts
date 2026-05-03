@@ -1,5 +1,5 @@
-from Scripts.utilities.gumps import GumpSelection
-from Scripts.glossary.items.tools import tools
+from utilities.gumps import GumpSelection
+from glossary.items.tools import tools
 
 cartographyTools = [ tools[ 'mapmaker\'s pen' ] ]
 

@@ -6,7 +6,7 @@ Last Contribution By: TheWarDoctor95 - April 16, 2019
 Description: Uses the selected target to train Item Identification to its cap
 '''
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 itemIdentificationTimerMilliseconds = 1200
 

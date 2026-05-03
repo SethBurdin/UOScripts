@@ -9,7 +9,7 @@ containerWithBODs = Items.FindBySerial( containerWithBODsSerial )
 Items.UseItem( containerWithBODs )
 Misc.Pause( 700 )
 
-from Scripts.utilities.items import FindItem, MoveItem
+from utilities.items import FindItem, MoveItem
 
 blacksmithingBOD = FindItem( 0x14EF, containerWithBODs, 0x044E )
 while blacksmithingBOD != None:

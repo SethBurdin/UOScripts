@@ -15,9 +15,9 @@ numberOfRecallsToSaveFor = 0
 # This will vary depending on which shard you are on
 additionalShardCooldown = 900
 
-from Scripts.glossary.spells import reagents, spells
-from Scripts.utilities.items import FindNumberOfItems
-from Scripts.glossary.colors import colors
+from glossary.spells import reagents, spells
+from utilities.items import FindNumberOfItems
+from glossary.colors import colors
 
 mageryTimerMilliseconds = 6500
 meditationTimerMilliseconds = 8200

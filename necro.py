@@ -1,7 +1,7 @@
 #rand = 0x0007F232
 #frand = 0x00055BB5
 #frand = 0x00017148
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
  
 #frand = Target.PromptTarget(, 0x0000)
 

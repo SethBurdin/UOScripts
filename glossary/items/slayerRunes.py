@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem
+from utilities.items import myItem
 
 slayerRunes = {
     'p rune': myItem( 'p rune', 0x486B, 0x0027, 'slayer rune', 1 ),

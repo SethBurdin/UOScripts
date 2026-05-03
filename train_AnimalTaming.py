@@ -61,10 +61,10 @@ try:
 except:
     pass  # Razor Enhanced provides these as runtime globals
 
-from Scripts.glossary import items
-from Scripts.glossary.enemies import GetEnemyNotorieties
-from Scripts.glossary import spells
-from Scripts.glossary import tameables
+from glossary import items
+from glossary.enemies import GetEnemyNotorieties
+from glossary import spells
+from glossary import tameables
 # Razor Enhanced caches module objects across script runs with its own loader.
 # Re-execute tameables.py directly into the cached module's namespace so that
 # all animal definitions and helper functions are always current from disk.

@@ -1,7 +1,7 @@
 
-from Scripts.utilities.items import FindItem, FindNumberOfItems, MoveItem
-from Scripts.glossary.colors import colors
-from Scripts.glossary.items.wood import wood
+from utilities.items import FindItem, FindNumberOfItems, MoveItem
+from glossary.colors import colors
+from glossary.items.wood import wood
 from Scripts import config
 
 global chopped

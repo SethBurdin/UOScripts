@@ -14,7 +14,7 @@ import json
 import os
 import time
 
-from Scripts.glossary import tameables
+from glossary import tameables
 # Razor Enhanced caches module objects across script runs — re-execute from disk
 # so that all helper functions (including GetBlueSpawningBodyIDsForPlayerSkill) are current.
 try:
@@ -23,8 +23,8 @@ try:
 except Exception as _reload_err:
     Misc.SendMessage( '[PATROL] WARNING: tameables reload failed: %s' % str( _reload_err ), 1100 )
 
-from Scripts.glossary.colors import colors
-from Scripts.utilities.mobiles import GetEmptyMobileList
+from glossary.colors import colors
+from utilities.mobiles import GetEmptyMobileList
 from Scripts import config
 from System.Collections.Generic import List
 from System import Byte

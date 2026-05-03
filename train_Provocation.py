@@ -11,9 +11,9 @@ autoSelectTarget = True
 provocationTimerMilliseconds = 10200
 
 from Scripts import config
-# from Scripts.glossary.items.instruments import FindInstrument
-from Scripts.glossary.colors import colors
-from Scripts.glossary.enemies import GetEnemies
+# from glossary.items.instruments import FindInstrument
+from glossary.colors import colors
+from glossary.enemies import GetEnemies
 
 def FindItem( itemsToLookFor, items ):
     '''

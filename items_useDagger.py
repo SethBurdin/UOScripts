@@ -1,6 +1,6 @@
-from Scripts.glossary.items.tools import tools
-from Scripts.utilities.items import FindItem
-from Scripts.glossary.colors import colors
+from glossary.items.tools import tools
+from utilities.items import FindItem
+from glossary.colors import colors
 
 dagger = FindItem( tools[ 'dagger' ].itemID, Player.Backpack )
 

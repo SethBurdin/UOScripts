@@ -1,5 +1,5 @@
 from Scripts import config
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 itemSerial = Target.PromptTarget( 'Select item to place' )
 item = Items.FindBySerial( itemSerial )

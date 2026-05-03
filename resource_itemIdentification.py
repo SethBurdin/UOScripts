@@ -5,11 +5,11 @@ sortItems = True
 
 itemIdentificationDelayMilliseconds = 500
 
-from Scripts.glossary.items.armor import armor
-from Scripts.glossary.items.shields import shields
-from Scripts.glossary.items.weapons import weapons
-from Scripts.utilities.items import MoveItem
-from Scripts.glossary.colors import colors
+from glossary.items.armor import armor
+from glossary.items.shields import shields
+from glossary.items.weapons import weapons
+from utilities.items import MoveItem
+from glossary.colors import colors
 from Scripts import config
 
 itemQualityToKeep = [

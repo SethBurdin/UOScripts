@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem
+from utilities.items import myItem
 
 ingots = {
     'agapite ingot': myItem( 'agapite ingot', 0x1BF2, 0x097E, 'ingot', 0.1 ),

@@ -3,8 +3,8 @@ Description: Repeatedly removes the bracelet and puts it back on.
     Useful for triggering on-equip effects (e.g. mana regeneration resets).
 '''
 
-from Scripts.utilities.items import MoveItem
-from Scripts.glossary.colors import colors
+from utilities.items import MoveItem
+from glossary.colors import colors
 from Scripts import config
 
 while not Player.IsGhost:

@@ -48,7 +48,7 @@ import datetime
 import os
 import time
 import random
-from Scripts.utilities.items import FindItem as _FindItem
+from utilities.items import FindItem as _FindItem
 # Import canonical gump menu mapping
 
 # Mapping of magery circle to the top menu button for that circle in the inscription gump

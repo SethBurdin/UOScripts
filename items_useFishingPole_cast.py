@@ -1,4 +1,4 @@
-from Scripts.glossary.items.tools import tools
+from glossary.items.tools import tools
 
 Items.UseItemByID( tools[ 'fishing pole' ].itemID )
     

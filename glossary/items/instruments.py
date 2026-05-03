@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem, FindItem
+from utilities.items import myItem, FindItem
 
 instruments = {
     'bamboo flute': myItem( 'bamboo flute', 0x2805, 0x0000, 'instrument', None ),

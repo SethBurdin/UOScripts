@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem, FindItem
+from utilities.items import myItem, FindItem
 
 healing = {
     'bandage': myItem( 'bandage', 0x0E21, 0x0000, 'healing', 0.1 ),

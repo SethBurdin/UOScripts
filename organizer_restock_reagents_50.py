@@ -12,9 +12,9 @@ houseTopLeftCornerY = 452
 houseBottomRightCornerX = 987
 houseBottomRightCornerY = 469
 
-from Scripts.utilities.items import FindItem, MoveItem, FindNumberOfItems
-from Scripts.glossary.items.reagents import reagents
-from Scripts.glossary.colors import colors
+from utilities.items import FindItem, MoveItem, FindNumberOfItems
+from glossary.items.reagents import reagents
+from glossary.colors import colors
 from Scripts import config
 
 def RestockReagents():

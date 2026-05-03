@@ -1,4 +1,4 @@
-from Scripts.glossary.items.gems import gems
+from glossary.items.gems import gems
 
 containerID = 0x43923D99
 

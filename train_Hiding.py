@@ -8,7 +8,7 @@ Description: Trains Hiding to its skill cap
 
 hidingTimerMilliseconds = 10200
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 def TrainHiding():
     '''

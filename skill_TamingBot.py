@@ -13,8 +13,8 @@ import json
 import os
 import time
 
-from Scripts.glossary.colors import colors
-from Scripts.utilities.mobiles import GetEmptyMobileList
+from glossary.colors import colors
+from utilities.mobiles import GetEmptyMobileList
 from Scripts import config
 from System.Collections.Generic import List
 from System import Int32, Byte
@@ -396,7 +396,7 @@ else:
     # ── General-specific ───────────────────────────────────────────────────────
 
     else:
-        from Scripts.glossary import tameables
+        from glossary import tameables
         try:
             _tameables_path = os.path.join(
                 os.path.dirname( os.path.abspath( __file__ ) ), 'glossary', 'tameables.py'

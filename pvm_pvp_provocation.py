@@ -21,10 +21,10 @@ showTargets = True
 
 import re
 from System.Collections.Generic import List
-from Scripts.glossary.items.instruments import FindInstrument
-from Scripts.glossary.enemies import GetEnemyNotorieties, GetEnemies
-from Scripts.utilities.mobiles import GetEmptyMobileList
-from Scripts.glossary.colors import colors
+from glossary.items.instruments import FindInstrument
+from glossary.enemies import GetEnemyNotorieties, GetEnemies
+from utilities.mobiles import GetEmptyMobileList
+from glossary.colors import colors
 from Scripts import config
 
 enemiesProvodSharedValue = 'enemiesProvod'

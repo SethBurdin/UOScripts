@@ -6,10 +6,10 @@ Last Contribution By: TheWarDoctor95 - April 26, 2019
 Description: Trains Carpentry to its cap
 '''
 
-from Scripts.glossary.colors import colors
-from Scripts.glossary.crafting.carpentry import FindCarpentryTool, carpentryCraftables
-from Scripts.glossary.items.containers import FindTrashBarrel
-from Scripts.utilities.items import FindItem, FindNumberOfItems, MoveItem
+from glossary.colors import colors
+from glossary.crafting.carpentry import FindCarpentryTool, carpentryCraftables
+from glossary.items.containers import FindTrashBarrel
+from utilities.items import FindItem, FindNumberOfItems, MoveItem
 
 # Set to serial of bag or 'pet' for the mount that you are on
 # Set to None if you don't want to keep slayers

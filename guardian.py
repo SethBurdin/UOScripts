@@ -6,7 +6,7 @@
 if False:
     from razorenhanced_stubs import *
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 PET_FOLLOW_RANGE     = 2      # tiles — beyond this the pet is recalled

@@ -17,9 +17,9 @@ except:
 
 from System.Collections.Generic import List
 from System import Int32
-from Scripts.glossary.items.tools import tools
-from Scripts.glossary.items.cloth import cloth
-from Scripts.utilities.items import FindItem
+from glossary.items.tools import tools
+from glossary.items.cloth import cloth
+from utilities.items import FindItem
 
 # ---------------------------------------------------------------------------
 # Configuration

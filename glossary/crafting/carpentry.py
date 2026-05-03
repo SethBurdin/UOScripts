@@ -1,7 +1,7 @@
-from Scripts.glossary.crafting.craftable import Craftable
-from Scripts.glossary.items.tools import tools
-from Scripts.utilities.gumps import GumpSelection
-from Scripts.utilities.items import FindItem
+from glossary.crafting.craftable import Craftable
+from glossary.items.tools import tools
+from utilities.gumps import GumpSelection
+from utilities.items import FindItem
 
 carpentryTools = [
     tools[ 'dovetail saw' ],

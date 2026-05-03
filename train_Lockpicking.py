@@ -10,9 +10,9 @@ Description: Uses lockpicks on a non-GM tinker box and a GM tinker box to train
 lockpickingTimerMilliseconds = 4200
 hidingTimerMilliseconds = 10200
 
-from Scripts.glossary.colors import colors
-from Scripts.glossary.items.tools import tools
-from Scripts.utilities.items import FindItem
+from glossary.colors import colors
+from glossary.items.tools import tools
+from utilities.items import FindItem
 
 lockpickItem = tools[ 'lockpick' ]
 

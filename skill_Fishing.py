@@ -15,10 +15,10 @@ moveForwardBackward = False
 autoFightMacroName = 'cast_EnergyBolt.py'
 
 from Scripts import config
-from Scripts.glossary.colors import colors
-from Scripts.glossary.items.containers import FindHatch
-from Scripts.glossary.items.tools import tools
-from Scripts.utilities.items import FindItem, MoveItem
+from glossary.colors import colors
+from glossary.items.containers import FindHatch
+from glossary.items.tools import tools
+from utilities.items import FindItem, MoveItem
 from System.Collections.Generic import List
 
 fishIDs = [ 0x09CF, 0x09CE, 0x09CC, 0x09CD ]

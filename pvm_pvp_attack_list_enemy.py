@@ -1,4 +1,4 @@
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 
 enemy = Target.GetTargetFromList( 'enemy' )
 if enemy != None:

@@ -1,5 +1,5 @@
-from Scripts.utilities.items import FindItem, MoveItem
-from Scripts.glossary.items.reagents import reagents
+from utilities.items import FindItem, MoveItem
+from glossary.items.reagents import reagents
 from Scripts import config
 
 reagentsBagSharedValue = 'reagentsBag'

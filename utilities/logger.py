@@ -6,7 +6,7 @@ Sends messages in-game and optionally appends timestamped lines to a file.
 
 Usage
 -----
-    from Scripts.utilities.logger import Logger
+    from utilities.logger import Logger
 
     import os
     log = Logger(

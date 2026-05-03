@@ -1,4 +1,4 @@
-from Scripts.utilities.items import myItem
+from utilities.items import myItem
 
 cloth = {
     'cut cloth': myItem( 'cut cloth', 0x1767, 0x07C2, 'tailoring', 10 ),

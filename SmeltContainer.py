@@ -1,9 +1,9 @@
 
 from Scripts import config
-from Scripts.glossary.items.ores import ores
-from Scripts.glossary.crafting.blacksmithing import blacksmithTools, FindBlacksmithTool, blacksmithCraftables
-from Scripts.glossary.colors import colors
-from Scripts.utilities.items import FindItem, FindNumberOfItems, MoveItem
+from glossary.items.ores import ores
+from glossary.crafting.blacksmithing import blacksmithTools, FindBlacksmithTool, blacksmithCraftables
+from glossary.colors import colors
+from utilities.items import FindItem, FindNumberOfItems, MoveItem
 
 
 def SmeltItems( itemID ):

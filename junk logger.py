@@ -1,9 +1,9 @@
 
-from Scripts.glossary.items.ores import wood 
+from glossary.items.ores import wood 
 
-from Scripts.glossary.colors import colors
+from glossary.colors import colors
 from Scripts import config
-from Scripts.utilities.items import FindItem, FindNumberOfItems, MoveItem
+from utilities.items import FindItem, FindNumberOfItems, MoveItem
 
 
 

@@ -6,9 +6,9 @@ Last Contribution By: TheWarDoctor95 - March 20, 2019
 Description: Uses bandages on a player's ghost to train Healing
 '''
 
-from Scripts.config import targetClearDelayMilliseconds
-from Scripts.glossary.items import FindBandage
-from Scripts.glossary.colors import colors
+from config import targetClearDelayMilliseconds
+from glossary.items import FindBandage
+from glossary.colors import colors
 
 def TrainHealing():
     '''

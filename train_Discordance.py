@@ -17,9 +17,9 @@ debugMode                 = True    # set to False once outcome detection is wor
                                     # when True, unmatched journal lines are printed to chat
 
 from Scripts import config
-from Scripts.glossary.items.instruments import FindInstrument
-from Scripts.glossary.colors import colors
-from Scripts.glossary.enemies import GetEnemies
+from glossary.items.instruments import FindInstrument
+from glossary.colors import colors
+from glossary.enemies import GetEnemies
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
 
