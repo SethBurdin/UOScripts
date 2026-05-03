@@ -10,6 +10,9 @@ Description: Finds the nearest enemy to attack. Prioritizes enemies in war mode
 if False:
     from razorenhanced_stubs import *
 
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from System.Collections.Generic import List
 from glossary.enemies import GetEnemyNotorieties, GetEnemies
 from utilities.mobiles import GetEmptyMobileList
