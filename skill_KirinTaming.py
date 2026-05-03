@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from glossary.colors import colors
 from glossary.enemies import GetEnemies
 from utilities.mobiles import GetEmptyMobileList
-from Scripts import config
+import config
 from System.Collections.Generic import List
 from System import Int32
 

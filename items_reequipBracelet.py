@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from utilities.items import MoveItem
 from glossary.colors import colors
-from Scripts import config
+import config
 
 while not Player.IsGhost:
     bracelet = Player.GetItemOnLayer( 'Bracelet' )

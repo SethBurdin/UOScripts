@@ -16,7 +16,7 @@ MIN_MAGERY_SKILL          = 52.0    # minimum Magery for Invisibility (6th circl
 debugMode                 = True    # set to False once outcome detection is working;
                                     # when True, unmatched journal lines are printed to chat
 
-from Scripts import config
+import config
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 

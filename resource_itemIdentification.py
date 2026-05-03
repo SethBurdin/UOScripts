@@ -13,7 +13,7 @@ from glossary.items.shields import shields
 from glossary.items.weapons import weapons
 from utilities.items import MoveItem
 from glossary.colors import colors
-from Scripts import config
+import config
 
 itemQualityToKeep = [
     # Strength

@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from glossary.items.ores import wood 
 
 from glossary.colors import colors
-from Scripts import config
+import config
 from utilities.items import FindItem, FindNumberOfItems, MoveItem
 
 

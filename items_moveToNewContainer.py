@@ -2,7 +2,7 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from utilities.items import MoveItem
-from Scripts import config
+import config
 
 sourceBox = Target.PromptTarget( 'Select container to move items out of' )
 sourceBoxItem = Items.FindBySerial( sourceBox )

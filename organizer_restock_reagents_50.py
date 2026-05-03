@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from utilities.items import FindItem, MoveItem, FindNumberOfItems
 from glossary.items.reagents import reagents
 from glossary.colors import colors
-from Scripts import config
+import config
 
 def RestockReagents():
     global restockTo

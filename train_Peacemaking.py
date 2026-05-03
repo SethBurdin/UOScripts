@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from glossary.items.instruments import FindInstrument
 from glossary.enemies import GetEnemyNotorieties, GetEnemies
-from Scripts import config
+import config
 
 
 '''

@@ -1,4 +1,4 @@
-from Scripts import config
+import config
 
 class myItem:
     name = None

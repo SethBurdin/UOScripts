@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from glossary.colors import colors
 from glossary.enemies import GetEnemies
 from utilities.mobiles import GetEmptyMobileList
-from Scripts import config
+import config
 # Name of the mob this script targets for taming and pet-kill logic.
 WARDOC_NAME = 'wardoc'
 

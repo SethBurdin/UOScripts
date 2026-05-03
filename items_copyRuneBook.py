@@ -6,7 +6,7 @@
 #   Select the correct book when the target comes up for 'Select item to recall off of to return to runebook being copied'
 
 import re
-from Scripts import config
+import config
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 

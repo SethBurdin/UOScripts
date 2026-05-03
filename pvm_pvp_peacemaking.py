@@ -20,7 +20,7 @@ from glossary.items.instruments import FindInstrument
 from glossary.enemies import GetEnemyNotorieties, GetEnemies
 from utilities.mobiles import GetEmptyMobileList
 from glossary.colors import colors
-from Scripts import config
+import config
 
 enemiesPeacedSharedValue = 'enemiesPeaced'
 

@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from glossary.items.ores import ores
 from glossary.colors import colors
-from Scripts import config
+import config
 
 messages = [
     'You smelt the ore removing the impurities and put the metal in your backpack.',

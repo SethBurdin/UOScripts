@@ -29,7 +29,7 @@ timesTried = 0
 bandageBeingApplied = False
 
 
-from Scripts import config
+import config
 from glossary.items.instruments import FindInstrument
 from glossary.colors import colors
 from glossary.enemies import GetEnemies

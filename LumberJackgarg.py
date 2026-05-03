@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from utilities.items import FindItem, FindNumberOfItems, MoveItem
 from glossary.colors import colors
 from glossary.items.wood import wood
-from Scripts import config
+import config
 
 global chopped
 chopped = False

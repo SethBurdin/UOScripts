@@ -10,7 +10,7 @@ Description: Uses the instruments from the player's backpack and the selected or
 autoSelectTarget = True
 provocationTimerMilliseconds = 10200
 
-from Scripts import config
+import config
 # from glossary.items.instruments import FindInstrument
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))

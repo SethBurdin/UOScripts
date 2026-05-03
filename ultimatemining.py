@@ -2,7 +2,7 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from utilities.items import FindItem, FindNumberOfItems, MoveItem
-from Scripts import config
+import config
 from glossary.colors import colors
 from glossary.items.ores import ores
 # global ores

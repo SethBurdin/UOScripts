@@ -6,7 +6,7 @@ Last Contribution By: TheWarDoctor95 - April 26, 2019
 Description: Trains Blacksmithy to its cap
 '''
 
-from Scripts import config
+import config
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
