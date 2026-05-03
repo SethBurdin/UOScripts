@@ -21,7 +21,7 @@ from Scripts.glossary.items.cloth import cloth
 
 MATERIALS_CHEST_SERIAL = 0x400ADEF7  # serial of the chest holding cloth/leather
 SEWING_KIT_ID          = 0x0F9D     # item type ID for sewing kit
-LOG_FILE               = r'C:\Users\sethb\apps\razor-enhanced\trainer_tailoring.log'
+LOG_FILE               = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'trainer_tailoring.log')
 
 CRAFT_GUMP_ID   = 949095101
 GUMP_WAIT_MS    = 5000   # ms to wait for the sewing kit gump to open

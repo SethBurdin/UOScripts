@@ -39,9 +39,14 @@ BEETLE_SERIAL    = 0x0000476D
 
 # Item IDs for hides / leather that appear on / from a corpse
 HIDE_ITEM_IDS = [
-    cloth['piles of hides'].itemID,   # 0x1079  raw hides on corpse
+    cloth['piles of hides'].itemID,    # 0x1079  raw hides on corpse
     cloth['pieces of leather'].itemID, # 0x1081  cut leather after skinning
 ]
+
+# Dragon scale IDs — confirm against in-game SingleClick if wrong on this shard
+SCALE_ITEM_IDS = [0x26B4, 0x26B5, 0x26B6, 0x26B7, 0x26B8, 0x26B9]
+
+RESOURCE_ITEM_IDS = set(HIDE_ITEM_IDS + SCALE_ITEM_IDS)
 
 # ---------------------------------------------------------------------------
 # Logging helper (inline — avoids module import issues in IronPython)
@@ -190,38 +195,33 @@ def find_beetle():
 # Step 4 - Transfer leather from corpse to beetle
 # ---------------------------------------------------------------------------
 
-def transfer_leather(corpse, beetle):
+def transfer_resources(corpse, beetle):
     '''
-    Dismounts, moves all hide / leather stacks from *corpse* to the beetle
-    (by serial — RE accepts a mobile serial as the move destination),
-    then remounts.
-    Returns the total number of stacks moved.
+    Dismounts, moves all hides and dragon scales from *corpse* to the beetle,
+    then remounts.  Returns the total number of stacks moved.
     '''
-    # Dismount so the beetle's storage is accessible
     mounted = Player.Mount is not None
     if mounted:
         Mobiles.UseMobile(Player.Serial)
         Misc.Pause(ACTION_DELAY_MS)
 
-    # Open the corpse so its contents are loaded
     Items.UseItem(corpse.Serial)
     Items.WaitForContents(corpse.Serial, 2500)
     Misc.Pause(ACTION_DELAY_MS)
 
     moved = 0
     for item in list(corpse.Contains):
-        if item.ItemID in HIDE_ITEM_IDS:
+        if item.ItemID in RESOURCE_ITEM_IDS:
             log('Moving %ix %s (0x%04X) to beetle.' % (item.Amount, item.Name, item.ItemID))
             Items.Move(item, beetle.Serial, 0)
             Misc.Pause(MOVE_PAUSE_MS)
             moved += 1
 
     if moved == 0:
-        log('No leather found on corpse 0x%X after skinning.' % corpse.Serial, 'warn')
+        log('No hides or scales on corpse 0x%X after skinning.' % corpse.Serial, 'warn')
     else:
-        log('%i leather stack(s) transferred to beetle.' % moved, 'ok')
+        log('%i stack(s) transferred to beetle.' % moved, 'ok')
 
-    # Remount
     if mounted:
         Mobiles.UseMobile(beetle.Serial)
         Misc.Pause(ACTION_DELAY_MS)
@@ -260,4 +260,4 @@ else:
 
             for corpse in skinnable:
                 if skin_corpse(tool, corpse):
-                    transfer_leather(corpse, beetle)
+                    transfer_resources(corpse, beetle)

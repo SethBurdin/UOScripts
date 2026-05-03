@@ -20,8 +20,10 @@ Description: Runebook explorer -- opens a runebook gump, parses its rune data,
         Lines N+20+    : name+coord pairs (2 lines per filled, 1 "Empty" per unused)
 
     Gate Travel button formula (confirmed from in-game tests):
-        button = 98 + slot_index  (0-based)
+        button = 100 + slot_index  (0-based)
         slot 0 -> 100, slot 4 -> 104, slot 6 -> 106
+    NOTE: if you scanned books before this was confirmed, re-run the explorer
+    to regenerate runebook_locations.json with correct gate_button values.
 '''
 
 import json

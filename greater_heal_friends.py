@@ -61,39 +61,66 @@ def HealPets():
     petFilter.RangeMax = 8
     
     pets = Mobiles.ApplyFilter( petFilter )
-    
-    if len( pets ) == 0:
+    # Explicitly filter out ghosts (should be redundant, but extra safe)
+    pets = [pet for pet in pets if not pet.IsGhost]
+    if len(pets) == 0:
         return
-    
-    petToHeal = Mobiles.Select( pets, 'Weakest' )
-    
-    if petToHeal.Hits == petToHeal.HitsMax :
+
+    petToHeal = Mobiles.Select(pets, 'Weakest')
+
+    if petToHeal.Hits == petToHeal.HitsMax:
         petFilter.Poisoned = 1
-        pets = Mobiles.ApplyFilter( petFilter )
-        if len( pets ) == 0:
+        pets = Mobiles.ApplyFilter(petFilter)
+        pets = [pet for pet in pets if not pet.IsGhost]
+        if len(pets) == 0:
             return
         else:
-            petToHeal = Mobiles.Select( pets, 'Weakest' )
+            petToHeal = Mobiles.Select(pets, 'Weakest')
     if not petToHeal.Poisoned:
         Spells.CastMagery("Greater Heal")
-        Target.WaitForTarget( 5000, False )
-        Target.TargetExecute( petToHeal )
-        Player.HeadMessage( colors[ 'cyan' ], 'Healing %s (currently %i%% health)' % ( petToHeal.Name, ( float( petToHeal.Hits ) / float( petToHeal.HitsMax ) * 100 ) ) )
-        Misc.Pause( 1700 )
+        Target.WaitForTarget(5000, False)
+        Target.TargetExecute(petToHeal)
+        Player.HeadMessage(colors['cyan'], 'Healing %s (currently %i%% health)' % (petToHeal.Name, (float(petToHeal.Hits) / float(petToHeal.HitsMax) * 100)))
+        Misc.Pause(1700)
     elif petToHeal.Poisoned:
         Spells.CastMagery("Arch Cure")
-        Target.WaitForTarget( 4000, False )
-        Target.TargetExecute( petToHeal )
-        Player.HeadMessage( colors[ 'cyan' ], 'Curing %s (currently %i%% health)' % ( petToHeal.Name, ( float( petToHeal.Hits ) / float( petToHeal.HitsMax ) * 100 ) ) )
-        Misc.Pause( 1500 )
-        
-        
-         
+        Target.WaitForTarget(4000, False)
+        Target.TargetExecute(petToHeal)
+        Player.HeadMessage(colors['cyan'], 'Curing %s (currently %i%% health)' % (petToHeal.Name, (float(petToHeal.Hits) / float(petToHeal.HitsMax) * 100)))
+        Misc.Pause(1500)
 
     # WaitForBandagesToApply()
     return
 
 
+BLESS_CHECK_TICKS = 200   # ~30 s at 150 ms per idle tick
+
+def BlessFriends():
+    petFilter          = Mobiles.Filter()
+    petFilter.IsGhost  = 0
+    petFilter.Friend   = 1
+    petFilter.RangeMin = 0
+    petFilter.RangeMax = 8
+
+    pets = Mobiles.ApplyFilter( petFilter )
+    pets = [ pet for pet in pets if not pet.IsGhost ]
+
+    for pet in pets:
+        props = pet.GetProperties()
+        if props and any( 'Blessed' in str( p ) for p in props ):
+            continue
+        Spells.CastMagery( 'Bless' )
+        Target.WaitForTarget( 5000, False )
+        Target.TargetExecute( pet )
+        Player.HeadMessage( colors['cyan'], 'Blessing %s' % pet.Name )
+        Misc.Pause( 1700 )
+
+
+bless_counter = BLESS_CHECK_TICKS   # fire on first pass
 while not Player.IsGhost:
     HealPets()
+    bless_counter += 1
+    if bless_counter >= BLESS_CHECK_TICKS:
+        BlessFriends()
+        bless_counter = 0
     Misc.Pause( 150 )

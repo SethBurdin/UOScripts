@@ -8,9 +8,10 @@ Usage
 -----
     from Scripts.utilities.logger import Logger
 
+    import os
     log = Logger(
         enabled  = True,
-        log_file = r'C:\\Users\\sethb\\apps\\razor-enhanced\\my_script.log',
+        log_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'my_script.log'),
     )
 
     log('starting up')                   # default color (cyan)

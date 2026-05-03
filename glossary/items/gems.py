@@ -45,21 +45,21 @@ gems = {
     ),
     'sapphire': myItem(
         name = 'sapphire',
-        itemID = 0x0F19,
+        itemID = 0x0F11,  # confirmed in-game (standard 0x0F19 is wrong on this shard)
         color = 0x0000,
         category = 'gem',
         weight = 0.1
     ),
     'star sapphire': myItem(
         name = 'star sapphire',
-        itemID = 0x0F21,
+        itemID = 0x0F0F,  # confirmed in-game (standard 0x0F21 is wrong on this shard)
         color = 0x0000,
         category = 'gem',
         weight = 0.1
     ),
     'tourmaline': myItem(
         name = 'tourmaline',
-        itemID = 0x0F2D,
+        itemID = 0x0F18,  # confirmed in-game (standard 0x0F2D is wrong on this shard)
         color = 0x0000,
         category = 'gem',
         weight = 0.1

@@ -6,6 +6,8 @@ Last Contribution By: TheWarDoctor95 - March 19, 2019
 Description: Tames nearby animals to train Animal Taming to GM
 '''
 
+import os
+
 ## Script options ##
 # Increment this whenever you make a change - if the wrong version prints at startup, remove/re-add the script in Razor
 SCRIPT_VERSION = '2026-03-17-b'
@@ -41,7 +43,7 @@ enablePeacemaking = False
 enableFollowAnimal = True
 # Path to a shared file for coordinating targets between multiple Razor Enhanced clients.
 # Both clients must use the same path. Set to None to disable multi-client coordination.
-SHARED_CLAIMS_FILE = r'C:\Users\sethb\apps\razor-enhanced\taming_shared_claims.txt'
+SHARED_CLAIMS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'taming_shared_claims.txt')
 # How long (seconds) before a claim in the shared file is considered stale/expired.
 # Set higher than your longest possible taming attempt.
 SHARED_CLAIM_EXPIRY_SECONDS = 120

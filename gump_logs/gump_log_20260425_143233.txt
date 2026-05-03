@@ -1,0 +1,77 @@
+Current Gump ID: 2653346093
+---- TEXT ----
+<CENTER>INSCRIPTION MENU</CENTER>
+<CENTER>CATEGORIES</CENTER>
+<CENTER>SELECTIONS</CENTER>
+<CENTER>NOTICES</CENTER>
+EXIT
+CANCEL MAKE
+MARK ITEM
+NON QUEST ITEM
+MAKE LAST
+~1_DONE~/~2_TOTAL~ COMPLETED
+LAST TEN
+First - Second Circle
+Third - Fourth Circle
+Fifth - Sixth Circle
+Seventh - Eighth Circle
+Spells of Necromancy
+Spells of Mysticism
+Spellbooks
+Other
+Reactive Armor
+Clumsy
+Create Food
+Feeblemind
+Heal
+Magic Arrow
+Night Sight
+Weaken
+Agility
+Cunning
+NEXT PAGE
+PREV PAGE
+Cure
+Harm
+Magic Trap
+Magic Untrap
+Protection
+Strength
+---- BUTTON IDS (attempted 0-100) ----
+Button 0: <CENTER>INSCRIPTION MENU</CENTER>
+Button 1: <CENTER>CATEGORIES</CENTER>
+Button 2: <CENTER>SELECTIONS</CENTER>
+Button 3: <CENTER>NOTICES</CENTER>
+Button 4: EXIT
+Button 5: CANCEL MAKE
+Button 6: MARK ITEM
+Button 7: NON QUEST ITEM
+Button 8: MAKE LAST
+Button 9: ~1_DONE~/~2_TOTAL~ COMPLETED
+Button 10: LAST TEN
+Button 11: First - Second Circle
+Button 12: Third - Fourth Circle
+Button 13: Fifth - Sixth Circle
+Button 14: Seventh - Eighth Circle
+Button 15: Spells of Necromancy
+Button 16: Spells of Mysticism
+Button 17: Spellbooks
+Button 18: Other
+Button 19: Reactive Armor
+Button 20: Clumsy
+Button 21: Create Food
+Button 22: Feeblemind
+Button 23: Heal
+Button 24: Magic Arrow
+Button 25: Night Sight
+Button 26: Weaken
+Button 27: Agility
+Button 28: Cunning
+Button 29: NEXT PAGE
+Button 30: PREV PAGE
+Button 31: Cure
+Button 32: Harm
+Button 33: Magic Trap
+Button 34: Magic Untrap
+Button 35: Protection
+Button 36: Strength

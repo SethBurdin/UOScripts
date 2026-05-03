@@ -760,3 +760,2159 @@
 2026-04-11 10:37:48  'Mass Dispel': mana 130→130 (no drop) — craft failed.
 2026-04-11 10:37:52  Crafting gump closed unexpectedly. Stopping.
 2026-04-11 10:37:52  CRAFT done.  Crafted: 21   Failed: 33
+
+============================================================
+  RUN START  2026-04-18 09:55:54
+============================================================
+2026-04-18 09:56:00  Scroll chest (0x400F3F52) not found. Are you in range?
+
+============================================================
+  RUN START  2026-04-18 09:59:00
+============================================================
+2026-04-18 09:59:06  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-04-18 09:59:06  Target your scroll chest now.
+2026-04-18 09:59:09  Scroll chest set to 0x4005BD27 (wooden box).
+2026-04-18 09:59:13  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-18 09:59:19  'Clumsy': mana 136→136 (no drop) — craft failed.
+2026-04-18 09:59:21  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-18 10:04:20
+============================================================
+2026-04-18 10:04:28  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-18 10:04:30  Crafting gump closed unexpectedly. Stopping.
+2026-04-18 10:04:30  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-18 10:04:41
+============================================================
+2026-04-18 10:04:44  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-04-18 10:04:44  Target your scroll chest now.
+2026-04-18 10:04:46  Scroll chest set to 0x4005BD27 (wooden box).
+2026-04-18 10:04:51  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-18 10:04:53  Crafting gump closed unexpectedly. Stopping.
+2026-04-18 10:04:53  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-18 10:07:42
+============================================================
+2026-04-18 10:07:45  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-04-18 10:07:45  Target your scroll chest now.
+2026-04-18 10:07:47  Scroll chest set to 0x4005BD27 (wooden box).
+2026-04-18 10:07:51  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-18 10:07:54  'Clumsy': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:07:59  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:08:01  'Create Food': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:08:06  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:08:08  'Feeblemind': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:08:13  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:08:15  'Heal': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:08:20  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:08:22  'Magic Arrow': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:08:27  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:08:29  'Night Sight': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:08:33  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:08:35  'Reactive Armor': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:08:42  Crafted 'Reactive Armor' -> chest.
+2026-04-18 10:08:44  'Weaken': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:08:51  Crafted 'Weaken' -> chest.
+2026-04-18 10:08:54  'Agility': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:08:59  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:09:01  'Cunning': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:09:06  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:09:08  'Cure': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:09:13  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:09:15  'Harm': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:09:20  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:09:22  'Magic Trap': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:09:26  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:09:29  'Magic Untrap': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:09:33  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:09:35  'Protection': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:09:40  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:09:42  'Strength': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:09:47  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:09:50  'Bless': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:09:57  Crafted 'Bless' -> chest.
+2026-04-18 10:09:59  'Fireball': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:10:06  Crafted 'Fireball' -> chest.
+2026-04-18 10:10:08  'Magic Lock': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:10:15  Crafted 'Magic Lock' -> chest.
+2026-04-18 10:10:17  'Poison': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:10:23  Crafted 'Poison' -> chest.
+2026-04-18 10:10:26  'Telekinesis': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:10:32  Crafted 'Telekinesis' -> chest.
+2026-04-18 10:10:34  'Teleport': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:10:41  Crafted 'Teleport' -> chest.
+2026-04-18 10:10:43  'Unlock': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:10:50  Crafted 'Unlock' -> chest.
+2026-04-18 10:10:52  'Wall of Stone': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:10:59  Crafted 'Wall of Stone' -> chest.
+2026-04-18 10:11:02  'Arch Cure': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:11:07  'Arch Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:11:09  'Arch Protection': mana 106→107 (no drop) — craft failed.
+2026-04-18 10:11:14  'Arch Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:11:16  'Curse': mana 80→81 (no drop) — craft failed.
+2026-04-18 10:11:21  'Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:11:23  'Fire Field': mana 53→54 (no drop) — craft failed.
+2026-04-18 10:11:27  'Fire Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:11:28  Mana 27/136 — meditating...
+2026-04-18 10:12:23  Mana restored: 136/136
+2026-04-18 10:12:27  'Greater Heal': mana 136→136 (no drop) — craft failed.
+2026-04-18 10:12:31  'Greater Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:12:34  'Lightning': mana 106→107 (no drop) — craft failed.
+2026-04-18 10:12:38  'Lightning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:12:40  'Mana Drain': mana 80→81 (no drop) — craft failed.
+2026-04-18 10:12:45  'Mana Drain': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:12:47  'Recall': mana 54→55 (no drop) — craft failed.
+2026-04-18 10:12:52  'Recall': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-18 10:12:53  Mana 27/136 — meditating...
+
+============================================================
+  RUN START  2026-04-18 10:13:11
+============================================================
+2026-04-18 10:13:42  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-04-18 10:13:42  Target your scroll chest now.
+
+============================================================
+  RUN START  2026-04-18 10:22:26
+============================================================
+2026-04-18 10:22:30  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-04-18 10:22:30  Target your scroll chest now.
+2026-04-18 10:22:33  Scroll chest set to 0x4005BD27 (wooden box).
+2026-04-18 10:22:34  Target the spellbook to fill...
+2026-04-18 10:22:38  Filling spellbook 0x4005853D from chest 0x4005BD27...
+2026-04-18 10:22:40  Added 'Clumsy' -> spellbook.
+2026-04-18 10:22:42  Added 'Create Food' -> spellbook.
+2026-04-18 10:22:44  Added 'Feeblemind' -> spellbook.
+2026-04-18 10:22:46  Added 'Heal' -> spellbook.
+2026-04-18 10:22:48  Added 'Magic Arrow' -> spellbook.
+2026-04-18 10:22:50  Added 'Night Sight' -> spellbook.
+2026-04-18 10:22:52  Added 'Reactive Armor' -> spellbook.
+2026-04-18 10:22:54  Added 'Weaken' -> spellbook.
+2026-04-18 10:22:54  'Agility' (0x1F35) not in chest.
+2026-04-18 10:22:55  'Cunning' (0x1F36) not in chest.
+2026-04-18 10:22:55  'Cure' (0x1F37) not in chest.
+2026-04-18 10:22:55  'Harm' (0x1F38) not in chest.
+2026-04-18 10:22:56  'Magic Trap' (0x1F39) not in chest.
+2026-04-18 10:22:56  'Magic Untrap' (0x1F3A) not in chest.
+2026-04-18 10:22:56  'Protection' (0x1F3B) not in chest.
+2026-04-18 10:22:56  'Strength' (0x1F3C) not in chest.
+2026-04-18 10:22:58  Added 'Bless' -> spellbook.
+2026-04-18 10:23:00  Added 'Fireball' -> spellbook.
+2026-04-18 10:23:02  Added 'Magic Lock' -> spellbook.
+2026-04-18 10:23:04  Added 'Poison' -> spellbook.
+2026-04-18 10:23:06  Added 'Telekinesis' -> spellbook.
+2026-04-18 10:23:08  Added 'Teleport' -> spellbook.
+2026-04-18 10:23:10  Added 'Unlock' -> spellbook.
+2026-04-18 10:23:12  Added 'Wall of Stone' -> spellbook.
+2026-04-18 10:23:13  'Arch Cure' (0x1F45) not in chest.
+2026-04-18 10:23:13  'Arch Protection' (0x1F46) not in chest.
+2026-04-18 10:23:13  'Curse' (0x1F47) not in chest.
+2026-04-18 10:23:14  'Fire Field' (0x1F48) not in chest.
+2026-04-18 10:23:14  'Greater Heal' (0x1F49) not in chest.
+2026-04-18 10:23:14  'Lightning' (0x1F4A) not in chest.
+2026-04-18 10:23:15  'Mana Drain' (0x1F4B) not in chest.
+2026-04-18 10:23:15  'Recall' (0x1F4C) not in chest.
+2026-04-18 10:23:17  Added 'Blade Spirits' -> spellbook.
+2026-04-18 10:23:19  Added 'Dispel Field' -> spellbook.
+2026-04-18 10:23:21  Added 'Incognito' -> spellbook.
+2026-04-18 10:23:23  Added 'Magic Reflection' -> spellbook.
+2026-04-18 10:23:25  Added 'Mind Blast' -> spellbook.
+2026-04-18 10:23:27  Added 'Paralyze' -> spellbook.
+2026-04-18 10:23:29  Added 'Poison Field' -> spellbook.
+2026-04-18 10:23:31  Added 'Summon Creature' -> spellbook.
+2026-04-18 10:23:31  'Dispel' (0x1F55) not in chest.
+2026-04-18 10:23:31  'Energy Bolt' (0x1F56) not in chest.
+2026-04-18 10:23:32  'Explosion' (0x1F57) not in chest.
+2026-04-18 10:23:32  'Invisibility' (0x1F58) not in chest.
+2026-04-18 10:23:32  'Mark' (0x1F59) not in chest.
+2026-04-18 10:23:33  'Mass Curse' (0x1F5A) not in chest.
+2026-04-18 10:23:33  'Paralyze Field' (0x1F5B) not in chest.
+2026-04-18 10:23:33  'Reveal' (0x1F5C) not in chest.
+2026-04-18 10:23:35  Added 'Chain Lightning' -> spellbook.
+2026-04-18 10:23:37  Added 'Energy Field' -> spellbook.
+2026-04-18 10:23:39  Added 'Flamestrike' -> spellbook.
+2026-04-18 10:23:41  Added 'Gate Travel' -> spellbook.
+2026-04-18 10:23:43  Added 'Mana Vampire' -> spellbook.
+2026-04-18 10:23:45  Added 'Mass Dispel' -> spellbook.
+2026-04-18 10:23:47  Added 'Meteor Swarm' -> spellbook.
+2026-04-18 10:23:49  Added 'Polymorph' -> spellbook.
+2026-04-18 10:23:50  'Earthquake' (0x1F65) not in chest.
+2026-04-18 10:23:50  'Energy Vortex' (0x1F66) not in chest.
+2026-04-18 10:23:50  'Resurrection' (0x1F67) not in chest.
+2026-04-18 10:23:51  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-18 10:23:51  'Summon Daemon' (0x1F69) not in chest.
+2026-04-18 10:23:51  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-18 10:23:51  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-04-18 10:23:52  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-18 10:23:52  FILL done.  Added: 32   Missing from chest: 32
+
+============================================================
+  RUN START  2026-04-23 07:37:00
+============================================================
+2026-04-23 07:37:05  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-04-23 07:37:05  Target your scroll chest now.
+
+============================================================
+  RUN START  2026-04-23 07:37:21
+============================================================
+2026-04-23 07:37:29  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-23 07:37:36  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:37:42  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:37:48  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:37:54  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:38:00  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:38:06  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:38:14  Crafted 'Reactive Armor' -> chest  [1 in chest].
+2026-04-23 07:38:22  Crafted 'Weaken' -> chest  [1 in chest].
+2026-04-23 07:38:29  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:38:35  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:38:41  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:38:47  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:38:53  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:38:59  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:39:05  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:39:11  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:39:20  Crafted 'Bless' -> chest  [1 in chest].
+2026-04-23 07:39:29  Crafted 'Fireball' -> chest  [1 in chest].
+2026-04-23 07:39:37  Crafted 'Magic Lock' -> chest  [1 in chest].
+2026-04-23 07:39:45  Crafted 'Poison' -> chest  [1 in chest].
+2026-04-23 07:39:53  Crafted 'Telekinesis' -> chest  [1 in chest].
+2026-04-23 07:40:01  Crafted 'Teleport' -> chest  [1 in chest].
+2026-04-23 07:40:09  Crafted 'Unlock' -> chest  [1 in chest].
+2026-04-23 07:40:17  Crafted 'Wall of Stone' -> chest  [1 in chest].
+2026-04-23 07:40:24  'Arch Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:40:30  'Arch Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:40:36  'Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:40:42  'Fire Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:40:43  Mana 20/136 — meditating...
+2026-04-23 07:41:41  Mana restored: 136/136
+2026-04-23 07:41:48  'Greater Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:41:54  'Lightning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:42:00  'Mana Drain': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:42:06  'Recall': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:42:07  Mana 20/136 — meditating...
+2026-04-23 07:43:06  Mana restored: 136/136
+2026-04-23 07:43:15  Crafted 'Blade Spirits' -> chest  [1 in chest].
+2026-04-23 07:43:23  Crafted 'Dispel Field' -> chest  [1 in chest].
+2026-04-23 07:43:31  Crafted 'Incognito' -> chest  [1 in chest].
+2026-04-23 07:43:39  Crafted 'Magic Reflection' -> chest  [1 in chest].
+2026-04-23 07:43:47  Crafted 'Mind Blast' -> chest  [1 in chest].
+2026-04-23 07:43:55  Crafted 'Paralyze' -> chest  [1 in chest].
+2026-04-23 07:44:03  Crafted 'Poison Field' -> chest  [1 in chest].
+2026-04-23 07:44:11  Crafted 'Summon Creature' -> chest  [1 in chest].
+2026-04-23 07:44:18  'Dispel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:44:24  'Energy Bolt': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:44:30  'Explosion': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:44:36  'Invisibility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:44:42  'Mark': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:44:48  'Mass Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:44:54  'Paralyze Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:45:00  'Reveal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-23 07:45:09  Crafted 'Chain Lightning' -> chest  [1 in chest].
+2026-04-23 07:45:17  Crafted 'Energy Field' -> chest  [1 in chest].
+2026-04-23 07:45:26  Crafted 'Flamestrike' -> chest  [1 in chest].
+2026-04-23 07:45:34  Crafted 'Gate Travel' -> chest  [1 in chest].
+2026-04-23 07:45:42  Crafted 'Mana Vampire' -> chest  [1 in chest].
+2026-04-23 07:45:50  Crafted 'Mass Dispel' -> chest  [1 in chest].
+2026-04-23 07:45:56  Crafting gump closed unexpectedly. Stopping.
+2026-04-23 07:45:56  CRAFT done.  Crafted: 24   Failed: 30
+
+============================================================
+  RUN START  2026-04-24 18:30:15
+============================================================
+2026-04-24 18:30:51  Gump ID 2653346093 detected (expected 949095101) — updating.
+
+============================================================
+  RUN START  2026-04-24 18:32:18
+============================================================
+2026-04-24 18:32:23  Target the spellbook to fill...
+2026-04-24 18:32:37  Filling spellbook 0x4005749B from chest 0x400F3F52...
+2026-04-24 18:32:39  Added 'Clumsy' -> spellbook.
+2026-04-24 18:32:41  Added 'Create Food' -> spellbook.
+2026-04-24 18:32:41  'Feeblemind' (0x1F30) not in chest.
+2026-04-24 18:32:43  Added 'Heal' -> spellbook.
+2026-04-24 18:32:45  Added 'Magic Arrow' -> spellbook.
+2026-04-24 18:32:47  Added 'Night Sight' -> spellbook.
+2026-04-24 18:32:49  Added 'Reactive Armor' -> spellbook.
+2026-04-24 18:32:51  Added 'Weaken' -> spellbook.
+2026-04-24 18:32:51  'Agility' (0x1F35) not in chest.
+2026-04-24 18:32:52  'Cunning' (0x1F36) not in chest.
+2026-04-24 18:32:52  'Cure' (0x1F37) not in chest.
+2026-04-24 18:32:52  'Harm' (0x1F38) not in chest.
+2026-04-24 18:32:53  'Magic Trap' (0x1F39) not in chest.
+2026-04-24 18:32:53  'Magic Untrap' (0x1F3A) not in chest.
+2026-04-24 18:32:53  'Protection' (0x1F3B) not in chest.
+2026-04-24 18:32:53  'Strength' (0x1F3C) not in chest.
+2026-04-24 18:32:55  Added 'Bless' -> spellbook.
+2026-04-24 18:32:57  Added 'Fireball' -> spellbook.
+2026-04-24 18:32:59  Added 'Magic Lock' -> spellbook.
+2026-04-24 18:33:01  Added 'Poison' -> spellbook.
+2026-04-24 18:33:03  Added 'Telekinesis' -> spellbook.
+2026-04-24 18:33:05  Added 'Teleport' -> spellbook.
+2026-04-24 18:33:07  Added 'Unlock' -> spellbook.
+2026-04-24 18:33:09  Added 'Wall of Stone' -> spellbook.
+2026-04-24 18:33:10  'Arch Cure' (0x1F45) not in chest.
+2026-04-24 18:33:10  'Arch Protection' (0x1F46) not in chest.
+2026-04-24 18:33:10  'Curse' (0x1F47) not in chest.
+2026-04-24 18:33:11  'Fire Field' (0x1F48) not in chest.
+2026-04-24 18:33:11  'Greater Heal' (0x1F49) not in chest.
+2026-04-24 18:33:11  'Lightning' (0x1F4A) not in chest.
+2026-04-24 18:33:12  'Mana Drain' (0x1F4B) not in chest.
+2026-04-24 18:33:12  'Recall' (0x1F4C) not in chest.
+2026-04-24 18:33:14  Added 'Blade Spirits' -> spellbook.
+2026-04-24 18:33:16  Added 'Dispel Field' -> spellbook.
+2026-04-24 18:33:18  Added 'Incognito' -> spellbook.
+2026-04-24 18:33:20  Added 'Magic Reflection' -> spellbook.
+2026-04-24 18:33:22  Added 'Mind Blast' -> spellbook.
+2026-04-24 18:33:24  Added 'Paralyze' -> spellbook.
+2026-04-24 18:33:26  Added 'Poison Field' -> spellbook.
+2026-04-24 18:33:28  Added 'Summon Creature' -> spellbook.
+2026-04-24 18:33:28  'Dispel' (0x1F55) not in chest.
+2026-04-24 18:33:28  'Energy Bolt' (0x1F56) not in chest.
+2026-04-24 18:33:29  'Explosion' (0x1F57) not in chest.
+2026-04-24 18:33:29  'Invisibility' (0x1F58) not in chest.
+2026-04-24 18:33:29  'Mark' (0x1F59) not in chest.
+2026-04-24 18:33:30  'Mass Curse' (0x1F5A) not in chest.
+2026-04-24 18:33:30  'Paralyze Field' (0x1F5B) not in chest.
+2026-04-24 18:33:30  'Reveal' (0x1F5C) not in chest.
+2026-04-24 18:33:32  Added 'Chain Lightning' -> spellbook.
+2026-04-24 18:33:34  Added 'Energy Field' -> spellbook.
+2026-04-24 18:33:36  Added 'Flamestrike' -> spellbook.
+2026-04-24 18:33:38  Added 'Gate Travel' -> spellbook.
+2026-04-24 18:33:40  Added 'Mana Vampire' -> spellbook.
+2026-04-24 18:33:42  Added 'Mass Dispel' -> spellbook.
+2026-04-24 18:33:43  'Meteor Swarm' (0x1F63) not in chest.
+2026-04-24 18:33:43  'Polymorph' (0x1F64) not in chest.
+2026-04-24 18:33:43  'Earthquake' (0x1F65) not in chest.
+2026-04-24 18:33:43  'Energy Vortex' (0x1F66) not in chest.
+2026-04-24 18:33:44  'Resurrection' (0x1F67) not in chest.
+2026-04-24 18:33:44  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-24 18:33:44  'Summon Daemon' (0x1F69) not in chest.
+2026-04-24 18:33:45  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-24 18:33:45  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-04-24 18:33:45  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-24 18:33:45  FILL done.  Added: 29   Missing from chest: 35
+
+============================================================
+  RUN START  2026-04-24 18:37:32
+============================================================
+2026-04-24 18:37:43  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 18:37:53  Crafted 'Clumsy' -> chest  [1 in chest].
+
+============================================================
+  RUN START  2026-04-24 18:41:25
+============================================================
+2026-04-24 18:41:33  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 18:41:40  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:41:46  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:41:54  Crafted 'Feeblemind' -> chest  [1 in chest].
+2026-04-24 18:42:00  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:42:06  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:42:13  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:42:21  Crafted 'Reactive Armor' -> chest  [1 in chest].
+
+============================================================
+  RUN START  2026-04-24 18:45:06
+============================================================
+2026-04-24 18:45:15  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 18:45:22  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:45:28  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:45:34  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:45:40  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:45:46  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:45:52  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:46:00  Crafted 'Reactive Armor' -> chest  [1 in chest].
+2026-04-24 18:46:08  Crafted 'Weaken' -> chest  [1 in chest].
+2026-04-24 18:46:15  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:46:21  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:46:27  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:46:33  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:46:39  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:46:45  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:46:51  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:46:57  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:47:06  Crafted 'Bless' -> chest  [1 in chest].
+2026-04-24 18:47:14  Crafted 'Fireball' -> chest  [1 in chest].
+2026-04-24 18:47:22  Crafted 'Magic Lock' -> chest  [1 in chest].
+2026-04-24 18:47:30  Crafted 'Poison' -> chest  [1 in chest].
+2026-04-24 18:47:38  Crafted 'Telekinesis' -> chest  [1 in chest].
+2026-04-24 18:47:46  Crafted 'Teleport' -> chest  [1 in chest].
+2026-04-24 18:47:54  Crafted 'Unlock' -> chest  [1 in chest].
+2026-04-24 18:48:02  Crafted 'Wall of Stone' -> chest  [1 in chest].
+2026-04-24 18:48:10  'Arch Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:48:16  'Arch Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:48:22  'Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:48:28  'Fire Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:48:34  'Greater Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:48:35  Mana 32/136 — meditating...
+2026-04-24 18:49:27  Mana restored: 136/136
+2026-04-24 18:49:34  'Lightning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:49:40  'Mana Drain': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:49:46  'Recall': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:49:56  Crafted 'Blade Spirits' -> chest  [1 in chest].
+2026-04-24 18:50:04  Crafted 'Dispel Field' -> chest  [1 in chest].
+2026-04-24 18:50:12  Crafted 'Incognito' -> chest  [1 in chest].
+2026-04-24 18:50:20  Crafted 'Magic Reflection' -> chest  [1 in chest].
+2026-04-24 18:50:28  Crafted 'Mind Blast' -> chest  [1 in chest].
+2026-04-24 18:50:36  Crafted 'Paralyze' -> chest  [1 in chest].
+2026-04-24 18:50:44  Crafted 'Poison Field' -> chest  [1 in chest].
+2026-04-24 18:50:52  Crafted 'Summon Creature' -> chest  [0 in chest].
+2026-04-24 18:50:59  'Dispel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:51:05  'Energy Bolt': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:51:11  'Explosion': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:51:17  'Invisibility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:51:23  'Mark': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:51:29  'Mass Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:51:35  'Paralyze Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:51:41  'Reveal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 18:51:49  Scribe's pen wore out — finding a replacement...
+2026-04-24 18:51:52  Crafted 'Chain Lightning' → chest (pen change)  [0 in chest].
+2026-04-24 18:51:52  No more pens in backpack. Stopping.
+2026-04-24 18:51:52  CRAFT done.  Crafted: 19   Failed: 30
+
+============================================================
+  RUN START  2026-04-24 19:15:26
+============================================================
+2026-04-24 19:15:35  No inscription pen found in chest or backpack. Stopping.
+
+============================================================
+  RUN START  2026-04-24 19:16:13
+============================================================
+2026-04-24 19:16:24  No inscription pen found in chest or backpack. Stopping.
+
+============================================================
+  RUN START  2026-04-24 19:16:50
+============================================================
+2026-04-24 19:16:54  No inscription pen found in chest or backpack. Stopping.
+
+============================================================
+  RUN START  2026-04-24 19:17:15
+============================================================
+2026-04-24 19:17:22  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 19:17:31  Crafted 'Clumsy' -> chest  [1 in chest].
+2026-04-24 19:17:37  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:17:43  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:17:49  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:17:55  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:18:01  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:18:09  Crafted 'Reactive Armor' -> chest  [1 in chest].
+2026-04-24 19:18:17  Crafted 'Weaken' -> chest  [1 in chest].
+2026-04-24 19:18:24  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:18:30  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:18:36  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:18:42  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:18:48  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:18:54  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:19:02  Crafted 'Protection' -> chest  [1 in chest].
+2026-04-24 19:19:10  Crafted 'Strength' -> chest  [1 in chest].
+2026-04-24 19:19:18  Crafting gump closed unexpectedly. Stopping.
+2026-04-24 19:19:18  CRAFT done.  Crafted: 5   Failed: 11
+
+============================================================
+  RUN START  2026-04-24 19:23:04
+============================================================
+
+============================================================
+  RUN START  2026-04-24 19:27:26
+============================================================
+2026-04-24 19:27:57  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 19:28:05  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:28:11  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:28:17  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:28:23  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:28:29  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:28:35  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:28:41  Crafted 'Reactive Armor' (left in backpack).
+2026-04-24 19:28:47  Crafted 'Weaken' (left in backpack).
+2026-04-24 19:28:54  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:29:00  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:29:06  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:29:12  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:29:18  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:29:24  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:29:30  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:29:36  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:29:44  Crafting gump closed unexpectedly. Stopping.
+2026-04-24 19:29:44  CRAFT done.  Crafted: 2   Failed: 14
+
+============================================================
+  RUN START  2026-04-24 19:34:31
+============================================================
+2026-04-24 19:34:41  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 19:34:49  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:34:55  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:35:01  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:35:07  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:35:13  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:35:19  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:35:25  Crafted 'Reactive Armor' (left in backpack).
+2026-04-24 19:35:31  Crafted 'Weaken' (left in backpack).
+2026-04-24 19:35:38  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:35:44  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:35:50  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:35:56  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:36:02  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:36:08  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:36:14  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:36:20  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 19:36:28  Crafting gump closed unexpectedly. Stopping.
+2026-04-24 19:36:28  CRAFT done.  Crafted: 2   Failed: 14
+
+============================================================
+  RUN START  2026-04-24 21:00:13
+============================================================
+2026-04-24 21:00:38  Target the spellbook to fill...
+2026-04-24 21:00:39  Filling spellbook 0x4012238E from chest 0x400F3F52...
+2026-04-24 21:00:41  Added 'Clumsy' -> spellbook.
+2026-04-24 21:00:43  Added 'Create Food' -> spellbook.
+2026-04-24 21:00:45  Added 'Feeblemind' -> spellbook.
+2026-04-24 21:00:47  Added 'Heal' -> spellbook.
+2026-04-24 21:00:49  Added 'Magic Arrow' -> spellbook.
+2026-04-24 21:00:51  Added 'Night Sight' -> spellbook.
+2026-04-24 21:00:53  Added 'Reactive Armor' -> spellbook.
+2026-04-24 21:00:55  Added 'Weaken' -> spellbook.
+2026-04-24 21:00:55  'Agility' (0x1F35) not in chest.
+2026-04-24 21:00:56  'Cunning' (0x1F36) not in chest.
+2026-04-24 21:00:58  Added 'Cure' -> spellbook.
+2026-04-24 21:00:58  'Harm' (0x1F38) not in chest.
+2026-04-24 21:01:00  Added 'Magic Trap' -> spellbook.
+2026-04-24 21:01:00  'Magic Untrap' (0x1F3A) not in chest.
+2026-04-24 21:01:02  Added 'Protection' -> spellbook.
+2026-04-24 21:01:04  Added 'Strength' -> spellbook.
+2026-04-24 21:01:06  Added 'Bless' -> spellbook.
+2026-04-24 21:01:08  Added 'Fireball' -> spellbook.
+2026-04-24 21:01:10  Added 'Magic Lock' -> spellbook.
+2026-04-24 21:01:12  Added 'Poison' -> spellbook.
+2026-04-24 21:01:14  Added 'Telekinesis' -> spellbook.
+2026-04-24 21:01:16  Added 'Teleport' -> spellbook.
+2026-04-24 21:01:18  Added 'Unlock' -> spellbook.
+2026-04-24 21:01:20  Added 'Wall of Stone' -> spellbook.
+2026-04-24 21:01:22  Added 'Arch Cure' -> spellbook.
+2026-04-24 21:01:24  Added 'Arch Protection' -> spellbook.
+2026-04-24 21:01:26  Added 'Curse' -> spellbook.
+2026-04-24 21:01:28  Added 'Fire Field' -> spellbook.
+2026-04-24 21:01:30  Added 'Greater Heal' -> spellbook.
+2026-04-24 21:01:32  Added 'Lightning' -> spellbook.
+2026-04-24 21:01:34  Added 'Mana Drain' -> spellbook.
+2026-04-24 21:01:36  Added 'Recall' -> spellbook.
+2026-04-24 21:01:38  Added 'Blade Spirits' -> spellbook.
+2026-04-24 21:01:40  Added 'Dispel Field' -> spellbook.
+2026-04-24 21:01:42  Added 'Incognito' -> spellbook.
+2026-04-24 21:01:44  Added 'Magic Reflection' -> spellbook.
+2026-04-24 21:01:46  Added 'Mind Blast' -> spellbook.
+2026-04-24 21:01:48  Added 'Paralyze' -> spellbook.
+2026-04-24 21:01:50  Added 'Poison Field' -> spellbook.
+2026-04-24 21:01:52  Added 'Summon Creature' -> spellbook.
+2026-04-24 21:01:54  Added 'Dispel' -> spellbook.
+2026-04-24 21:01:56  Added 'Energy Bolt' -> spellbook.
+2026-04-24 21:01:58  Added 'Explosion' -> spellbook.
+2026-04-24 21:02:00  Added 'Invisibility' -> spellbook.
+2026-04-24 21:02:01  'Mark' (0x1F59) not in chest.
+2026-04-24 21:02:01  'Mass Curse' (0x1F5A) not in chest.
+2026-04-24 21:02:03  Added 'Paralyze Field' -> spellbook.
+2026-04-24 21:02:05  Added 'Reveal' -> spellbook.
+2026-04-24 21:02:07  Added 'Chain Lightning' -> spellbook.
+2026-04-24 21:02:09  Added 'Energy Field' -> spellbook.
+2026-04-24 21:02:11  Added 'Flamestrike' -> spellbook.
+2026-04-24 21:02:13  Added 'Gate Travel' -> spellbook.
+2026-04-24 21:02:15  Added 'Mana Vampire' -> spellbook.
+2026-04-24 21:02:17  Added 'Mass Dispel' -> spellbook.
+2026-04-24 21:02:19  Added 'Meteor Swarm' -> spellbook.
+2026-04-24 21:02:21  Added 'Polymorph' -> spellbook.
+2026-04-24 21:02:21  'Earthquake' (0x1F65) not in chest.
+2026-04-24 21:02:23  Added 'Energy Vortex' -> spellbook.
+2026-04-24 21:02:25  Added 'Resurrection' -> spellbook.
+2026-04-24 21:02:25  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-24 21:02:26  'Summon Daemon' (0x1F69) not in chest.
+2026-04-24 21:02:26  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-24 21:02:26  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-04-24 21:02:28  Added 'Summon Water Elemental' -> spellbook.
+2026-04-24 21:02:28  FILL done.  Added: 53   Missing from chest: 11
+
+============================================================
+  RUN START  2026-04-24 21:04:50
+============================================================
+2026-04-24 21:05:00  Target the spellbook to fill...
+2026-04-24 21:05:02  Filling spellbook 0x4012361B from chest 0x400F3F52...
+2026-04-24 21:05:04  Added 'Clumsy' -> spellbook.
+2026-04-24 21:05:06  Added 'Create Food' -> spellbook.
+2026-04-24 21:05:08  Added 'Feeblemind' -> spellbook.
+2026-04-24 21:05:10  Added 'Heal' -> spellbook.
+2026-04-24 21:05:12  Added 'Magic Arrow' -> spellbook.
+2026-04-24 21:05:14  Added 'Night Sight' -> spellbook.
+2026-04-24 21:05:16  Added 'Reactive Armor' -> spellbook.
+2026-04-24 21:05:18  Added 'Weaken' -> spellbook.
+2026-04-24 21:05:19  'Agility' (0x1F35) not in chest.
+2026-04-24 21:05:19  'Cunning' (0x1F36) not in chest.
+2026-04-24 21:05:19  'Cure' (0x1F37) not in chest.
+2026-04-24 21:05:19  'Harm' (0x1F38) not in chest.
+2026-04-24 21:05:20  'Magic Trap' (0x1F39) not in chest.
+2026-04-24 21:05:20  'Magic Untrap' (0x1F3A) not in chest.
+2026-04-24 21:05:20  'Protection' (0x1F3B) not in chest.
+2026-04-24 21:05:21  'Strength' (0x1F3C) not in chest.
+2026-04-24 21:05:23  Added 'Bless' -> spellbook.
+2026-04-24 21:05:25  Added 'Fireball' -> spellbook.
+2026-04-24 21:05:27  Added 'Magic Lock' -> spellbook.
+2026-04-24 21:05:29  Added 'Poison' -> spellbook.
+2026-04-24 21:05:31  Added 'Telekinesis' -> spellbook.
+2026-04-24 21:05:33  Added 'Teleport' -> spellbook.
+2026-04-24 21:05:35  Added 'Unlock' -> spellbook.
+2026-04-24 21:05:37  Added 'Wall of Stone' -> spellbook.
+2026-04-24 21:05:39  Added 'Arch Cure' -> spellbook.
+2026-04-24 21:05:41  Added 'Arch Protection' -> spellbook.
+2026-04-24 21:05:43  Added 'Curse' -> spellbook.
+2026-04-24 21:05:45  Added 'Fire Field' -> spellbook.
+2026-04-24 21:05:47  Added 'Greater Heal' -> spellbook.
+2026-04-24 21:05:49  Added 'Lightning' -> spellbook.
+2026-04-24 21:05:51  Added 'Mana Drain' -> spellbook.
+2026-04-24 21:05:53  Added 'Recall' -> spellbook.
+2026-04-24 21:05:55  Added 'Blade Spirits' -> spellbook.
+2026-04-24 21:05:57  Added 'Dispel Field' -> spellbook.
+2026-04-24 21:05:59  Added 'Incognito' -> spellbook.
+2026-04-24 21:06:01  Added 'Magic Reflection' -> spellbook.
+2026-04-24 21:06:03  Added 'Mind Blast' -> spellbook.
+2026-04-24 21:06:03  'Paralyze' (0x1F52) not in chest.
+2026-04-24 21:06:05  Added 'Poison Field' -> spellbook.
+2026-04-24 21:06:07  Added 'Summon Creature' -> spellbook.
+2026-04-24 21:06:07  'Dispel' (0x1F55) not in chest.
+2026-04-24 21:06:08  'Energy Bolt' (0x1F56) not in chest.
+2026-04-24 21:06:08  'Explosion' (0x1F57) not in chest.
+2026-04-24 21:06:10  Added 'Invisibility' -> spellbook.
+2026-04-24 21:06:10  'Mark' (0x1F59) not in chest.
+2026-04-24 21:06:10  'Mass Curse' (0x1F5A) not in chest.
+2026-04-24 21:06:11  'Paralyze Field' (0x1F5B) not in chest.
+2026-04-24 21:06:11  'Reveal' (0x1F5C) not in chest.
+2026-04-24 21:06:13  Added 'Chain Lightning' -> spellbook.
+2026-04-24 21:06:15  Added 'Energy Field' -> spellbook.
+2026-04-24 21:06:17  Added 'Flamestrike' -> spellbook.
+2026-04-24 21:06:19  Added 'Gate Travel' -> spellbook.
+2026-04-24 21:06:21  Added 'Mana Vampire' -> spellbook.
+2026-04-24 21:06:21  'Mass Dispel' (0x1F62) not in chest.
+2026-04-24 21:06:23  Added 'Meteor Swarm' -> spellbook.
+2026-04-24 21:06:25  Added 'Polymorph' -> spellbook.
+2026-04-24 21:06:26  'Earthquake' (0x1F65) not in chest.
+2026-04-24 21:06:26  'Energy Vortex' (0x1F66) not in chest.
+2026-04-24 21:06:28  Added 'Resurrection' -> spellbook.
+2026-04-24 21:06:28  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-24 21:06:29  'Summon Daemon' (0x1F69) not in chest.
+2026-04-24 21:06:29  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-24 21:06:29  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-04-24 21:06:30  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-24 21:06:30  FILL done.  Added: 40   Missing from chest: 24
+
+============================================================
+  RUN START  2026-04-24 21:11:41
+============================================================
+2026-04-24 21:11:48  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 21:11:55  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:12:01  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:12:07  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:12:13  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:12:19  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:12:25  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:12:31  Crafted 'Reactive Armor' (left in backpack).
+2026-04-24 21:12:37  Crafted 'Weaken' (left in backpack).
+2026-04-24 21:12:44  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:12:50  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:12:56  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:13:02  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:13:08  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:13:14  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:13:20  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:13:26  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:13:34  Crafting gump closed unexpectedly. Stopping.
+2026-04-24 21:13:34  CRAFT done.  Crafted: 2   Failed: 14
+
+============================================================
+  RUN START  2026-04-24 21:25:17
+============================================================
+2026-04-24 21:25:28  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 21:25:35  Crafted 'Clumsy' (left in backpack).
+2026-04-24 21:25:41  Crafted 'Create Food' (left in backpack).
+2026-04-24 21:25:47  Crafted 'Feeblemind' (left in backpack).
+2026-04-24 21:25:53  Crafted 'Heal' (left in backpack).
+2026-04-24 21:25:59  Crafted 'Magic Arrow' (left in backpack).
+2026-04-24 21:26:05  Crafted 'Night Sight' (left in backpack).
+2026-04-24 21:26:11  Crafted 'Reactive Armor' (left in backpack).
+2026-04-24 21:26:17  Crafted 'Weaken' (left in backpack).
+2026-04-24 21:26:25  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:26:31  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:26:37  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:26:43  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:26:49  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:26:55  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:27:01  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:27:07  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:27:15  Crafting gump closed unexpectedly. Stopping.
+2026-04-24 21:27:15  CRAFT done.  Crafted: 8   Failed: 8
+
+============================================================
+  RUN START  2026-04-24 21:28:17
+============================================================
+2026-04-24 21:28:49  Target the spellbook to fill...
+2026-04-24 21:28:50  Filling spellbook 0x4005749B from chest 0x400F3F52...
+2026-04-24 21:28:52  Added 'Clumsy' -> spellbook.
+2026-04-24 21:28:54  Added 'Create Food' -> spellbook.
+2026-04-24 21:28:56  Added 'Feeblemind' -> spellbook.
+2026-04-24 21:28:58  Added 'Heal' -> spellbook.
+2026-04-24 21:29:00  Added 'Magic Arrow' -> spellbook.
+2026-04-24 21:29:02  Added 'Night Sight' -> spellbook.
+2026-04-24 21:29:04  Added 'Reactive Armor' -> spellbook.
+2026-04-24 21:29:06  Added 'Weaken' -> spellbook.
+2026-04-24 21:29:07  'Agility' (0x1F35) not in chest.
+2026-04-24 21:29:07  'Cunning' (0x1F36) not in chest.
+2026-04-24 21:29:07  'Cure' (0x1F37) not in chest.
+2026-04-24 21:29:08  'Harm' (0x1F38) not in chest.
+2026-04-24 21:29:08  'Magic Trap' (0x1F39) not in chest.
+2026-04-24 21:29:08  'Magic Untrap' (0x1F3A) not in chest.
+2026-04-24 21:29:08  'Protection' (0x1F3B) not in chest.
+2026-04-24 21:29:09  'Strength' (0x1F3C) not in chest.
+2026-04-24 21:29:11  Added 'Bless' -> spellbook.
+2026-04-24 21:29:13  Added 'Fireball' -> spellbook.
+2026-04-24 21:29:15  Added 'Magic Lock' -> spellbook.
+2026-04-24 21:29:17  Added 'Poison' -> spellbook.
+
+============================================================
+  RUN START  2026-04-24 21:29:19
+============================================================
+2026-04-24 21:29:55  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 21:30:02  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-24 21:30:06
+============================================================
+2026-04-24 21:30:20  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-24 21:30:27  Crafted 'Clumsy' (left in backpack).
+2026-04-24 21:30:33  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:30:39  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:30:46  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:30:52  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:30:58  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:31:04  Crafted 'Reactive Armor' (left in backpack).
+2026-04-24 21:31:10  Crafted 'Weaken' (left in backpack).
+2026-04-24 21:31:17  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:31:23  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:31:29  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:31:35  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:31:41  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-24 21:31:48  Scribe's pen wore out — finding a replacement...
+2026-04-24 21:31:49  No more pens in backpack. Stopping.
+2026-04-24 21:31:49  CRAFT done.  Crafted: 3   Failed: 10
+2026-04-24 21:31:49  CRAFT done.  Crafted: 3   Failed: 10
+
+============================================================
+  RUN START  2026-04-25 08:08:13
+============================================================
+2026-04-25 08:08:17  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-04-25 08:08:17  Target your scroll chest now.
+
+============================================================
+  RUN START  2026-04-25 08:08:27
+============================================================
+2026-04-25 08:08:31  No inscription pen found in chest or backpack. Stopping.
+
+============================================================
+  RUN START  2026-04-25 08:08:46
+============================================================
+2026-04-25 08:08:55  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-25 08:09:03  Crafting gump closed unexpectedly. Stopping.
+2026-04-25 08:09:03  CRAFT done.  Crafted: 0   Failed: 0
+2026-04-25 08:09:03  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-25 14:34:59
+============================================================
+2026-04-25 14:35:03  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-04-25 14:35:03  Target your scroll chest now.
+
+============================================================
+  RUN START  2026-04-25 14:35:16
+============================================================
+2026-04-25 14:35:28  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-25 14:35:36  Crafting gump closed unexpectedly. Stopping.
+2026-04-25 14:35:36  CRAFT done.  Crafted: 0   Failed: 0
+2026-04-25 14:35:36  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-25 14:41:07
+============================================================
+2026-04-25 14:41:24  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-25 14:41:33  Crafting gump closed unexpectedly. Stopping.
+2026-04-25 14:41:33  CRAFT done.  Crafted: 0   Failed: 0
+2026-04-25 14:41:33  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-25 14:45:10
+============================================================
+2026-04-25 14:45:29  Gump ID 2653346093 detected (expected 949095101) — updating.
+2026-04-25 14:45:38  Crafting gump closed unexpectedly. Stopping.
+2026-04-25 14:45:38  CRAFT done.  Crafted: 0   Failed: 0
+2026-04-25 14:45:38  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-25 14:47:05
+============================================================
+
+============================================================
+  RUN START  2026-04-25 14:47:52
+============================================================
+2026-04-25 14:48:01  [FATAL] Unexpected gump ID 2653346093 (expected 949095101). Aborting to prevent disconnect.
+
+============================================================
+  RUN START  2026-04-25 14:49:30
+============================================================
+2026-04-25 14:49:39  [FATAL] Unexpected gump ID 2653346093 (expected 949095101). Aborting to prevent disconnect.
+
+============================================================
+  RUN START  2026-04-25 14:51:36
+============================================================
+2026-04-25 14:51:45  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 14:51:54  Crafting gump closed unexpectedly. Stopping.
+2026-04-25 14:51:54  CRAFT done.  Crafted: 0   Failed: 0
+2026-04-25 14:51:54  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-25 14:52:04
+============================================================
+2026-04-25 14:52:12  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+
+============================================================
+  RUN START  2026-04-25 14:52:21
+============================================================
+2026-04-25 14:52:30  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 14:52:39  Crafting gump closed unexpectedly. Stopping.
+2026-04-25 14:52:39  CRAFT done.  Crafted: 0   Failed: 0
+2026-04-25 14:52:39  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-25 14:53:58
+============================================================
+2026-04-25 14:54:09  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698, 2654174381]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 14:54:10  [ERROR] 7th/8th circle requires gump 0x9e26d92d (2654174381), but got None. Aborting craft for this spell.
+2026-04-25 14:54:11  Crafting gump closed unexpectedly. Stopping.
+2026-04-25 14:54:11  CRAFT done.  Crafted: 0   Failed: 0
+2026-04-25 14:54:11  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-25 14:54:17
+============================================================
+2026-04-25 14:54:26  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698, 2654174381]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 14:54:28  [ERROR] 7th/8th circle requires gump 0x9e26d92d (2654174381), but got None. Aborting craft for this spell.
+2026-04-25 14:54:28  Crafting gump closed unexpectedly. Stopping.
+2026-04-25 14:54:28  CRAFT done.  Crafted: 0   Failed: 0
+2026-04-25 14:54:28  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-25 15:12:30
+============================================================
+2026-04-25 15:12:39  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698, 2654174381]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 15:12:46  [ERROR] 7th/8th circle requires gump 0x9e26d92d (2654174381), but did not appear after 5000 ms. Aborting craft for this spell.
+2026-04-25 15:12:46  Crafting gump closed unexpectedly. Stopping.
+2026-04-25 15:12:46  CRAFT done.  Crafted: 0   Failed: 0
+2026-04-25 15:12:46  CRAFT done.  Crafted: 0   Failed: 0
+
+============================================================
+  RUN START  2026-04-25 15:48:27
+============================================================
+2026-04-25 15:48:43  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698, 2654174381]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 15:48:52  'Summon Water Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:49:02  'Summon Fire Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:49:11  'Summon Earth Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:49:20  'Summon Daemon': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:49:29  'Summon Air Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:49:39  'Resurrection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:49:48  'Energy Vortex': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:49:57  'Earthquake': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:50:06  'Polymorph': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:50:15  'Meteor Swarm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:50:25  'Mass Dispel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:50:34  'Mana Vampire': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:50:43  'Gate Travel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:50:52  'Flamestrike': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 15:53:36
+============================================================
+2026-04-25 15:53:59  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698, 2654174381]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 15:54:08  'Summon Water Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:54:18  'Summon Fire Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:54:27  'Summon Earth Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:54:36  'Summon Daemon': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:54:45  'Summon Air Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 15:54:54  'Resurrection': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 17:41:29
+============================================================
+
+============================================================
+  RUN START  2026-04-25 17:45:39
+============================================================
+2026-04-25 17:45:59  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698, 2654174381]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 17:46:09  'Summon Fire Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:46:18  'Summon Water Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:46:27  'Chain Lightning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:46:37  'Energy Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:46:46  'Flamestrike': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:46:55  'Gate Travel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:47:04  'Mana Vampire': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:47:13  'Mass Dispel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:47:23  'Meteor Swarm': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 17:49:02
+============================================================
+2026-04-25 17:49:14  [WARN] Unexpected gump ID 2653346093 (allowed: [949095101, 2683824698, 2654174381]). Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 17:49:23  'Polymorph': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:49:33  'Dispel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:49:42  'Energy Bolt': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:49:51  'Explosion': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:50:00  'Invisibility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:50:09  'Mark': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:50:19  'Mass Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:50:28  'Paralyze Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:50:37  'Reveal': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 17:50:43
+============================================================
+
+============================================================
+  RUN START  2026-04-25 17:55:33
+============================================================
+2026-04-25 17:55:39  [WARN] Gump ID 0 not in allowed list [2653346093]. Proceeding, but consider adding it to CRAFT_GUMP_IDS for your shard.
+2026-04-25 17:55:48  'Blade Spirits': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:55:58  'Dispel Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:56:07  'Incognito': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 17:56:16  'Magic Reflection': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 18:05:04
+============================================================
+2026-04-25 18:05:20  'Mind Blast': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:05:29  'Paralyze': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:05:38  'Poison Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:05:47  'Summon Creature': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:05:57  Crafted 'Arch Cure' (left in backpack).
+
+============================================================
+  RUN START  2026-04-25 18:06:04
+============================================================
+
+============================================================
+  RUN START  2026-04-25 18:06:15
+============================================================
+2026-04-25 18:07:27  Crafted 'Arch Protection' (left in backpack).
+2026-04-25 18:07:36  Crafted 'Curse' (left in backpack).
+2026-04-25 18:07:45  Crafted 'Fire Field' (left in backpack).
+2026-04-25 18:07:54  Crafted 'Greater Heal' (left in backpack).
+2026-04-25 18:08:03  Crafted 'Lightning' (left in backpack).
+2026-04-25 18:08:13  'Mana Drain': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:08:22  'Recall': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:08:31  'Bless': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:08:40  'Fireball': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:08:49  'Magic Lock': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:08:59  'Poison': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:09:08  'Telekinesis': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:09:17  'Teleport': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:09:26  'Unlock': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:09:35  'Wall of Stone': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:09:45  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:09:54  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 18:09:57
+============================================================
+
+============================================================
+  RUN START  2026-04-25 18:10:10
+============================================================
+2026-04-25 18:10:24  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:10:33  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:10:42  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:10:51  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:11:01  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:11:10  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:11:19  Crafted 'Reactive Armor' (left in backpack).
+2026-04-25 18:11:28  Crafted 'Clumsy' (left in backpack).
+2026-04-25 18:11:37  Crafted 'Create Food' (left in backpack).
+2026-04-25 18:11:47  Crafted 'Feeblemind' (left in backpack).
+2026-04-25 18:11:56  Crafted 'Heal' (left in backpack).
+2026-04-25 18:12:05  Crafted 'Magic Arrow' (left in backpack).
+2026-04-25 18:12:14  Crafted 'Night Sight' (left in backpack).
+2026-04-25 18:12:23  Crafted 'Weaken' (left in backpack).
+2026-04-25 18:12:24  CRAFT done.  Crafted: 8   Failed: 6
+2026-04-25 18:12:25  CRAFT done.  Crafted: 8   Failed: 6
+
+============================================================
+  RUN START  2026-04-25 18:33:45
+============================================================
+2026-04-25 18:34:04  'Earthquake': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:34:13  'Energy Vortex': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:34:22  'Resurrection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:34:31  'Summon Air Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:34:41  'Summon Daemon': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:34:50  'Summon Earth Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 18:39:36
+============================================================
+2026-04-25 18:39:53  'Earthquake': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:40:02  'Energy Vortex': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:40:11  'Resurrection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:40:21  'Summon Air Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 18:44:20
+============================================================
+
+============================================================
+  RUN START  2026-04-25 18:48:02
+============================================================
+2026-04-25 18:48:15  'Earthquake': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 18:51:43
+============================================================
+2026-04-25 18:51:48  Target the spellbook to fill...
+
+============================================================
+  RUN START  2026-04-25 18:51:52
+============================================================
+
+============================================================
+  RUN START  2026-04-25 18:53:20
+============================================================
+2026-04-25 18:53:39  'Earthquake': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 18:56:12
+============================================================
+
+============================================================
+  RUN START  2026-04-25 18:57:11
+============================================================
+2026-04-25 18:57:25  'Earthquake': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:57:34  'Energy Vortex': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:57:43  'Resurrection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:57:52  'Summon Air Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 18:58:01  'Summon Daemon': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 18:58:07
+============================================================
+
+============================================================
+  RUN START  2026-04-25 19:15:45
+============================================================
+
+============================================================
+  RUN START  2026-04-25 19:22:22
+============================================================
+
+============================================================
+  RUN START  2026-04-25 19:24:13
+============================================================
+
+============================================================
+  RUN START  2026-04-25 19:25:50
+============================================================
+2026-04-25 19:26:04  Crafted 'Reactive Armor' (left in backpack).
+
+============================================================
+  RUN START  2026-04-25 19:28:55
+============================================================
+
+============================================================
+  RUN START  2026-04-25 19:31:37
+============================================================
+
+============================================================
+  RUN START  2026-04-25 19:34:02
+============================================================
+
+============================================================
+  RUN START  2026-04-25 19:41:09
+============================================================
+2026-04-25 19:41:25  Crafted 'Reactive Armor' (left in backpack).
+
+============================================================
+  RUN START  2026-04-25 19:42:29
+============================================================
+
+============================================================
+  RUN START  2026-04-25 21:53:08
+============================================================
+2026-04-25 21:53:17  Crafted 'Reactive Armor' (left in backpack).
+
+============================================================
+  RUN START  2026-04-25 22:13:37
+============================================================
+2026-04-25 22:13:51  Crafted 'Reactive Armor' (left in backpack).
+2026-04-25 22:13:56  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:01  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:06  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:11  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:16  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:21  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:26  'Weaken': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:31  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:36  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:41  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:46  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:51  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:14:56  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:02  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:07  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:12  'Bless': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:17  'Fireball': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:22  'Magic Lock': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:27  'Poison': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:32  'Telekinesis': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:37  'Teleport': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:42  'Unlock': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:47  'Wall of Stone': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:52  'Arch Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:15:57  'Arch Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:16:02  'Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:16:07  'Fire Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:16:12  'Greater Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:16:17  'Lightning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:16:22  'Mana Drain': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:16:27  'Recall': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:16:32  Crafted 'Blade Spirits' (left in backpack).
+2026-04-25 22:16:37  Crafted 'Dispel Field' (left in backpack).
+2026-04-25 22:16:42  Crafted 'Incognito' (left in backpack).
+2026-04-25 22:16:47  Crafted 'Magic Reflection' (left in backpack).
+2026-04-25 22:16:52  Crafted 'Mind Blast' (left in backpack).
+2026-04-25 22:16:57  Crafted 'Paralyze' (left in backpack).
+2026-04-25 22:17:02  Crafted 'Poison Field' (left in backpack).
+2026-04-25 22:17:07  Crafted 'Summon Creature' (left in backpack).
+2026-04-25 22:17:12  Crafted 'Dispel' (left in backpack).
+2026-04-25 22:17:17  Crafted 'Energy Bolt' (left in backpack).
+2026-04-25 22:17:22  Crafted 'Explosion' (left in backpack).
+2026-04-25 22:17:27  Crafted 'Invisibility' (left in backpack).
+2026-04-25 22:17:32  Crafted 'Mark' (left in backpack).
+
+============================================================
+  RUN START  2026-04-25 22:17:37
+============================================================
+2026-04-25 22:18:45  Crafting gump did not open. Check that this is the right tool.
+
+============================================================
+  RUN START  2026-04-25 22:19:25
+============================================================
+
+============================================================
+  RUN START  2026-04-25 22:19:46
+============================================================
+
+============================================================
+  RUN START  2026-04-25 22:40:42
+============================================================
+2026-04-25 22:40:49  Crafted 'Reactive Armor' (left in backpack).
+2026-04-25 22:40:53  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:40:56  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:40:57  Mana 33/136 — meditating...
+2026-04-25 22:41:49  Mana restored: 136/136
+2026-04-25 22:41:52  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:41:56  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:41:59  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:42:02  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:42:03  Mana 39/136 — meditating...
+2026-04-25 22:42:52  Mana restored: 136/136
+2026-04-25 22:42:55  'Weaken': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:42:58  'Agility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:02  'Cunning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:05  'Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:08  'Harm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:12  'Magic Trap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:15  'Magic Untrap': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:18  'Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:20  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:23  'Bless': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:25  'Fireball': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:27  'Magic Lock': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:29  'Poison': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:31  'Telekinesis': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:33  'Teleport': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:38  'Unlock': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:43  'Wall of Stone': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:48  'Arch Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:53  'Arch Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:43:58  'Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:44:03  'Fire Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:44:08  'Greater Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:44:13  'Lightning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:44:18  'Mana Drain': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:44:23  'Recall': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:44:28  Crafted 'Blade Spirits' (left in backpack).
+2026-04-25 22:44:33  Crafted 'Dispel Field' (left in backpack).
+2026-04-25 22:44:38  Crafted 'Incognito' (left in backpack).
+2026-04-25 22:44:43  Crafted 'Magic Reflection' (left in backpack).
+2026-04-25 22:44:48  Crafted 'Mind Blast' (left in backpack).
+2026-04-25 22:44:53  Crafted 'Paralyze' (left in backpack).
+2026-04-25 22:44:58  Crafted 'Poison Field' (left in backpack).
+2026-04-25 22:45:03  Crafted 'Summon Creature' (left in backpack).
+2026-04-25 22:45:08  Crafted 'Dispel' (left in backpack).
+2026-04-25 22:45:13  Crafted 'Energy Bolt' (left in backpack).
+2026-04-25 22:45:18  Crafted 'Explosion' (left in backpack).
+2026-04-25 22:45:23  Crafted 'Invisibility' (left in backpack).
+2026-04-25 22:45:28  Crafted 'Mark' (left in backpack).
+2026-04-25 22:45:33  Crafted 'Mass Curse' (left in backpack).
+2026-04-25 22:45:38  Crafted 'Paralyze Field' (left in backpack).
+2026-04-25 22:45:43  Crafted 'Reveal' (left in backpack).
+2026-04-25 22:45:48  Crafted 'Chain Lightning' (left in backpack).
+2026-04-25 22:45:53  Crafted 'Energy Field' (left in backpack).
+2026-04-25 22:45:58  Crafted 'Flamestrike' (left in backpack).
+2026-04-25 22:46:03  Crafted 'Gate Travel' (left in backpack).
+2026-04-25 22:46:08  'Mana Vampire': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:46:13  Crafted 'Mass Dispel' (left in backpack).
+2026-04-25 22:46:18  Crafted 'Meteor Swarm' (left in backpack).
+2026-04-25 22:46:23  Crafted 'Polymorph' (left in backpack).
+2026-04-25 22:46:28  'Earthquake': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:46:33  'Energy Vortex': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:46:38  Crafted 'Resurrection' (left in backpack).
+2026-04-25 22:46:43  'Summon Air Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 22:46:48  Crafted 'Summon Daemon' (left in backpack).
+2026-04-25 22:46:53  Crafted 'Summon Earth Elemental' (left in backpack).
+2026-04-25 22:46:58  Crafted 'Summon Fire Elemental' (left in backpack).
+2026-04-25 22:47:03  Crafted 'Summon Water Elemental' (left in backpack).
+2026-04-25 22:47:04  CRAFT done.  Crafted: 29   Failed: 35
+2026-04-25 22:47:05  CRAFT done.  Crafted: 29   Failed: 35
+
+============================================================
+  RUN START  2026-04-25 23:11:57
+============================================================
+2026-04-25 23:12:14  'Reactive Armor': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:12:16  'Clumsy': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:12:18  'Create Food': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:12:22  'Feeblemind': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:12:24  'Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:12:26  'Magic Arrow': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:12:28  'Night Sight': scroll not found after craft — reagents/blanks missing or skill fail.
+
+============================================================
+  RUN START  2026-04-25 23:15:31
+============================================================
+2026-04-25 23:15:37  Target the spellbook to fill...
+2026-04-25 23:15:40  Filling spellbook 0x4012361B from chest 0x400F3F52...
+2026-04-25 23:15:40  'Earthquake' (0x1F65) not in chest.
+2026-04-25 23:15:40  'Energy Vortex' (0x1F66) not in chest.
+2026-04-25 23:15:42  Added 'Resurrection' -> spellbook.
+2026-04-25 23:15:43  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-25 23:15:45  Added 'Summon Daemon' -> spellbook.
+2026-04-25 23:15:47  Added 'Summon Earth Elemental' -> spellbook.
+2026-04-25 23:15:49  Added 'Summon Fire Elemental' -> spellbook.
+2026-04-25 23:15:51  Added 'Summon Water Elemental' -> spellbook.
+2026-04-25 23:15:53  Added 'Chain Lightning' -> spellbook.
+2026-04-25 23:15:55  Added 'Energy Field' -> spellbook.
+2026-04-25 23:15:57  Added 'Flamestrike' -> spellbook.
+2026-04-25 23:15:59  Added 'Gate Travel' -> spellbook.
+2026-04-25 23:16:01  Added 'Mana Vampire' -> spellbook.
+2026-04-25 23:16:03  Added 'Mass Dispel' -> spellbook.
+2026-04-25 23:16:05  Added 'Meteor Swarm' -> spellbook.
+2026-04-25 23:16:07  Added 'Polymorph' -> spellbook.
+2026-04-25 23:16:09  Added 'Dispel' -> spellbook.
+2026-04-25 23:16:11  Added 'Energy Bolt' -> spellbook.
+2026-04-25 23:16:13  Added 'Explosion' -> spellbook.
+2026-04-25 23:16:15  Added 'Invisibility' -> spellbook.
+2026-04-25 23:16:17  Added 'Mark' -> spellbook.
+2026-04-25 23:16:19  Added 'Mass Curse' -> spellbook.
+2026-04-25 23:16:21  Added 'Paralyze Field' -> spellbook.
+2026-04-25 23:16:23  Added 'Reveal' -> spellbook.
+2026-04-25 23:16:25  Added 'Blade Spirits' -> spellbook.
+2026-04-25 23:16:27  Added 'Dispel Field' -> spellbook.
+2026-04-25 23:16:29  Added 'Incognito' -> spellbook.
+2026-04-25 23:16:31  Added 'Magic Reflection' -> spellbook.
+2026-04-25 23:16:33  Added 'Mind Blast' -> spellbook.
+2026-04-25 23:16:35  Added 'Paralyze' -> spellbook.
+2026-04-25 23:16:37  Added 'Poison Field' -> spellbook.
+2026-04-25 23:16:39  Added 'Summon Creature' -> spellbook.
+2026-04-25 23:16:41  Added 'Arch Cure' -> spellbook.
+2026-04-25 23:16:43  Added 'Arch Protection' -> spellbook.
+2026-04-25 23:16:45  Added 'Curse' -> spellbook.
+2026-04-25 23:16:47  Added 'Fire Field' -> spellbook.
+2026-04-25 23:16:49  Added 'Greater Heal' -> spellbook.
+2026-04-25 23:16:51  Added 'Lightning' -> spellbook.
+2026-04-25 23:16:53  Added 'Mana Drain' -> spellbook.
+2026-04-25 23:16:55  Added 'Recall' -> spellbook.
+2026-04-25 23:16:57  Added 'Bless' -> spellbook.
+2026-04-25 23:16:59  Added 'Fireball' -> spellbook.
+2026-04-25 23:17:01  Added 'Magic Lock' -> spellbook.
+2026-04-25 23:17:03  Added 'Poison' -> spellbook.
+2026-04-25 23:17:05  Added 'Telekinesis' -> spellbook.
+2026-04-25 23:17:07  Added 'Teleport' -> spellbook.
+2026-04-25 23:17:09  Added 'Unlock' -> spellbook.
+2026-04-25 23:17:11  Added 'Wall of Stone' -> spellbook.
+2026-04-25 23:17:13  Added 'Agility' -> spellbook.
+2026-04-25 23:17:15  Added 'Cunning' -> spellbook.
+2026-04-25 23:17:17  Added 'Cure' -> spellbook.
+2026-04-25 23:17:19  Added 'Harm' -> spellbook.
+2026-04-25 23:17:21  Added 'Magic Trap' -> spellbook.
+2026-04-25 23:17:23  Added 'Magic Untrap' -> spellbook.
+2026-04-25 23:17:25  Added 'Protection' -> spellbook.
+2026-04-25 23:17:27  Added 'Strength' -> spellbook.
+2026-04-25 23:17:29  Added 'Reactive Armor' -> spellbook.
+2026-04-25 23:17:31  Added 'Clumsy' -> spellbook.
+2026-04-25 23:17:33  Added 'Create Food' -> spellbook.
+2026-04-25 23:17:35  Added 'Feeblemind' -> spellbook.
+2026-04-25 23:17:37  Added 'Heal' -> spellbook.
+2026-04-25 23:17:39  Added 'Magic Arrow' -> spellbook.
+2026-04-25 23:17:41  Added 'Night Sight' -> spellbook.
+2026-04-25 23:17:43  Added 'Weaken' -> spellbook.
+2026-04-25 23:17:43  FILL done.  Added: 61   Missing from chest: 3
+
+============================================================
+  RUN START  2026-04-25 23:18:15
+============================================================
+2026-04-25 23:18:19  Target the spellbook to fill...
+2026-04-25 23:18:20  Filling spellbook 0x4012238E from chest 0x400F3F52...
+2026-04-25 23:18:20  'Earthquake' (0x1F65) not in chest.
+2026-04-25 23:18:21  'Energy Vortex' (0x1F66) not in chest.
+2026-04-25 23:18:23  Added 'Resurrection' -> spellbook.
+2026-04-25 23:18:23  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-25 23:18:23  'Summon Daemon' (0x1F69) not in chest.
+2026-04-25 23:18:25  Added 'Summon Earth Elemental' -> spellbook.
+2026-04-25 23:18:27  Added 'Summon Fire Elemental' -> spellbook.
+2026-04-25 23:18:28  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-25 23:18:30  Added 'Chain Lightning' -> spellbook.
+2026-04-25 23:18:32  Added 'Energy Field' -> spellbook.
+2026-04-25 23:18:34  Added 'Flamestrike' -> spellbook.
+2026-04-25 23:18:36  Added 'Gate Travel' -> spellbook.
+2026-04-25 23:18:38  Added 'Mana Vampire' -> spellbook.
+2026-04-25 23:18:40  Added 'Mass Dispel' -> spellbook.
+2026-04-25 23:18:42  Added 'Meteor Swarm' -> spellbook.
+2026-04-25 23:18:44  Added 'Polymorph' -> spellbook.
+2026-04-25 23:18:44  'Dispel' (0x1F55) not in chest.
+2026-04-25 23:18:44  'Energy Bolt' (0x1F56) not in chest.
+2026-04-25 23:18:45  'Explosion' (0x1F57) not in chest.
+2026-04-25 23:18:47  Added 'Invisibility' -> spellbook.
+2026-04-25 23:18:47  'Mark' (0x1F59) not in chest.
+2026-04-25 23:18:49  Added 'Mass Curse' -> spellbook.
+2026-04-25 23:18:49  'Paralyze Field' (0x1F5B) not in chest.
+2026-04-25 23:18:51  Added 'Reveal' -> spellbook.
+2026-04-25 23:18:53  Added 'Blade Spirits' -> spellbook.
+2026-04-25 23:18:55  Added 'Dispel Field' -> spellbook.
+2026-04-25 23:18:57  Added 'Incognito' -> spellbook.
+2026-04-25 23:18:59  Added 'Magic Reflection' -> spellbook.
+2026-04-25 23:19:01  Added 'Mind Blast' -> spellbook.
+2026-04-25 23:19:03  Added 'Paralyze' -> spellbook.
+2026-04-25 23:19:05  Added 'Poison Field' -> spellbook.
+2026-04-25 23:19:07  Added 'Summon Creature' -> spellbook.
+2026-04-25 23:19:09  Added 'Arch Cure' -> spellbook.
+2026-04-25 23:19:11  Added 'Arch Protection' -> spellbook.
+2026-04-25 23:19:13  Added 'Curse' -> spellbook.
+2026-04-25 23:19:15  Added 'Fire Field' -> spellbook.
+2026-04-25 23:19:17  Added 'Greater Heal' -> spellbook.
+2026-04-25 23:19:19  Added 'Lightning' -> spellbook.
+2026-04-25 23:19:21  Added 'Mana Drain' -> spellbook.
+2026-04-25 23:19:23  Added 'Recall' -> spellbook.
+2026-04-25 23:19:25  Added 'Bless' -> spellbook.
+2026-04-25 23:19:27  Added 'Fireball' -> spellbook.
+2026-04-25 23:19:29  Added 'Magic Lock' -> spellbook.
+2026-04-25 23:19:31  Added 'Poison' -> spellbook.
+2026-04-25 23:19:33  Added 'Telekinesis' -> spellbook.
+2026-04-25 23:19:35  Added 'Teleport' -> spellbook.
+2026-04-25 23:19:37  Added 'Unlock' -> spellbook.
+2026-04-25 23:19:39  Added 'Wall of Stone' -> spellbook.
+2026-04-25 23:19:40  'Agility' (0x1F35) not in chest.
+2026-04-25 23:19:40  'Cunning' (0x1F36) not in chest.
+2026-04-25 23:19:40  'Cure' (0x1F37) not in chest.
+2026-04-25 23:19:40  'Harm' (0x1F38) not in chest.
+2026-04-25 23:19:41  'Magic Trap' (0x1F39) not in chest.
+2026-04-25 23:19:41  'Magic Untrap' (0x1F3A) not in chest.
+2026-04-25 23:19:41  'Protection' (0x1F3B) not in chest.
+2026-04-25 23:19:42  'Strength' (0x1F3C) not in chest.
+2026-04-25 23:19:44  Added 'Reactive Armor' -> spellbook.
+2026-04-25 23:19:46  Added 'Clumsy' -> spellbook.
+2026-04-25 23:19:48  Added 'Create Food' -> spellbook.
+2026-04-25 23:19:50  Added 'Feeblemind' -> spellbook.
+2026-04-25 23:19:52  Added 'Heal' -> spellbook.
+2026-04-25 23:19:54  Added 'Magic Arrow' -> spellbook.
+2026-04-25 23:19:56  Added 'Night Sight' -> spellbook.
+2026-04-25 23:19:58  Added 'Weaken' -> spellbook.
+2026-04-25 23:19:58  FILL done.  Added: 46   Missing from chest: 18
+
+============================================================
+  RUN START  2026-04-25 23:27:16
+============================================================
+2026-04-25 23:27:25  Crafted 'Reactive Armor' (left in backpack).
+2026-04-25 23:27:27  Crafted 'Clumsy' (left in backpack).
+2026-04-25 23:27:30  Crafted 'Create Food' (left in backpack).
+2026-04-25 23:27:32  Crafted 'Feeblemind' (left in backpack).
+2026-04-25 23:27:35  Crafted 'Heal' (left in backpack).
+2026-04-25 23:27:37  Crafted 'Magic Arrow' (left in backpack).
+2026-04-25 23:27:40  Crafted 'Night Sight' (left in backpack).
+2026-04-25 23:27:42  Crafted 'Weaken' (left in backpack).
+2026-04-25 23:27:45  Crafted 'Agility' (left in backpack).
+2026-04-25 23:27:47  Crafted 'Cunning' (left in backpack).
+2026-04-25 23:27:50  Crafted 'Cure' (left in backpack).
+2026-04-25 23:27:53  Crafted 'Harm' (left in backpack).
+2026-04-25 23:27:55  Crafted 'Magic Trap' (left in backpack).
+2026-04-25 23:27:58  Crafted 'Magic Untrap' (left in backpack).
+2026-04-25 23:28:00  Crafted 'Protection' (left in backpack).
+2026-04-25 23:28:03  Crafted 'Strength' (left in backpack).
+2026-04-25 23:28:06  Crafted 'Bless' (left in backpack).
+2026-04-25 23:28:09  Crafted 'Fireball' (left in backpack).
+2026-04-25 23:28:11  Crafted 'Magic Lock' (left in backpack).
+2026-04-25 23:28:14  Crafted 'Poison' (left in backpack).
+2026-04-25 23:28:16  Crafted 'Telekinesis' (left in backpack).
+2026-04-25 23:28:19  Crafted 'Teleport' (left in backpack).
+2026-04-25 23:28:21  Crafted 'Unlock' (left in backpack).
+2026-04-25 23:28:24  Crafted 'Wall of Stone' (left in backpack).
+2026-04-25 23:28:26  Crafted 'Arch Cure' (left in backpack).
+2026-04-25 23:28:29  Crafted 'Arch Protection' (left in backpack).
+2026-04-25 23:28:31  Crafted 'Curse' (left in backpack).
+2026-04-25 23:28:34  Crafted 'Fire Field' (left in backpack).
+2026-04-25 23:28:37  Crafted 'Greater Heal' (left in backpack).
+2026-04-25 23:28:39  Crafted 'Lightning' (left in backpack).
+2026-04-25 23:28:42  Crafted 'Mana Drain' (left in backpack).
+2026-04-25 23:28:44  Crafted 'Recall' (left in backpack).
+2026-04-25 23:28:48  Crafted 'Blade Spirits' (left in backpack).
+2026-04-25 23:28:50  Crafted 'Dispel Field' (left in backpack).
+2026-04-25 23:28:51  Mana 33/136 — meditating...
+2026-04-25 23:29:43  Mana restored: 136/136
+2026-04-25 23:29:46  Crafted 'Incognito' (left in backpack).
+2026-04-25 23:29:49  Crafted 'Magic Reflection' (left in backpack).
+2026-04-25 23:29:52  Crafted 'Mind Blast' (left in backpack).
+2026-04-25 23:29:54  Crafted 'Paralyze' (left in backpack).
+2026-04-25 23:29:57  Crafted 'Poison Field' (left in backpack).
+2026-04-25 23:29:59  Crafted 'Summon Creature' (left in backpack).
+2026-04-25 23:30:02  Crafted 'Dispel' (left in backpack).
+2026-04-25 23:30:04  Crafted 'Energy Bolt' (left in backpack).
+2026-04-25 23:30:07  Crafted 'Explosion' (left in backpack).
+2026-04-25 23:30:08  Mana 36/136 — meditating...
+2026-04-25 23:30:58  Mana restored: 136/136
+2026-04-25 23:31:02  Crafted 'Invisibility' (left in backpack).
+2026-04-25 23:31:04  Crafted 'Mark' (left in backpack).
+2026-04-25 23:31:07  Crafted 'Mass Curse' (left in backpack).
+2026-04-25 23:31:09  Crafted 'Paralyze Field' (left in backpack).
+2026-04-25 23:31:12  Crafted 'Reveal' (left in backpack).
+2026-04-25 23:31:17  Crafted 'Chain Lightning' (left in backpack).
+2026-04-25 23:31:18  Mana 30/136 — meditating...
+
+============================================================
+  RUN START  2026-04-25 23:31:48
+============================================================
+2026-04-25 23:31:54  Target the spellbook to fill...
+2026-04-25 23:31:56  Filling spellbook 0x4012238E from chest 0x400F3F52...
+2026-04-25 23:31:56  'Earthquake' (0x1F65) not in chest.
+2026-04-25 23:31:57  'Energy Vortex' (0x1F66) not in chest.
+2026-04-25 23:31:59  Added 'Resurrection' -> spellbook.
+2026-04-25 23:31:59  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-25 23:31:59  'Summon Daemon' (0x1F69) not in chest.
+2026-04-25 23:31:59  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-25 23:32:00  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-04-25 23:32:00  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-25 23:32:02  Added 'Chain Lightning' -> spellbook.
+2026-04-25 23:32:04  Added 'Energy Field' -> spellbook.
+2026-04-25 23:32:06  Added 'Flamestrike' -> spellbook.
+2026-04-25 23:32:08  Added 'Gate Travel' -> spellbook.
+2026-04-25 23:32:10  Added 'Mana Vampire' -> spellbook.
+2026-04-25 23:32:12  Added 'Mass Dispel' -> spellbook.
+2026-04-25 23:32:14  Added 'Meteor Swarm' -> spellbook.
+2026-04-25 23:32:16  Added 'Polymorph' -> spellbook.
+2026-04-25 23:32:16  'Dispel' (0x1F55) not in chest.
+2026-04-25 23:32:17  'Energy Bolt' (0x1F56) not in chest.
+2026-04-25 23:32:17  'Explosion' (0x1F57) not in chest.
+2026-04-25 23:32:19  Added 'Invisibility' -> spellbook.
+2026-04-25 23:32:19  'Mark' (0x1F59) not in chest.
+2026-04-25 23:32:20  'Mass Curse' (0x1F5A) not in chest.
+2026-04-25 23:32:20  'Paralyze Field' (0x1F5B) not in chest.
+2026-04-25 23:32:22  Added 'Reveal' -> spellbook.
+2026-04-25 23:32:24  Added 'Blade Spirits' -> spellbook.
+2026-04-25 23:32:26  Added 'Dispel Field' -> spellbook.
+2026-04-25 23:32:28  Added 'Incognito' -> spellbook.
+2026-04-25 23:32:30  Added 'Magic Reflection' -> spellbook.
+2026-04-25 23:32:32  Added 'Mind Blast' -> spellbook.
+2026-04-25 23:32:34  Added 'Paralyze' -> spellbook.
+2026-04-25 23:32:36  Added 'Poison Field' -> spellbook.
+2026-04-25 23:32:38  Added 'Summon Creature' -> spellbook.
+2026-04-25 23:32:40  Added 'Arch Cure' -> spellbook.
+2026-04-25 23:32:42  Added 'Arch Protection' -> spellbook.
+2026-04-25 23:32:44  Added 'Curse' -> spellbook.
+2026-04-25 23:32:46  Added 'Fire Field' -> spellbook.
+2026-04-25 23:32:48  Added 'Greater Heal' -> spellbook.
+2026-04-25 23:32:50  Added 'Lightning' -> spellbook.
+2026-04-25 23:32:52  Added 'Mana Drain' -> spellbook.
+2026-04-25 23:32:54  Added 'Recall' -> spellbook.
+2026-04-25 23:32:56  Added 'Bless' -> spellbook.
+2026-04-25 23:32:58  Added 'Fireball' -> spellbook.
+2026-04-25 23:33:00  Added 'Magic Lock' -> spellbook.
+2026-04-25 23:33:02  Added 'Poison' -> spellbook.
+2026-04-25 23:33:04  Added 'Telekinesis' -> spellbook.
+2026-04-25 23:33:06  Added 'Teleport' -> spellbook.
+2026-04-25 23:33:08  Added 'Unlock' -> spellbook.
+2026-04-25 23:33:10  Added 'Wall of Stone' -> spellbook.
+2026-04-25 23:33:10  'Agility' (0x1F35) not in chest.
+2026-04-25 23:33:11  'Cunning' (0x1F36) not in chest.
+2026-04-25 23:33:11  'Cure' (0x1F37) not in chest.
+2026-04-25 23:33:11  'Harm' (0x1F38) not in chest.
+2026-04-25 23:33:11  'Magic Trap' (0x1F39) not in chest.
+2026-04-25 23:33:12  'Magic Untrap' (0x1F3A) not in chest.
+2026-04-25 23:33:12  'Protection' (0x1F3B) not in chest.
+2026-04-25 23:33:12  'Strength' (0x1F3C) not in chest.
+2026-04-25 23:33:14  Added 'Reactive Armor' -> spellbook.
+2026-04-25 23:33:16  Added 'Clumsy' -> spellbook.
+2026-04-25 23:33:18  Added 'Create Food' -> spellbook.
+2026-04-25 23:33:20  Added 'Feeblemind' -> spellbook.
+2026-04-25 23:33:22  Added 'Heal' -> spellbook.
+2026-04-25 23:33:24  Added 'Magic Arrow' -> spellbook.
+2026-04-25 23:33:26  Added 'Night Sight' -> spellbook.
+2026-04-25 23:33:28  Added 'Weaken' -> spellbook.
+2026-04-25 23:33:28  FILL done.  Added: 43   Missing from chest: 21
+
+============================================================
+  RUN START  2026-04-25 23:36:30
+============================================================
+2026-04-25 23:36:33  Target the spellbook to fill...
+2026-04-25 23:36:36  Filling spellbook 0x4012238E from chest 0x400F3F52...
+2026-04-25 23:36:36  'Earthquake' (0x1F65) not in chest.
+2026-04-25 23:36:36  'Energy Vortex' (0x1F66) not in chest.
+2026-04-25 23:36:38  Added 'Resurrection' -> spellbook.
+2026-04-25 23:36:39  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-25 23:36:39  'Summon Daemon' (0x1F69) not in chest.
+2026-04-25 23:36:39  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-25 23:36:40  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-04-25 23:36:40  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-25 23:36:42  Added 'Chain Lightning' -> spellbook.
+2026-04-25 23:36:44  Added 'Energy Field' -> spellbook.
+2026-04-25 23:36:46  Added 'Flamestrike' -> spellbook.
+2026-04-25 23:36:48  Added 'Gate Travel' -> spellbook.
+2026-04-25 23:36:50  Added 'Mana Vampire' -> spellbook.
+2026-04-25 23:36:52  Added 'Mass Dispel' -> spellbook.
+2026-04-25 23:36:54  Added 'Meteor Swarm' -> spellbook.
+2026-04-25 23:36:56  Added 'Polymorph' -> spellbook.
+2026-04-25 23:36:58  Added 'Dispel' -> spellbook.
+2026-04-25 23:37:00  Added 'Energy Bolt' -> spellbook.
+2026-04-25 23:37:02  Added 'Explosion' -> spellbook.
+2026-04-25 23:37:04  Added 'Invisibility' -> spellbook.
+2026-04-25 23:37:04  'Mark' (0x1F59) not in chest.
+2026-04-25 23:37:05  'Mass Curse' (0x1F5A) not in chest.
+2026-04-25 23:37:05  'Paralyze Field' (0x1F5B) not in chest.
+2026-04-25 23:37:07  Added 'Reveal' -> spellbook.
+2026-04-25 23:37:09  Added 'Blade Spirits' -> spellbook.
+2026-04-25 23:37:11  Added 'Dispel Field' -> spellbook.
+2026-04-25 23:37:13  Added 'Incognito' -> spellbook.
+2026-04-25 23:37:15  Added 'Magic Reflection' -> spellbook.
+2026-04-25 23:37:17  Added 'Mind Blast' -> spellbook.
+2026-04-25 23:37:19  Added 'Paralyze' -> spellbook.
+2026-04-25 23:37:21  Added 'Poison Field' -> spellbook.
+2026-04-25 23:37:23  Added 'Summon Creature' -> spellbook.
+2026-04-25 23:37:25  Added 'Arch Cure' -> spellbook.
+2026-04-25 23:37:27  Added 'Arch Protection' -> spellbook.
+2026-04-25 23:37:29  Added 'Curse' -> spellbook.
+2026-04-25 23:37:31  Added 'Fire Field' -> spellbook.
+2026-04-25 23:37:33  Added 'Greater Heal' -> spellbook.
+2026-04-25 23:37:35  Added 'Lightning' -> spellbook.
+2026-04-25 23:37:37  Added 'Mana Drain' -> spellbook.
+2026-04-25 23:37:39  Added 'Recall' -> spellbook.
+2026-04-25 23:37:41  Added 'Bless' -> spellbook.
+2026-04-25 23:37:43  Added 'Fireball' -> spellbook.
+2026-04-25 23:37:45  Added 'Magic Lock' -> spellbook.
+2026-04-25 23:37:47  Added 'Poison' -> spellbook.
+2026-04-25 23:37:49  Added 'Telekinesis' -> spellbook.
+2026-04-25 23:37:51  Added 'Teleport' -> spellbook.
+2026-04-25 23:37:53  Added 'Unlock' -> spellbook.
+2026-04-25 23:37:55  Added 'Wall of Stone' -> spellbook.
+2026-04-25 23:37:57  Added 'Agility' -> spellbook.
+2026-04-25 23:37:59  Added 'Cunning' -> spellbook.
+2026-04-25 23:38:01  Added 'Cure' -> spellbook.
+2026-04-25 23:38:03  Added 'Harm' -> spellbook.
+2026-04-25 23:38:05  Added 'Magic Trap' -> spellbook.
+2026-04-25 23:38:07  Added 'Magic Untrap' -> spellbook.
+2026-04-25 23:38:09  Added 'Protection' -> spellbook.
+2026-04-25 23:38:11  Added 'Strength' -> spellbook.
+2026-04-25 23:38:13  Added 'Reactive Armor' -> spellbook.
+2026-04-25 23:38:15  Added 'Clumsy' -> spellbook.
+2026-04-25 23:38:17  Added 'Create Food' -> spellbook.
+2026-04-25 23:38:19  Added 'Feeblemind' -> spellbook.
+2026-04-25 23:38:21  Added 'Heal' -> spellbook.
+2026-04-25 23:38:23  Added 'Magic Arrow' -> spellbook.
+2026-04-25 23:38:25  Added 'Night Sight' -> spellbook.
+2026-04-25 23:38:27  Added 'Weaken' -> spellbook.
+2026-04-25 23:38:27  FILL done.  Added: 54   Missing from chest: 10
+
+============================================================
+  RUN START  2026-04-25 23:42:28
+============================================================
+2026-04-25 23:42:38  Crafted 'Reactive Armor' (left in backpack).
+2026-04-25 23:42:41  Crafted 'Clumsy' (left in backpack).
+2026-04-25 23:42:43  Crafted 'Create Food' (left in backpack).
+2026-04-25 23:42:46  Crafted 'Feeblemind' (left in backpack).
+2026-04-25 23:42:48  Crafted 'Heal' (left in backpack).
+2026-04-25 23:42:51  Crafted 'Magic Arrow' (left in backpack).
+2026-04-25 23:42:53  Crafted 'Night Sight' (left in backpack).
+2026-04-25 23:42:56  Crafted 'Weaken' (left in backpack).
+2026-04-25 23:42:58  Crafted 'Agility' (left in backpack).
+2026-04-25 23:43:01  Crafted 'Cunning' (left in backpack).
+2026-04-25 23:43:03  Crafted 'Cure' (left in backpack).
+2026-04-25 23:43:06  Crafted 'Harm' (left in backpack).
+2026-04-25 23:43:08  Crafted 'Magic Trap' (left in backpack).
+2026-04-25 23:43:11  Crafted 'Magic Untrap' (left in backpack).
+2026-04-25 23:43:14  Crafted 'Protection' (left in backpack).
+2026-04-25 23:43:16  Crafted 'Strength' (left in backpack).
+2026-04-25 23:43:19  Crafted 'Bless' (left in backpack).
+2026-04-25 23:43:22  Crafted 'Fireball' (left in backpack).
+2026-04-25 23:43:25  Crafted 'Magic Lock' (left in backpack).
+2026-04-25 23:43:27  Crafted 'Poison' (left in backpack).
+2026-04-25 23:43:30  Crafted 'Telekinesis' (left in backpack).
+2026-04-25 23:43:32  Crafted 'Teleport' (left in backpack).
+2026-04-25 23:43:35  Crafted 'Unlock' (left in backpack).
+2026-04-25 23:43:37  Crafted 'Wall of Stone' (left in backpack).
+2026-04-25 23:43:40  Crafted 'Arch Cure' (left in backpack).
+2026-04-25 23:43:42  Crafted 'Arch Protection' (left in backpack).
+2026-04-25 23:43:45  Crafted 'Curse' (left in backpack).
+2026-04-25 23:43:47  Crafted 'Fire Field' (left in backpack).
+2026-04-25 23:43:50  Crafted 'Greater Heal' (left in backpack).
+2026-04-25 23:43:52  Crafted 'Lightning' (left in backpack).
+2026-04-25 23:43:55  Crafted 'Mana Drain' (left in backpack).
+2026-04-25 23:43:58  Crafted 'Recall' (left in backpack).
+2026-04-25 23:44:01  Crafted 'Blade Spirits' (left in backpack).
+2026-04-25 23:44:03  Crafted 'Dispel Field' (left in backpack).
+2026-04-25 23:44:04  Mana 32/136 — meditating...
+2026-04-25 23:44:38  Mana restored: 136/136
+2026-04-25 23:44:42  Crafted 'Incognito' (left in backpack).
+2026-04-25 23:44:44  Crafted 'Magic Reflection' (left in backpack).
+2026-04-25 23:44:47  Crafted 'Mind Blast' (left in backpack).
+2026-04-25 23:44:49  Crafted 'Paralyze' (left in backpack).
+2026-04-25 23:44:52  Crafted 'Poison Field' (left in backpack).
+2026-04-25 23:44:54  Crafted 'Summon Creature' (left in backpack).
+2026-04-25 23:44:57  Crafted 'Dispel' (left in backpack).
+2026-04-25 23:45:00  Crafted 'Energy Bolt' (left in backpack).
+2026-04-25 23:45:02  Crafted 'Explosion' (left in backpack).
+2026-04-25 23:45:03  Mana 36/136 — meditating...
+2026-04-25 23:45:53  Mana restored: 136/136
+2026-04-25 23:45:57  Crafted 'Invisibility' (left in backpack).
+2026-04-25 23:45:59  Crafted 'Mark' (left in backpack).
+2026-04-25 23:46:02  Crafted 'Mass Curse' (left in backpack).
+2026-04-25 23:46:04  Crafted 'Paralyze Field' (left in backpack).
+2026-04-25 23:46:07  Crafted 'Reveal' (left in backpack).
+2026-04-25 23:46:10  'Chain Lightning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:46:13  Crafted 'Energy Field' (left in backpack).
+2026-04-25 23:46:14  Mana 31/136 — meditating...
+2026-04-25 23:46:49  Mana restored: 136/136
+2026-04-25 23:46:52  Crafted 'Flamestrike' (left in backpack).
+2026-04-25 23:46:54  'Gate Travel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:46:55  'Mana Vampire': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:46:56  'Mass Dispel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:46:57  'Meteor Swarm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:46:59  'Polymorph': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:47:00  'Earthquake': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:47:01  'Energy Vortex': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:47:02  'Resurrection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:47:04  'Summon Air Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:47:05  'Summon Daemon': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:47:06  'Summon Earth Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:47:09  Crafted 'Summon Fire Elemental' (left in backpack).
+2026-04-25 23:47:11  'Summon Water Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-25 23:47:12  Transferring scrolls to chest...
+2026-04-25 23:47:14  Transferred 'Reactive Armor' to chest.
+2026-04-25 23:47:16  Transferred 'Clumsy' to chest.
+2026-04-25 23:47:18  Transferred 'Create Food' to chest.
+2026-04-25 23:47:20  Transferred 'Feeblemind' to chest.
+2026-04-25 23:47:22  Transferred 'Heal' to chest.
+2026-04-25 23:47:24  Transferred 'Magic Arrow' to chest.
+2026-04-25 23:47:26  Transferred 'Night Sight' to chest.
+2026-04-25 23:47:28  Transferred 'Weaken' to chest.
+2026-04-25 23:47:30  Transferred 'Agility' to chest.
+2026-04-25 23:47:32  Transferred 'Cunning' to chest.
+2026-04-25 23:47:34  Transferred 'Cure' to chest.
+2026-04-25 23:47:36  Transferred 'Harm' to chest.
+2026-04-25 23:47:38  Transferred 'Magic Trap' to chest.
+2026-04-25 23:47:40  Transferred 'Magic Untrap' to chest.
+2026-04-25 23:47:42  Transferred 'Protection' to chest.
+2026-04-25 23:47:44  Transferred 'Strength' to chest.
+2026-04-25 23:47:46  Transferred 'Bless' to chest.
+
+============================================================
+  RUN START  2026-04-25 23:56:06
+============================================================
+2026-04-25 23:56:09  Target the spellbook to fill...
+2026-04-25 23:56:10  Filling spellbook 0x4012238E from chest 0x400F3F52...
+2026-04-25 23:56:11  'Earthquake' (0x1F65) not in chest.
+2026-04-25 23:56:11  'Energy Vortex' (0x1F66) not in chest.
+2026-04-25 23:56:13  Added 'Resurrection' -> spellbook.
+2026-04-25 23:56:13  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-25 23:56:13  'Summon Daemon' (0x1F69) not in chest.
+2026-04-25 23:56:14  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-25 23:56:16  Added 'Summon Fire Elemental' -> spellbook.
+2026-04-25 23:56:16  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-25 23:56:18  Added 'Chain Lightning' -> spellbook.
+2026-04-25 23:56:20  Added 'Energy Field' -> spellbook.
+2026-04-25 23:56:22  Added 'Flamestrike' -> spellbook.
+2026-04-25 23:56:24  Added 'Gate Travel' -> spellbook.
+2026-04-25 23:56:26  Added 'Mana Vampire' -> spellbook.
+2026-04-25 23:56:28  Added 'Mass Dispel' -> spellbook.
+2026-04-25 23:56:30  Added 'Meteor Swarm' -> spellbook.
+2026-04-25 23:56:32  Added 'Polymorph' -> spellbook.
+2026-04-25 23:56:34  Added 'Dispel' -> spellbook.
+2026-04-25 23:56:36  Added 'Energy Bolt' -> spellbook.
+2026-04-25 23:56:38  Added 'Explosion' -> spellbook.
+2026-04-25 23:56:40  Added 'Invisibility' -> spellbook.
+2026-04-25 23:56:42  Added 'Mark' -> spellbook.
+2026-04-25 23:56:44  Added 'Mass Curse' -> spellbook.
+2026-04-25 23:56:46  Added 'Paralyze Field' -> spellbook.
+2026-04-25 23:56:48  Added 'Reveal' -> spellbook.
+2026-04-25 23:56:50  Added 'Blade Spirits' -> spellbook.
+2026-04-25 23:56:52  Added 'Dispel Field' -> spellbook.
+2026-04-25 23:56:54  Added 'Incognito' -> spellbook.
+2026-04-25 23:56:56  Added 'Magic Reflection' -> spellbook.
+2026-04-25 23:56:58  Added 'Mind Blast' -> spellbook.
+2026-04-25 23:57:00  Added 'Paralyze' -> spellbook.
+2026-04-25 23:57:02  Added 'Poison Field' -> spellbook.
+2026-04-25 23:57:04  Added 'Summon Creature' -> spellbook.
+2026-04-25 23:57:06  Added 'Arch Cure' -> spellbook.
+2026-04-25 23:57:08  Added 'Arch Protection' -> spellbook.
+2026-04-25 23:57:10  Added 'Curse' -> spellbook.
+2026-04-25 23:57:12  Added 'Fire Field' -> spellbook.
+2026-04-25 23:57:14  Added 'Greater Heal' -> spellbook.
+2026-04-25 23:57:16  Added 'Lightning' -> spellbook.
+2026-04-25 23:57:18  Added 'Mana Drain' -> spellbook.
+2026-04-25 23:57:20  Added 'Recall' -> spellbook.
+2026-04-25 23:57:22  Added 'Bless' -> spellbook.
+2026-04-25 23:57:24  Added 'Fireball' -> spellbook.
+2026-04-25 23:57:26  Added 'Magic Lock' -> spellbook.
+2026-04-25 23:57:28  Added 'Poison' -> spellbook.
+2026-04-25 23:57:30  Added 'Telekinesis' -> spellbook.
+2026-04-25 23:57:32  Added 'Teleport' -> spellbook.
+2026-04-25 23:57:34  Added 'Unlock' -> spellbook.
+2026-04-25 23:57:36  Added 'Wall of Stone' -> spellbook.
+2026-04-25 23:57:38  Added 'Agility' -> spellbook.
+2026-04-25 23:57:40  Added 'Cunning' -> spellbook.
+2026-04-25 23:57:42  Added 'Cure' -> spellbook.
+2026-04-25 23:57:44  Added 'Harm' -> spellbook.
+2026-04-25 23:57:46  Added 'Magic Trap' -> spellbook.
+2026-04-25 23:57:48  Added 'Magic Untrap' -> spellbook.
+2026-04-25 23:57:50  Added 'Protection' -> spellbook.
+2026-04-25 23:57:52  Added 'Strength' -> spellbook.
+2026-04-25 23:57:54  Added 'Reactive Armor' -> spellbook.
+2026-04-25 23:57:56  Added 'Clumsy' -> spellbook.
+2026-04-25 23:57:58  Added 'Create Food' -> spellbook.
+2026-04-25 23:58:00  Added 'Feeblemind' -> spellbook.
+2026-04-25 23:58:02  Added 'Heal' -> spellbook.
+2026-04-25 23:58:04  Added 'Magic Arrow' -> spellbook.
+2026-04-25 23:58:06  Added 'Night Sight' -> spellbook.
+2026-04-25 23:58:08  Added 'Weaken' -> spellbook.
+2026-04-25 23:58:08  FILL done.  Added: 58   Missing from chest: 6
+
+============================================================
+  RUN START  2026-04-26 00:01:48
+============================================================
+2026-04-26 00:01:58  Crafted 'Reactive Armor' (left in backpack).
+2026-04-26 00:02:00  Crafted 'Clumsy' (left in backpack).
+2026-04-26 00:02:03  Crafted 'Create Food' (left in backpack).
+2026-04-26 00:02:05  Crafted 'Feeblemind' (left in backpack).
+2026-04-26 00:02:08  Crafted 'Heal' (left in backpack).
+2026-04-26 00:02:10  Crafted 'Magic Arrow' (left in backpack).
+2026-04-26 00:02:13  Crafted 'Night Sight' (left in backpack).
+2026-04-26 00:02:15  Crafted 'Weaken' (left in backpack).
+2026-04-26 00:02:18  Crafted 'Agility' (left in backpack).
+2026-04-26 00:02:20  Crafted 'Cunning' (left in backpack).
+2026-04-26 00:02:23  Crafted 'Cure' (left in backpack).
+2026-04-26 00:02:25  Crafted 'Harm' (left in backpack).
+2026-04-26 00:02:28  Crafted 'Magic Trap' (left in backpack).
+2026-04-26 00:02:31  Crafted 'Magic Untrap' (left in backpack).
+2026-04-26 00:02:35  Crafted 'Protection' (left in backpack).
+2026-04-26 00:02:39  'Strength': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-26 00:02:40  Scribe's pen wore out — finding a replacement...
+2026-04-26 00:02:45  Crafted 'Fireball' (left in backpack).
+2026-04-26 00:02:47  Crafted 'Magic Lock' (left in backpack).
+2026-04-26 00:02:50  Crafted 'Poison' (left in backpack).
+2026-04-26 00:02:52  Crafted 'Telekinesis' (left in backpack).
+2026-04-26 00:02:55  Crafted 'Teleport' (left in backpack).
+2026-04-26 00:02:58  Crafted 'Unlock' (left in backpack).
+2026-04-26 00:03:00  Crafted 'Wall of Stone' (left in backpack).
+2026-04-26 00:03:03  Crafted 'Arch Cure' (left in backpack).
+2026-04-26 00:03:05  Crafted 'Arch Protection' (left in backpack).
+2026-04-26 00:03:08  Crafted 'Curse' (left in backpack).
+2026-04-26 00:03:10  Crafted 'Fire Field' (left in backpack).
+2026-04-26 00:03:13  Crafted 'Greater Heal' (left in backpack).
+2026-04-26 00:03:15  Crafted 'Lightning' (left in backpack).
+2026-04-26 00:03:18  Crafted 'Mana Drain' (left in backpack).
+2026-04-26 00:03:20  Crafted 'Recall' (left in backpack).
+2026-04-26 00:03:24  Crafted 'Blade Spirits' (left in backpack).
+2026-04-26 00:03:26  Crafted 'Dispel Field' (left in backpack).
+2026-04-26 00:03:29  Crafted 'Incognito' (left in backpack).
+2026-04-26 00:03:30  Mana 34/136 — meditating...
+2026-04-26 00:04:21  Mana restored: 136/136
+2026-04-26 00:04:25  Crafted 'Magic Reflection' (left in backpack).
+2026-04-26 00:04:27  Crafted 'Mind Blast' (left in backpack).
+2026-04-26 00:04:30  Crafted 'Paralyze' (left in backpack).
+2026-04-26 00:04:32  Crafted 'Poison Field' (left in backpack).
+2026-04-26 00:04:35  Crafted 'Summon Creature' (left in backpack).
+2026-04-26 00:04:37  Crafted 'Dispel' (left in backpack).
+2026-04-26 00:04:40  Crafted 'Energy Bolt' (left in backpack).
+2026-04-26 00:04:42  Crafted 'Explosion' (left in backpack).
+2026-04-26 00:04:45  Crafted 'Invisibility' (left in backpack).
+2026-04-26 00:04:46  Mana 30/136 — meditating...
+2026-04-26 00:05:39  Mana restored: 136/136
+2026-04-26 00:05:43  Crafted 'Mark' (left in backpack).
+2026-04-26 00:05:45  Crafted 'Mass Curse' (left in backpack).
+2026-04-26 00:05:48  Crafted 'Paralyze Field' (left in backpack).
+2026-04-26 00:05:50  Crafted 'Reveal' (left in backpack).
+2026-04-26 00:05:54  Crafted 'Chain Lightning' (left in backpack).
+2026-04-26 00:05:56  Crafted 'Energy Field' (left in backpack).
+2026-04-26 00:05:57  Mana 6/136 — meditating...
+2026-04-26 00:07:03  Mana restored: 136/136
+2026-04-26 00:07:06  'Flamestrike': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-26 00:07:09  Crafted 'Gate Travel' (left in backpack).
+2026-04-26 00:07:11  Crafted 'Mana Vampire' (left in backpack).
+2026-04-26 00:07:14  Crafted 'Mass Dispel' (left in backpack).
+2026-04-26 00:07:15  Mana 29/136 — meditating...
+2026-04-26 00:07:50  Mana restored: 136/136
+2026-04-26 00:07:53  Crafted 'Meteor Swarm' (left in backpack).
+2026-04-26 00:07:56  'Polymorph': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-26 00:07:58  'Earthquake': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-26 00:08:01  Crafted 'Energy Vortex' (left in backpack).
+2026-04-26 00:08:03  'Resurrection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-26 00:08:06  Crafted 'Summon Air Elemental' (left in backpack).
+2026-04-26 00:08:07  Mana 25/136 — meditating...
+2026-04-26 00:08:43  Mana restored: 136/136
+2026-04-26 00:08:47  'Summon Daemon': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-26 00:08:49  'Summon Earth Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-26 00:08:52  'Summon Fire Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-26 00:08:54  'Summon Water Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-04-26 00:08:55  Transferring scrolls to chest...
+2026-04-26 00:08:57  Transferred 'Reactive Armor' to chest.
+2026-04-26 00:08:59  Transferred 'Clumsy' to chest.
+2026-04-26 00:09:01  Transferred 'Create Food' to chest.
+2026-04-26 00:09:03  Transferred 'Feeblemind' to chest.
+2026-04-26 00:09:05  Transferred 'Heal' to chest.
+2026-04-26 00:09:07  Transferred 'Magic Arrow' to chest.
+2026-04-26 00:09:09  Transferred 'Night Sight' to chest.
+2026-04-26 00:09:11  Transferred 'Weaken' to chest.
+2026-04-26 00:09:13  Transferred 'Agility' to chest.
+2026-04-26 00:09:15  Transferred 'Cunning' to chest.
+2026-04-26 00:09:17  Transferred 'Cure' to chest.
+2026-04-26 00:09:19  Transferred 'Harm' to chest.
+2026-04-26 00:09:21  Transferred 'Magic Trap' to chest.
+2026-04-26 00:09:23  Transferred 'Magic Untrap' to chest.
+2026-04-26 00:09:25  Transferred 'Protection' to chest.
+2026-04-26 00:09:27  Transferred 'Fireball' to chest.
+2026-04-26 00:09:29  Transferred 'Magic Lock' to chest.
+2026-04-26 00:09:31  Transferred 'Poison' to chest.
+2026-04-26 00:09:33  Transferred 'Telekinesis' to chest.
+2026-04-26 00:09:35  Transferred 'Teleport' to chest.
+2026-04-26 00:09:37  Transferred 'Unlock' to chest.
+2026-04-26 00:09:39  Transferred 'Wall of Stone' to chest.
+2026-04-26 00:09:41  Transferred 'Arch Cure' to chest.
+2026-04-26 00:09:43  Transferred 'Arch Protection' to chest.
+2026-04-26 00:09:45  Transferred 'Curse' to chest.
+2026-04-26 00:09:47  Transferred 'Fire Field' to chest.
+2026-04-26 00:09:49  Transferred 'Greater Heal' to chest.
+2026-04-26 00:09:51  Transferred 'Lightning' to chest.
+2026-04-26 00:09:53  Transferred 'Mana Drain' to chest.
+2026-04-26 00:09:55  Transferred 'Recall' to chest.
+2026-04-26 00:09:57  Transferred 'Blade Spirits' to chest.
+2026-04-26 00:09:59  Transferred 'Dispel Field' to chest.
+2026-04-26 00:10:01  Transferred 'Incognito' to chest.
+2026-04-26 00:10:03  Transferred 'Magic Reflection' to chest.
+2026-04-26 00:10:05  Transferred 'Mind Blast' to chest.
+2026-04-26 00:10:07  Transferred 'Paralyze' to chest.
+2026-04-26 00:10:09  Transferred 'Poison Field' to chest.
+2026-04-26 00:10:11  Transferred 'Summon Creature' to chest.
+2026-04-26 00:10:13  Transferred 'Dispel' to chest.
+2026-04-26 00:10:15  Transferred 'Energy Bolt' to chest.
+2026-04-26 00:10:17  Transferred 'Explosion' to chest.
+2026-04-26 00:10:19  Transferred 'Invisibility' to chest.
+2026-04-26 00:10:21  Transferred 'Mark' to chest.
+2026-04-26 00:10:23  Transferred 'Mass Curse' to chest.
+2026-04-26 00:10:25  Transferred 'Paralyze Field' to chest.
+2026-04-26 00:10:27  Transferred 'Reveal' to chest.
+2026-04-26 00:10:29  Transferred 'Chain Lightning' to chest.
+2026-04-26 00:10:31  Transferred 'Energy Field' to chest.
+2026-04-26 00:10:33  Transferred 'Gate Travel' to chest.
+2026-04-26 00:10:35  Transferred 'Mana Vampire' to chest.
+2026-04-26 00:10:37  Transferred 'Mass Dispel' to chest.
+2026-04-26 00:10:39  Transferred 'Meteor Swarm' to chest.
+2026-04-26 00:10:41  Transferred 'Energy Vortex' to chest.
+2026-04-26 00:10:43  Transferred 'Summon Air Elemental' to chest.
+2026-04-26 00:10:43  CRAFT done.  Crafted: 54   Failed: 9   Transferred: 54
+
+============================================================
+  RUN START  2026-04-26 00:10:50
+============================================================
+2026-04-26 00:10:53  Target the spellbook to fill...
+2026-04-26 00:10:54  Filling spellbook 0x4012238E from chest 0x400F3F52...
+2026-04-26 00:10:54  'Earthquake' (0x1F65) not in chest.
+2026-04-26 00:10:56  Added 'Energy Vortex' -> spellbook.
+2026-04-26 00:10:58  Added 'Resurrection' -> spellbook.
+2026-04-26 00:11:00  Added 'Summon Air Elemental' -> spellbook.
+2026-04-26 00:11:00  'Summon Daemon' (0x1F69) not in chest.
+2026-04-26 00:11:01  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-26 00:11:03  Added 'Summon Fire Elemental' -> spellbook.
+2026-04-26 00:11:03  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-26 00:11:05  Added 'Chain Lightning' -> spellbook.
+2026-04-26 00:11:07  Added 'Energy Field' -> spellbook.
+2026-04-26 00:11:09  Added 'Flamestrike' -> spellbook.
+2026-04-26 00:11:11  Added 'Gate Travel' -> spellbook.
+2026-04-26 00:11:13  Added 'Mana Vampire' -> spellbook.
+2026-04-26 00:11:15  Added 'Mass Dispel' -> spellbook.
+2026-04-26 00:11:17  Added 'Meteor Swarm' -> spellbook.
+2026-04-26 00:11:19  Added 'Polymorph' -> spellbook.
+2026-04-26 00:11:21  Added 'Dispel' -> spellbook.
+2026-04-26 00:11:23  Added 'Energy Bolt' -> spellbook.
+2026-04-26 00:11:25  Added 'Explosion' -> spellbook.
+2026-04-26 00:11:27  Added 'Invisibility' -> spellbook.
+2026-04-26 00:11:29  Added 'Mark' -> spellbook.
+2026-04-26 00:11:31  Added 'Mass Curse' -> spellbook.
+2026-04-26 00:11:33  Added 'Paralyze Field' -> spellbook.
+2026-04-26 00:11:35  Added 'Reveal' -> spellbook.
+2026-04-26 00:11:37  Added 'Blade Spirits' -> spellbook.
+2026-04-26 00:11:39  Added 'Dispel Field' -> spellbook.
+2026-04-26 00:11:41  Added 'Incognito' -> spellbook.
+2026-04-26 00:11:43  Added 'Magic Reflection' -> spellbook.
+2026-04-26 00:11:45  Added 'Mind Blast' -> spellbook.
+2026-04-26 00:11:47  Added 'Paralyze' -> spellbook.
+2026-04-26 00:11:49  Added 'Poison Field' -> spellbook.
+2026-04-26 00:11:51  Added 'Summon Creature' -> spellbook.
+2026-04-26 00:11:53  Added 'Arch Cure' -> spellbook.
+2026-04-26 00:11:55  Added 'Arch Protection' -> spellbook.
+2026-04-26 00:11:57  Added 'Curse' -> spellbook.
+2026-04-26 00:11:59  Added 'Fire Field' -> spellbook.
+2026-04-26 00:12:01  Added 'Greater Heal' -> spellbook.
+2026-04-26 00:12:03  Added 'Lightning' -> spellbook.
+2026-04-26 00:12:05  Added 'Mana Drain' -> spellbook.
+2026-04-26 00:12:07  Added 'Recall' -> spellbook.
+2026-04-26 00:12:09  Added 'Bless' -> spellbook.
+2026-04-26 00:12:11  Added 'Fireball' -> spellbook.
+2026-04-26 00:12:13  Added 'Magic Lock' -> spellbook.
+2026-04-26 00:12:15  Added 'Poison' -> spellbook.
+2026-04-26 00:12:17  Added 'Telekinesis' -> spellbook.
+2026-04-26 00:12:19  Added 'Teleport' -> spellbook.
+2026-04-26 00:12:21  Added 'Unlock' -> spellbook.
+2026-04-26 00:12:23  Added 'Wall of Stone' -> spellbook.
+2026-04-26 00:12:25  Added 'Agility' -> spellbook.
+2026-04-26 00:12:27  Added 'Cunning' -> spellbook.
+2026-04-26 00:12:29  Added 'Cure' -> spellbook.
+2026-04-26 00:12:31  Added 'Harm' -> spellbook.
+2026-04-26 00:12:33  Added 'Magic Trap' -> spellbook.
+2026-04-26 00:12:35  Added 'Magic Untrap' -> spellbook.
+2026-04-26 00:12:37  Added 'Protection' -> spellbook.
+2026-04-26 00:12:39  Added 'Strength' -> spellbook.
+2026-04-26 00:12:41  Added 'Reactive Armor' -> spellbook.
+2026-04-26 00:12:43  Added 'Clumsy' -> spellbook.
+2026-04-26 00:12:45  Added 'Create Food' -> spellbook.
+2026-04-26 00:12:47  Added 'Feeblemind' -> spellbook.
+2026-04-26 00:12:49  Added 'Heal' -> spellbook.
+2026-04-26 00:12:51  Added 'Magic Arrow' -> spellbook.
+2026-04-26 00:12:53  Added 'Night Sight' -> spellbook.
+2026-04-26 00:12:55  Added 'Weaken' -> spellbook.
+2026-04-26 00:12:55  FILL done.  Added: 60   Missing from chest: 4
+
+============================================================
+  RUN START  2026-04-26 00:16:32
+============================================================
+2026-04-26 00:16:35  Target the spellbook to fill...
+2026-04-26 00:16:36  Filling spellbook 0x4012361B from chest 0x400F3F52...
+2026-04-26 00:16:37  'Earthquake' (0x1F65) not in chest.
+2026-04-26 00:16:39  Added 'Energy Vortex' -> spellbook.
+2026-04-26 00:16:41  Added 'Resurrection' -> spellbook.
+2026-04-26 00:16:41  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-26 00:16:41  'Summon Daemon' (0x1F69) not in chest.
+2026-04-26 00:16:42  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-26 00:16:44  Added 'Summon Fire Elemental' -> spellbook.
+2026-04-26 00:16:44  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-26 00:16:46  Added 'Chain Lightning' -> spellbook.
+2026-04-26 00:16:48  Added 'Energy Field' -> spellbook.
+2026-04-26 00:16:50  Added 'Flamestrike' -> spellbook.
+2026-04-26 00:16:52  Added 'Gate Travel' -> spellbook.
+2026-04-26 00:16:54  Added 'Mana Vampire' -> spellbook.
+2026-04-26 00:16:56  Added 'Mass Dispel' -> spellbook.
+2026-04-26 00:16:58  Added 'Meteor Swarm' -> spellbook.
+2026-04-26 00:17:00  Added 'Polymorph' -> spellbook.
+2026-04-26 00:17:02  Added 'Dispel' -> spellbook.
+2026-04-26 00:17:04  Added 'Energy Bolt' -> spellbook.
+2026-04-26 00:17:06  Added 'Explosion' -> spellbook.
+2026-04-26 00:17:08  Added 'Invisibility' -> spellbook.
+2026-04-26 00:17:10  Added 'Mark' -> spellbook.
+2026-04-26 00:17:12  Added 'Mass Curse' -> spellbook.
+2026-04-26 00:17:14  Added 'Paralyze Field' -> spellbook.
+2026-04-26 00:17:16  Added 'Reveal' -> spellbook.
+2026-04-26 00:17:18  Added 'Blade Spirits' -> spellbook.
+2026-04-26 00:17:20  Added 'Dispel Field' -> spellbook.
+2026-04-26 00:17:22  Added 'Incognito' -> spellbook.
+2026-04-26 00:17:24  Added 'Magic Reflection' -> spellbook.
+2026-04-26 00:17:26  Added 'Mind Blast' -> spellbook.
+2026-04-26 00:17:28  Added 'Paralyze' -> spellbook.
+2026-04-26 00:17:30  Added 'Poison Field' -> spellbook.
+2026-04-26 00:17:32  Added 'Summon Creature' -> spellbook.
+2026-04-26 00:17:34  Added 'Arch Cure' -> spellbook.
+2026-04-26 00:17:36  Added 'Arch Protection' -> spellbook.
+2026-04-26 00:17:38  Added 'Curse' -> spellbook.
+2026-04-26 00:17:40  Added 'Fire Field' -> spellbook.
+2026-04-26 00:17:42  Added 'Greater Heal' -> spellbook.
+2026-04-26 00:17:44  Added 'Lightning' -> spellbook.
+2026-04-26 00:17:46  Added 'Mana Drain' -> spellbook.
+2026-04-26 00:17:48  Added 'Recall' -> spellbook.
+2026-04-26 00:17:50  Added 'Bless' -> spellbook.
+2026-04-26 00:17:52  Added 'Fireball' -> spellbook.
+2026-04-26 00:17:54  Added 'Magic Lock' -> spellbook.
+2026-04-26 00:17:56  Added 'Poison' -> spellbook.
+2026-04-26 00:17:58  Added 'Telekinesis' -> spellbook.
+2026-04-26 00:18:00  Added 'Teleport' -> spellbook.
+2026-04-26 00:18:02  Added 'Unlock' -> spellbook.
+2026-04-26 00:18:04  Added 'Wall of Stone' -> spellbook.
+2026-04-26 00:18:06  Added 'Agility' -> spellbook.
+2026-04-26 00:18:08  Added 'Cunning' -> spellbook.
+2026-04-26 00:18:10  Added 'Cure' -> spellbook.
+2026-04-26 00:18:12  Added 'Harm' -> spellbook.
+2026-04-26 00:18:14  Added 'Magic Trap' -> spellbook.
+2026-04-26 00:18:16  Added 'Magic Untrap' -> spellbook.
+2026-04-26 00:18:18  Added 'Protection' -> spellbook.
+2026-04-26 00:18:20  Added 'Strength' -> spellbook.
+2026-04-26 00:18:22  Added 'Reactive Armor' -> spellbook.
+2026-04-26 00:18:24  Added 'Clumsy' -> spellbook.
+2026-04-26 00:18:26  Added 'Create Food' -> spellbook.
+2026-04-26 00:18:28  Added 'Feeblemind' -> spellbook.
+2026-04-26 00:18:30  Added 'Heal' -> spellbook.
+2026-04-26 00:18:32  Added 'Magic Arrow' -> spellbook.
+2026-04-26 00:18:34  Added 'Night Sight' -> spellbook.
+2026-04-26 00:18:36  Added 'Weaken' -> spellbook.
+2026-04-26 00:18:36  FILL done.  Added: 59   Missing from chest: 5
+
+============================================================
+  RUN START  2026-04-26 00:22:20
+============================================================
+2026-04-26 00:22:26  Target the spellbook to fill...
+2026-04-26 00:22:42  Filling spellbook 0x40123B98 from chest 0x400F3F52...
+2026-04-26 00:22:42  'Earthquake' (0x1F65) not in chest.
+2026-04-26 00:22:42  'Energy Vortex' (0x1F66) not in chest.
+2026-04-26 00:22:44  Added 'Resurrection' -> spellbook.
+2026-04-26 00:22:45  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-26 00:22:45  'Summon Daemon' (0x1F69) not in chest.
+2026-04-26 00:22:45  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-26 00:22:47  Added 'Summon Fire Elemental' -> spellbook.
+2026-04-26 00:22:48  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-26 00:22:50  Added 'Chain Lightning' -> spellbook.
+2026-04-26 00:22:52  Added 'Energy Field' -> spellbook.
+2026-04-26 00:22:54  Added 'Flamestrike' -> spellbook.
+2026-04-26 00:22:56  Added 'Gate Travel' -> spellbook.
+2026-04-26 00:22:58  Added 'Mana Vampire' -> spellbook.
+2026-04-26 00:23:00  Added 'Mass Dispel' -> spellbook.
+2026-04-26 00:23:02  Added 'Meteor Swarm' -> spellbook.
+2026-04-26 00:23:04  Added 'Polymorph' -> spellbook.
+2026-04-26 00:23:06  Added 'Dispel' -> spellbook.
+2026-04-26 00:23:08  Added 'Energy Bolt' -> spellbook.
+2026-04-26 00:23:10  Added 'Explosion' -> spellbook.
+2026-04-26 00:23:12  Added 'Invisibility' -> spellbook.
+2026-04-26 00:23:14  Added 'Mark' -> spellbook.
+2026-04-26 00:23:16  Added 'Mass Curse' -> spellbook.
+2026-04-26 00:23:18  Added 'Paralyze Field' -> spellbook.
+2026-04-26 00:23:20  Added 'Reveal' -> spellbook.
+2026-04-26 00:23:22  Added 'Blade Spirits' -> spellbook.
+2026-04-26 00:23:24  Added 'Dispel Field' -> spellbook.
+2026-04-26 00:23:26  Added 'Incognito' -> spellbook.
+2026-04-26 00:23:28  Added 'Magic Reflection' -> spellbook.
+2026-04-26 00:23:30  Added 'Mind Blast' -> spellbook.
+2026-04-26 00:23:32  Added 'Paralyze' -> spellbook.
+2026-04-26 00:23:34  Added 'Poison Field' -> spellbook.
+2026-04-26 00:23:36  Added 'Summon Creature' -> spellbook.
+2026-04-26 00:23:38  Added 'Arch Cure' -> spellbook.
+2026-04-26 00:23:40  Added 'Arch Protection' -> spellbook.
+2026-04-26 00:23:42  Added 'Curse' -> spellbook.
+2026-04-26 00:23:44  Added 'Fire Field' -> spellbook.
+2026-04-26 00:23:46  Added 'Greater Heal' -> spellbook.
+2026-04-26 00:23:48  Added 'Lightning' -> spellbook.
+2026-04-26 00:23:50  Added 'Mana Drain' -> spellbook.
+2026-04-26 00:23:52  Added 'Recall' -> spellbook.
+2026-04-26 00:23:54  Added 'Bless' -> spellbook.
+2026-04-26 00:23:56  Added 'Fireball' -> spellbook.
+2026-04-26 00:23:58  Added 'Magic Lock' -> spellbook.
+2026-04-26 00:24:00  Added 'Poison' -> spellbook.
+2026-04-26 00:24:02  Added 'Telekinesis' -> spellbook.
+2026-04-26 00:24:04  Added 'Teleport' -> spellbook.
+2026-04-26 00:24:06  Added 'Unlock' -> spellbook.
+2026-04-26 00:24:08  Added 'Wall of Stone' -> spellbook.
+2026-04-26 00:24:10  Added 'Agility' -> spellbook.
+2026-04-26 00:24:12  Added 'Cunning' -> spellbook.
+2026-04-26 00:24:14  Added 'Cure' -> spellbook.
+2026-04-26 00:24:16  Added 'Harm' -> spellbook.
+2026-04-26 00:24:18  Added 'Magic Trap' -> spellbook.
+2026-04-26 00:24:20  Added 'Magic Untrap' -> spellbook.
+2026-04-26 00:24:22  Added 'Protection' -> spellbook.
+2026-04-26 00:24:24  Added 'Strength' -> spellbook.
+2026-04-26 00:24:26  Added 'Reactive Armor' -> spellbook.
+2026-04-26 00:24:28  Added 'Clumsy' -> spellbook.
+2026-04-26 00:24:30  Added 'Create Food' -> spellbook.
+2026-04-26 00:24:32  Added 'Feeblemind' -> spellbook.
+2026-04-26 00:24:34  Added 'Heal' -> spellbook.
+2026-04-26 00:24:36  Added 'Magic Arrow' -> spellbook.
+2026-04-26 00:24:38  Added 'Night Sight' -> spellbook.
+2026-04-26 00:24:40  Added 'Weaken' -> spellbook.
+2026-04-26 00:24:40  FILL done.  Added: 58   Missing from chest: 6
+
+============================================================
+  RUN START  2026-04-26 08:40:54
+============================================================
+2026-04-26 08:41:02  Target the spellbook to fill...
+2026-04-26 08:41:04  Filling spellbook 0x401236D6 from chest 0x400F3F52...
+2026-04-26 08:41:05  'Earthquake' (0x1F65) not in chest.
+2026-04-26 08:41:05  'Energy Vortex' (0x1F66) not in chest.
+2026-04-26 08:41:07  Added 'Resurrection' -> spellbook.
+2026-04-26 08:41:07  'Summon Air Elemental' (0x1F68) not in chest.
+2026-04-26 08:41:08  'Summon Daemon' (0x1F69) not in chest.
+2026-04-26 08:41:08  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-04-26 08:41:08  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-04-26 08:41:09  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-04-26 08:41:11  Added 'Chain Lightning' -> spellbook.
+2026-04-26 08:41:13  Added 'Energy Field' -> spellbook.
+2026-04-26 08:41:15  Added 'Flamestrike' -> spellbook.
+2026-04-26 08:41:17  Added 'Gate Travel' -> spellbook.
+2026-04-26 08:41:19  Added 'Mana Vampire' -> spellbook.
+2026-04-26 08:41:21  Added 'Mass Dispel' -> spellbook.
+2026-04-26 08:41:23  Added 'Meteor Swarm' -> spellbook.
+2026-04-26 08:41:25  Added 'Polymorph' -> spellbook.
+2026-04-26 08:41:27  Added 'Dispel' -> spellbook.
+2026-04-26 08:41:29  Added 'Energy Bolt' -> spellbook.
+2026-04-26 08:41:31  Added 'Explosion' -> spellbook.
+2026-04-26 08:41:33  Added 'Invisibility' -> spellbook.
+2026-04-26 08:41:35  Added 'Mark' -> spellbook.
+2026-04-26 08:41:37  Added 'Mass Curse' -> spellbook.
+2026-04-26 08:41:39  Added 'Paralyze Field' -> spellbook.
+2026-04-26 08:41:41  Added 'Reveal' -> spellbook.
+2026-04-26 08:41:43  Added 'Blade Spirits' -> spellbook.
+2026-04-26 08:41:45  Added 'Dispel Field' -> spellbook.
+2026-04-26 08:41:47  Added 'Incognito' -> spellbook.
+2026-04-26 08:41:49  Added 'Magic Reflection' -> spellbook.
+2026-04-26 08:41:51  Added 'Mind Blast' -> spellbook.
+2026-04-26 08:41:53  Added 'Paralyze' -> spellbook.
+2026-04-26 08:41:55  Added 'Poison Field' -> spellbook.
+2026-04-26 08:41:57  Added 'Summon Creature' -> spellbook.
+2026-04-26 08:41:59  Added 'Arch Cure' -> spellbook.
+2026-04-26 08:42:01  Added 'Arch Protection' -> spellbook.
+2026-04-26 08:42:03  Added 'Curse' -> spellbook.
+2026-04-26 08:42:05  Added 'Fire Field' -> spellbook.
+2026-04-26 08:42:07  Added 'Greater Heal' -> spellbook.
+2026-04-26 08:42:09  Added 'Lightning' -> spellbook.
+2026-04-26 08:42:11  Added 'Mana Drain' -> spellbook.
+2026-04-26 08:42:13  Added 'Recall' -> spellbook.
+2026-04-26 08:42:15  Added 'Bless' -> spellbook.
+2026-04-26 08:42:17  Added 'Fireball' -> spellbook.
+2026-04-26 08:42:19  Added 'Magic Lock' -> spellbook.
+2026-04-26 08:42:21  Added 'Poison' -> spellbook.
+2026-04-26 08:42:23  Added 'Telekinesis' -> spellbook.
+2026-04-26 08:42:25  Added 'Teleport' -> spellbook.
+2026-04-26 08:42:27  Added 'Unlock' -> spellbook.
+2026-04-26 08:42:29  Added 'Wall of Stone' -> spellbook.
+2026-04-26 08:42:31  Added 'Agility' -> spellbook.
+2026-04-26 08:42:33  Added 'Cunning' -> spellbook.
+2026-04-26 08:42:35  Added 'Cure' -> spellbook.
+2026-04-26 08:42:37  Added 'Harm' -> spellbook.
+2026-04-26 08:42:39  Added 'Magic Trap' -> spellbook.
+2026-04-26 08:42:41  Added 'Magic Untrap' -> spellbook.
+2026-04-26 08:42:43  Added 'Protection' -> spellbook.
+2026-04-26 08:42:45  Added 'Strength' -> spellbook.
+2026-04-26 08:42:47  Added 'Reactive Armor' -> spellbook.
+2026-04-26 08:42:49  Added 'Clumsy' -> spellbook.
+2026-04-26 08:42:51  Added 'Create Food' -> spellbook.
+2026-04-26 08:42:53  Added 'Feeblemind' -> spellbook.
+2026-04-26 08:42:55  Added 'Heal' -> spellbook.
+2026-04-26 08:42:57  Added 'Magic Arrow' -> spellbook.
+2026-04-26 08:42:59  Added 'Night Sight' -> spellbook.
+2026-04-26 08:43:01  Added 'Weaken' -> spellbook.
+2026-04-26 08:43:01  FILL done.  Added: 57   Missing from chest: 7

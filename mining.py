@@ -27,6 +27,17 @@ class cfg:
     pause_after_transfer      = 1000  # ms – between each Items.Move / MoveOnGround call
     pause_after_drop_settle   = 2500  # ms – wait after all ore is on ground before smelting
     loop_delay                = 100   # ms – bottom of every main loop iteration
+    max_silent_ok             = 2     # rotate direction after this many swings with no journal response
+
+    # Body graphic IDs — verify with Object Inspector if your shard differs.
+    pack_beetle_body   = 0x00EF     # giant/pack beetle
+    fire_beetle_body   = 0x00A9     # fire beetle (acts as mobile forge)
+
+    # Optional hardcoded serials — set these to skip the mobile scan entirely.
+    # Useful when auto-detect is unreliable (e.g. beetle is out of scan range).
+    fire_beetle_serial = 0x0000169A
+    pack_beetle_serial = None
+
     mining_directions = [
         (-1,  0),   # west
         ( 1,  0),   # east
@@ -44,6 +55,9 @@ JOURNAL_NO_ORE     = "no metal here to mine"
 JOURNAL_CANT_MINE  = ["can't mine there", "cannot be seen",
                        "That is not accessable", "blocked"]
 JOURNAL_PACK_FULL  = "Your backpack is full"
+# Broad fragments present in any shard's "you got ore" message.
+# If your shard uses different text, add a fragment here.
+JOURNAL_ORE_SUCCESS = ["backpack", "put", "ore"]
 
 # Human-readable direction labels (aligned with cfg.mining_directions order)
 DIR_LABELS = ["West", "East", "North", "South", "NW", "NE", "SW", "SE"]
@@ -65,6 +79,8 @@ GATE_TRAVEL_DELAY = 4000   # ms to wait for gate to open / travel to complete
 # ── Session state (persists for the life of this script run) ──────────────────
 forge_serial         = None
 mount_serial         = None
+pack_beetle_serial   = None
+fire_beetle_serial   = None
 smelting_in_progress = False
 # Maps (dx, dy) -> (tz, tile_id) after the first successful swing per direction.
 # Cleared automatically if the cached values stop working (player moved).
@@ -248,6 +264,110 @@ def _smelt_ore_impl():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Beetle detection
+# ─────────────────────────────────────────────────────────────────────────────
+
+def find_beetles():
+    """
+    Locate a pack beetle and/or fire beetle.
+    Priority: cfg hardcoded serials → body-ID scan → cached session serials.
+    The Friend filter is intentionally omitted — it matches Razor's friends list,
+    not UO pets, and excludes beetles that haven't been manually listed there.
+    Returns (pack_mobile_or_None, fire_mobile_or_None).
+    """
+    global pack_beetle_serial, fire_beetle_serial
+
+    pack = None
+    fire = None
+
+    # ── Hardcoded serials in cfg take priority ────────────────────────────────
+    if cfg.fire_beetle_serial is not None:
+        fire = Mobiles.FindBySerial(cfg.fire_beetle_serial)
+    if cfg.pack_beetle_serial is not None:
+        pack = Mobiles.FindBySerial(cfg.pack_beetle_serial)
+
+    # ── Body-ID scan for anything not already found ───────────────────────────
+    if pack is None or fire is None:
+        filt = Mobiles.Filter()
+        filt.RangeMax = 10
+        filt.IsHuman  = False
+        for mob in Mobiles.ApplyFilter(filt):
+            if mob.Serial == Player.Serial:
+                continue
+            if fire is None and mob.Body == cfg.fire_beetle_body:
+                fire = mob
+                fire_beetle_serial = mob.Serial
+            elif pack is None and mob.Body == cfg.pack_beetle_body and mob.Backpack is not None:
+                pack = mob
+                pack_beetle_serial = mob.Serial
+
+    # ── Session serial cache as last resort ───────────────────────────────────
+    if pack is None and pack_beetle_serial is not None:
+        pack = Mobiles.FindBySerial(pack_beetle_serial)
+    if fire is None and fire_beetle_serial is not None:
+        fire = Mobiles.FindBySerial(fire_beetle_serial)
+
+    if pack is not None:
+        log("Pack beetle: %s (0x%X)" % (pack.Name, pack.Serial), 0x3B)
+    if fire is not None:
+        log("Fire beetle: %s (0x%X)" % (fire.Name, fire.Serial), 0x3B)
+    if pack is None and fire is None:
+        log("No pack or fire beetle detected.", 0x25)
+
+    return pack, fire
+
+
+def smelt_with_fire_beetle(fire_beetle):
+    """Smelt all ore in the player's backpack using the fire beetle as a mobile forge."""
+    global forge_serial
+    log("Smelting with fire beetle (0x%X)..." % fire_beetle.Serial)
+    prev_forge   = forge_serial
+    forge_serial = fire_beetle.Serial
+    try:
+        smelt_from_backpack()
+    finally:
+        forge_serial = prev_forge
+
+
+def handle_overweight():
+    """
+    Dismount if mounted (beetle is invisible to mobile scans while ridden),
+    detect beetle type, transfer or smelt, then remount.
+    Returns True if weight is back under threshold.
+    """
+    global mount_serial
+
+    was_mounted = Player.Mount is not None
+    if was_mounted:
+        log("Dismounting to scan for beetles...", 0x3B)
+        Mobiles.UseMobile(Player.Serial)
+        Misc.Pause(1500)
+
+    pack, fire = find_beetles()
+
+    if pack is not None:
+        mount_serial = pack.Serial
+        if not transfer_to_mount():
+            log("Pack beetle full – falling back to smelt.", 0x25)
+            if fire is not None:
+                smelt_with_fire_beetle(fire)
+            else:
+                smelt_ore()
+    elif fire is not None:
+        smelt_with_fire_beetle(fire)
+    else:
+        smelt_ore()
+
+    # Remount whichever beetle we found.
+    remount_target = pack or fire
+    if was_mounted and remount_target is not None:
+        Mobiles.UseMobile(remount_target.Serial)
+        Misc.Pause(1500)
+
+    return Player.Weight < cfg.weight_transfer_threshold
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Pack-animal transfer
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -344,8 +464,11 @@ def mine_at(dx, dy):
 
     def _swing(tz, tile_id):
         Journal.Clear()
+        Target.ClearQueue()
         Items.UseItem(tool)
-        Target.WaitForTarget(3000, False)
+        if not Target.WaitForTarget(3000, False):
+            log("Target cursor never appeared – treating as cant_mine.", 0x3B)
+            return False
         Target.TargetExecute(tx, ty, tz, tile_id)
         Misc.Pause(cfg.pause_after_mine)
         return not Journal.Search("cannot be seen")
@@ -353,7 +476,9 @@ def mine_at(dx, dy):
     # ── Use cached tile info if available ─────────────────────────────────────
     if (dx, dy) in _tile_cache:
         tz, tile_id = _tile_cache[(dx, dy)]
-        _swing(tz, tile_id)
+        if not _swing(tz, tile_id):
+            del _tile_cache[(dx, dy)]   # cached tile no longer valid — clear it
+            return "cant_mine"
         return "ok"
 
     # ── First attempt: land tile (works outdoors) ─────────────────────────────
@@ -405,11 +530,38 @@ def read_journal_status():
 
 MOONGATE_ID = 0x0F6C
 
+def _bank_stacks(source_serial, item_ids, label):
+    """Move every matching stack from source_serial into the open bank box. Returns total amount."""
+    total = 0
+    for iid in item_ids:
+        stack = Items.FindByID(iid, -1, source_serial)
+        while stack is not None:
+            total += stack.Amount
+            Items.Move(stack, Player.Bank, stack.Amount)
+            Misc.Pause(cfg.pause_after_transfer)
+            stack = Items.FindByID(iid, -1, source_serial)
+    if total:
+        log("Banked %d %s." % (total, label))
+    return total
+
+
 def bank_ingots():
     """
-    Cast Gate Travel on the runebook (uses its default rune = bank), step
-    through the moongate, say 'bank' to open the box, deposit all ingots.
+    Gate to bank and deposit based on detected beetle type:
+      Fire beetle  – deposit ingots from player backpack.
+      Pack beetle  – dismount, pull ore + ingots from beetle to bank,
+                     then deposit player backpack ingots as well.
+      No beetle    – deposit player backpack ingots only.
     """
+    # ── Detect beetle type before gating ─────────────────────────────────────
+    pack, fire = find_beetles()
+    if pack is not None:
+        log("Pack beetle detected – will pull ore and ingots from beetle at bank.", 0x3B)
+    elif fire is not None:
+        log("Fire beetle detected – will deposit player ingots at bank.", 0x3B)
+    else:
+        log("No beetle detected – depositing player backpack ingots only.", 0x3B)
+
     # ── Find runebook ─────────────────────────────────────────────────────────
     runebook = Items.FindByID(RUNEBOOK_ITEM_ID, -1, Player.Backpack.Serial)
     if runebook is None:
@@ -427,7 +579,6 @@ def bank_ingots():
     Target.WaitForTarget(4000, False)
     Target.TargetExecute(runebook.Serial)
 
-    # Wait for the server confirmation phrase before searching for the gate
     Timer.Create("gate_cast_timeout", 6000)
     while Timer.Check("gate_cast_timeout"):
         if Journal.Search("You open a magical gate"):
@@ -438,7 +589,7 @@ def bank_ingots():
         log("Gate Travel confirmation not seen – spell may have failed.", 0x25)
         return
 
-    Misc.Pause(500)   # brief settle so the gate item spawns
+    Misc.Pause(500)
 
     # ── Find the moongate and step through ────────────────────────────────────
     log("Looking for moongate...")
@@ -473,20 +624,30 @@ def bank_ingots():
 
     Misc.Pause(500)
 
-    # ── Deposit all ingots ────────────────────────────────────────────────────
-    total = 0
-    for iid in INGOT_IDS:
-        stack = Items.FindByID(iid, -1, Player.Backpack.Serial)
-        while stack is not None:
-            total += stack.Amount
-            Items.Move(stack, Player.Bank, stack.Amount)
-            Misc.Pause(cfg.pause_after_transfer)
-            stack = Items.FindByID(iid, -1, Player.Backpack.Serial)
+    # ── Deposit based on beetle type ──────────────────────────────────────────
+    if pack is not None:
+        # Dismount so the beetle is accessible.
+        was_mounted = Player.Mount is not None
+        if was_mounted:
+            Mobiles.UseMobile(Player.Serial)
+            Misc.Pause(1500)
 
-    if total:
-        log("Deposited %d ingots into bank." % total)
+        beetle = Mobiles.FindBySerial(pack.Serial)
+        if beetle is not None and beetle.Backpack is not None:
+            _bank_stacks(beetle.Backpack.Serial, ORE_IDS,   "ore from beetle")
+            _bank_stacks(beetle.Backpack.Serial, INGOT_IDS, "ingots from beetle")
+        else:
+            log("Could not access pack beetle backpack at bank.", 0x25)
+
+        _bank_stacks(Player.Backpack.Serial, INGOT_IDS, "ingots from backpack")
+
+        if was_mounted:
+            Mobiles.UseMobile(pack.Serial)
+            Misc.Pause(1500)
+
     else:
-        log("No ingots found to deposit.", 0x3B)
+        # Fire beetle or no beetle — deposit player ingots.
+        _bank_stacks(Player.Backpack.Serial, INGOT_IDS, "ingots from backpack")
 
 
 def check_loop_command():
@@ -521,6 +682,12 @@ def run_mining_loop():
     num_dirs     = len(cfg.mining_directions)
     dir_index    = 0
     consec_fails = 0
+    silent_count = 0   # consecutive swings with no journal response
+
+    if Player.Mount is not None:
+        log("Mounted – dismounting before mining.", 0x3B)
+        Mobiles.UseMobile(Player.Serial)
+        Misc.Pause(1500)
 
     pos = Player.Position
     log("Mining started at (%d, %d, %d)." % (pos.X, pos.Y, pos.Z))
@@ -553,14 +720,11 @@ def run_mining_loop():
 
         # ── Weight threshold check ────────────────────────────────────────────
         if not smelting_in_progress and Player.Weight >= cfg.weight_transfer_threshold:
-            log("Weight %d / %d – transferring ore to pack animal."
+            log("Weight %d / %d – acting on beetle type."
                 % (Player.Weight, Player.MaxWeight), 0x25)
-            if not transfer_to_mount():
-                log("Mount pack full or unavailable – smelting to free space.", 0x25)
-                smelt_ore()
-                if Player.Weight >= cfg.weight_transfer_threshold:
-                    log("Still overweight after smelt – stopping.", 0x25)
-                    break
+            if not handle_overweight():
+                log("Still overweight after action – stopping.", 0x25)
+                break
 
         # ── Mine current direction ────────────────────────────────────────────
         dx, dy    = cfg.mining_directions[dir_index]
@@ -580,7 +744,10 @@ def run_mining_loop():
         log("Journal status: %s" % status, 0x3B)
 
         if status in ("no_ore", "cant_mine"):
+            if status == "no_ore":
+                Player.HeadMessage(0x25, "No metal – moving on")
             consec_fails += 1
+            silent_count  = 0
             dir_index     = (dir_index + 1) % num_dirs
             dx2, dy2      = cfg.mining_directions[dir_index]
             log("Spot unmineable (%s). Rotating to direction %d / %d  (dx=%+d, dy=%+d)."
@@ -593,17 +760,27 @@ def run_mining_loop():
             if smelting_in_progress:
                 pass  # already smelting – ignore pack_full signal mid-smelt
             else:
-                log("Backpack full – transferring ore to pack animal.", 0x25)
-                if not transfer_to_mount():
-                    log("Mount pack full or unavailable – smelting to free space.", 0x25)
-                    smelt_ore()
-                    if Player.Weight >= cfg.weight_transfer_threshold:
-                        log("Still overweight after smelt – stopping.", 0x25)
-                        break
+                log("Backpack full – acting on beetle type.", 0x25)
+                if not handle_overweight():
+                    log("Still overweight after action – stopping.", 0x25)
+                    break
             consec_fails = 0
 
         else:
-            consec_fails = 0   # successful mine – reset the rotation counter
+            if any(Journal.Search(p) for p in JOURNAL_ORE_SUCCESS):
+                consec_fails = 0
+                silent_count = 0
+            else:
+                silent_count += 1
+                log("Silent swing %d/%d – no journal response." % (silent_count, cfg.max_silent_ok), 0x3B)
+                if silent_count >= cfg.max_silent_ok:
+                    log("Rotating after %d silent swings." % silent_count, 0x25)
+                    consec_fails += 1
+                    dir_index    = (dir_index + 1) % num_dirs
+                    silent_count = 0
+                else:
+                    consec_fails = 0
+            silent_count = 0
 
         Misc.Pause(cfg.loop_delay)
 

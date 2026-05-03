@@ -1,7 +1,7 @@
 Player.UseSkill('Imbuing')
-Gumps.WaitForGump(1697188745, 10000)
-Gumps.SendAction(1697188745, 10011)
+Gumps.WaitForGump(0x5b394d53, 10000)   # Imbuing menu
+Gumps.SendAction(0x5b394d53, 10011)    # Unravel Container
 Target.WaitForTarget(10000, False)
 Target.TargetExecute(0x4027E2DB)
-Gumps.WaitForGump(3074326971, 10000)
-Gumps.SendAction(3074326971, 1)
+Gumps.WaitForGump(0x7f3111a7, 10000)   # Confirm dialog
+Gumps.SendAction(0x7f3111a7, 1)

@@ -35,6 +35,7 @@ from Scripts.glossary.colors import colors
 LOCATIONS_FILE   = os.path.join( os.path.dirname( __file__ ), 'runebook_locations.json' )
 RUNEBOOK_GUMP_ID = 89
 POLL_MS          = 300   # main-loop poll interval (ms)
+PARTY_CHAT_TYPE  = 'Party'   # Journal entry Type for party chat; set '' to disable filter
 
 # Mana costs -- tune per shard
 MANA_GATE        = 40    # Gate Travel  (Circle 7)
@@ -317,13 +318,18 @@ def HandleRez():
     Target.WaitForTarget( SPELL_TARGET_MS, False )
     Target.TargetExecute( ghost )
 
-    # Wait for ghost to accept (may require manual accept on some shards)
-    waited = 0
-    while ghost.IsGhost and waited < REZ_ACCEPT_MS:
+    # Re-fetch each tick so IsGhost reflects current server state
+    waited   = 0
+    accepted = False
+    while waited < REZ_ACCEPT_MS:
         Misc.Pause( 500 )
         waited += 500
+        fresh = Mobiles.FindBySerial( ghost.Serial )
+        if fresh is None or not fresh.IsGhost:
+            accepted = True
+            break
 
-    if ghost.IsGhost:
+    if not accepted:
         Misc.SendMessage( 'Rez not accepted by %s.' % ghost.Name, colors['yellow'] )
         Player.ChatParty( 'Gatekeeper: rez not accepted by %s.' % ghost.Name )
         return
@@ -419,19 +425,20 @@ def Main():
     base_pos = ( Player.Position.X, Player.Position.Y )
     gate_idx  = [0]   # mutable so HandleGate can advance it (IronPython 2 compat)
 
-    # Clear journal at startup so we don't replay pre-existing entries
+    # Discard pre-existing entries; watermark advances so entries are never re-read
     Journal.Clear()
+    journal_idx = 0
 
     while not Player.IsGhost:
-        # GetJournalEntry() returns the full List[JournalEntry] at runtime
-        found_cmd = None
-        found_arg = None
-        entries = Journal.GetJournalEntry( 0 )
-        if entries:
-            for entry in entries:
-                # Skip nameless entries (e.g. our own ChatParty echo) and self.
-                # Party chat from other players always has a Name.
+        found_cmd  = None
+        found_arg  = None
+        new_entries = Journal.GetJournalEntry( journal_idx )
+        if new_entries:
+            journal_idx += len( new_entries )
+            for entry in new_entries:
                 if not entry.Name or entry.Name.lower() == Player.Name.lower():
+                    continue
+                if PARTY_CHAT_TYPE and entry.Type != PARTY_CHAT_TYPE:
                     continue
                 cmd = NormalizeText( entry.Text )
                 if cmd.startswith( 'gate ' ):
@@ -439,18 +446,13 @@ def Main():
                     if arg:
                         found_cmd = 'gate'
                         found_arg = arg
-                    break   # process one command per poll cycle
+                    break
                 elif cmd == 'rez':
                     found_cmd = 'rez'
                     break
                 elif cmd == 'heal':
                     found_cmd = 'heal'
                     break
-
-        # Clear so accumulated entries aren't replayed next cycle.
-        # Any commands that arrived during a handler will have been appended
-        # before this Clear, so they'll be caught here first.
-        Journal.Clear()
 
         if found_cmd == 'gate' and found_arg:
             HandleGate( runes, found_arg, base_pos, gate_idx )
