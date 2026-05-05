@@ -16,7 +16,7 @@ PET_FOLLOW_RANGE     = 2      # tiles — beyond this the pet is recalled
 HEALTH_THRESHOLD     = 0.90   # heal/cure when pet HP ratio drops below this
 CHECK_INTERVAL        = 1500  # ms between main loop ticks
 FOLLOW_CHECK_INTERVAL = 1500  # ms between "all follow me" repeats while waiting for pet
-FOLLOW_MAX_CHECKS     = 2     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
+FOLLOW_MAX_CHECKS     = 1     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
 PET_SCAN_RANGE        = 30    # tile radius to search for a friendly mobile
 GUARD_BREAK_DISTANCE  = 4     # tiles player must move from guard origin before pet is immediately recalled
 
@@ -188,6 +188,8 @@ def cure_pet(pet):
 
 
 def check_pet_health(pet):
+    if Player.Name.lower() == 'kspot':
+        return
     if pet.HitsMax == 0:
         return
     hp_ratio = float(pet.Hits) / pet.HitsMax
