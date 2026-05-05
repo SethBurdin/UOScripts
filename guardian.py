@@ -16,8 +16,9 @@ PET_FOLLOW_RANGE     = 2      # tiles — beyond this the pet is recalled
 HEALTH_THRESHOLD     = 0.90   # heal/cure when pet HP ratio drops below this
 CHECK_INTERVAL        = 1500  # ms between main loop ticks
 FOLLOW_CHECK_INTERVAL = 1500  # ms between "all follow me" repeats while waiting for pet
-FOLLOW_MAX_CHECKS     = 6     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
-PET_SCAN_RANGE       = 30     # tile radius to search for a friendly mobile
+FOLLOW_MAX_CHECKS     = 2     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
+PET_SCAN_RANGE        = 30    # tile radius to search for a friendly mobile
+GUARD_BREAK_DISTANCE  = 4     # tiles player must move from guard origin before pet is immediately recalled
 
 # Auto-bank gold
 WEIGHT_BANK_THRESHOLD = 0.90        # recall home when weight ratio >= this
@@ -154,6 +155,7 @@ def find_pet():
     f = Mobiles.Filter()
     f.Enabled  = True
     f.Friend   = True
+    f.IsHuman  = False
     f.RangeMin = 0
     f.RangeMax = PET_SCAN_RANGE
     candidates = Mobiles.ApplyFilter(f)
@@ -186,7 +188,9 @@ def cure_pet(pet):
 
 
 def check_pet_health(pet):
-    hp_ratio = float(pet.Hits) / max(pet.HitsMax, 1)
+    if pet.HitsMax == 0:
+        return
+    hp_ratio = float(pet.Hits) / pet.HitsMax
     if pet.Poisoned and hp_ratio < HEALTH_THRESHOLD:
         cure_pet(pet)
     elif hp_ratio < HEALTH_THRESHOLD:
@@ -214,14 +218,26 @@ def recall_pet(pet):
 def main():
     log("Guardian started.", colors['cyan'])
     is_guarding = False
+    guard_pos   = None  # player tile when "all guard me" was last issued
 
     while not Player.IsGhost:
         bank_gold_if_heavy()
+
+        # Break guard the moment the player moves far enough from the guard origin.
+        # This fires "all follow me" immediately rather than waiting for the pet
+        # distance check, which is what lets the pet kill mobs before being recalled.
+        if is_guarding and guard_pos is not None:
+            pos = Player.Position
+            if max(abs(pos.X - guard_pos[0]), abs(pos.Y - guard_pos[1])) > GUARD_BREAK_DISTANCE:
+                is_guarding = False
+                guard_pos   = None
+                Player.ChatSay(690, 'all follow me')
 
         pet = find_pet()
         if pet is None:
             log("No pet found — calling out...", colors['yellow'])
             is_guarding = False
+            guard_pos   = None
             Player.ChatSay(690, 'all follow me')
             Misc.Pause(CHECK_INTERVAL)
             continue
@@ -230,14 +246,17 @@ def main():
 
         if Player.DistanceTo(pet) > PET_FOLLOW_RANGE:
             is_guarding = False
+            guard_pos   = None
             arrived = recall_pet(pet)
             if not arrived:
                 Misc.Pause(CHECK_INTERVAL)
                 continue
 
         if not is_guarding:
+            pos = Player.Position
             Player.ChatSay(690, 'all guard me')
             is_guarding = True
+            guard_pos   = (pos.X, pos.Y)
 
         Misc.Pause(CHECK_INTERVAL)
 
