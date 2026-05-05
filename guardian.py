@@ -19,11 +19,135 @@ FOLLOW_CHECK_INTERVAL = 3000  # ms between checks after "all follow me"
 FOLLOW_MAX_CHECKS    = 3      # max polls waiting for pet to arrive
 PET_SCAN_RANGE       = 30     # tile radius to search for a friendly mobile
 
+# Auto-bank gold
+WEIGHT_BANK_THRESHOLD = 0.90        # recall home when weight ratio >= this
+GOLD_DEST_SERIAL      = 0x400B404A  # serial of the container to deposit gold into — EDIT THIS
+HOME_RUNEBOOK_NAME    = "home"      # label on the runebook item (case-insensitive)
+FARM_RUNE_NAME        = "ww"        # label of the rune to return to after banking (case-insensitive)
+RECALL_SETTLE_DELAY   = 2000        # ms to wait after recall lands
+
+RUNEBOOK_ITEM_ID   = 0x22C5
+GOLD_ITEM_ID       = 0x0EED
+RUNEBOOK_GUMP_ID   = 89
+RECALL_BUTTON_BASE = 50   # confirmed: recall slot N = 50 + N  (macro: slot0=50, slot1=51, slot12=62, slot13=63)
+GATE_BUTTON_BASE   = 100  # confirmed: gate slot N = 100 + N
+
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
 def log(msg, color=68):
     Misc.SendMessage("[guardian] " + msg, color)
+
+
+# ─── Auto-bank gold ───────────────────────────────────────────────────────────
+
+def find_home_runebook():
+    rb = Items.FindByID(RUNEBOOK_ITEM_ID, -1, Player.Backpack.Serial)
+    if rb is None:
+        return None
+    props = Items.GetPropStringList(rb.Serial) or []
+    if any(p.strip().lower() == HOME_RUNEBOOK_NAME for p in props):
+        return rb
+    return None
+
+
+def recall_to_named_rune(runebook, rune_name):
+    """
+    Open the runebook gump, locate rune_name in the text list, then recall using
+    the confirmed fixed formula: button = 50 + absolute_slot_index.
+
+    LastGumpGetLineList returns all gump text elements (labels, charges, page tabs,
+    rune names, etc.) not just rune names. The rune names form a contiguous block;
+    we find the target and walk backward through that block to determine its
+    0-based slot index within the 16-slot runebook.
+    """
+    Items.UseItem(runebook)
+    if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
+        log("Runebook gump did not open.", colors['red'])
+        return False
+
+    lines = Gumps.LastGumpGetLineList()
+    target = rune_name.strip().lower()
+
+    target_idx = None
+    for i, line in enumerate(lines):
+        if line.strip().lower() == target:
+            target_idx = i
+            break
+
+    if target_idx is None:
+        log("Rune '%s' not found. Lines: %s" % (rune_name, lines), colors['red'])
+        # Do NOT send any gump action here — unknown buttons can drop runes.
+        return False
+
+    # Walk backward through the rune name block to count its 0-based slot index.
+    # Stop at empty strings, digit-only entries (page tabs), or known fixed gump labels.
+    _GUMP_LABELS = {"rename book", "charges", "max charges"}
+    slot = 0
+    i = target_idx - 1
+    while i >= 0:
+        entry = lines[i].strip()
+        if not entry or entry.isdigit() or entry.lower() in _GUMP_LABELS:
+            break
+        slot += 1
+        i -= 1
+
+    button_id = RECALL_BUTTON_BASE + slot
+    log("Recalling to '%s' (slot %d → button %d)." % (rune_name, slot, button_id), colors['cyan'])
+    Gumps.SendAction(RUNEBOOK_GUMP_ID, button_id)
+    Misc.Pause(RECALL_SETTLE_DELAY)
+    return True
+
+
+def transfer_gold():
+    dest = Items.FindBySerial(GOLD_DEST_SERIAL)
+    if dest is None:
+        log("Gold destination (0x%X) not found — set GOLD_DEST_SERIAL in config." % GOLD_DEST_SERIAL, colors['red'])
+        return
+    total = 0
+    gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+    while gold is not None:
+        total += gold.Amount
+        Items.Move(gold, dest, gold.Amount)
+        Misc.Pause(800)
+        gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+    if total:
+        log("Deposited %d gold into 0x%X." % (total, GOLD_DEST_SERIAL), colors['cyan'])
+    else:
+        log("No gold to deposit.", colors['yellow'])
+
+
+def bank_gold_if_heavy():
+    if Player.MaxWeight == 0:
+        return
+    ratio = float(Player.Weight) / Player.MaxWeight
+    if ratio < WEIGHT_BANK_THRESHOLD:
+        return
+
+    log("Weight at %.0f%% — recalling home to deposit gold." % (ratio * 100), colors['yellow'])
+
+    rb = find_home_runebook()
+    if rb is None:
+        log("No runebook named '%s' in backpack — cannot bank." % HOME_RUNEBOOK_NAME, colors['red'])
+        return
+
+    mana_before = Player.Mana
+    Journal.Clear()
+    Spells.CastMagery("Recall")
+    if not Target.WaitForTarget(4000, False):
+        log("Recall: target cursor never appeared.", colors['red'])
+        return
+    Target.TargetExecute(rb.Serial)
+
+    Timer.Create("recall_mana", 3000)
+    while Timer.Check("recall_mana"):
+        if Player.Mana < mana_before:
+            break
+        Misc.Pause(50)
+
+    Misc.Pause(RECALL_SETTLE_DELAY)
+    transfer_gold()
+    recall_to_named_rune(rb, FARM_RUNE_NAME)
 
 
 def find_pet():
@@ -71,8 +195,8 @@ def check_pet_health(pet):
 
 def recall_pet(pet):
     log("Pet too far (%d tiles) — all follow me" % Player.DistanceTo(pet), colors['yellow'])
-    Player.ChatSay(690, 'all follow me')
     for i in range(FOLLOW_MAX_CHECKS):
+        Player.ChatSay(690, 'all follow me')
         Misc.Pause(FOLLOW_CHECK_INTERVAL)
         fresh = Mobiles.FindBySerial(pet.Serial)
         if fresh is None:
@@ -89,22 +213,32 @@ def recall_pet(pet):
 
 def main():
     log("Guardian started.", colors['cyan'])
+    is_guarding = False
+
     while not Player.IsGhost:
+        bank_gold_if_heavy()
+
         pet = find_pet()
         if pet is None:
-            log("No pet found — waiting...", colors['yellow'])
+            log("No pet found — calling out...", colors['yellow'])
+            is_guarding = False
+            Player.ChatSay(690, 'all follow me')
             Misc.Pause(CHECK_INTERVAL)
             continue
 
         check_pet_health(pet)
 
         if Player.DistanceTo(pet) > PET_FOLLOW_RANGE:
+            is_guarding = False
             arrived = recall_pet(pet)
             if not arrived:
                 Misc.Pause(CHECK_INTERVAL)
                 continue
 
-        Player.ChatSay(690, 'all guard me')
+        if not is_guarding:
+            Player.ChatSay(690, 'all guard me')
+            is_guarding = True
+
         Misc.Pause(CHECK_INTERVAL)
 
 

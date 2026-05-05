@@ -23,6 +23,7 @@ from glossary.items.containers import FindHatch
 from glossary.items.tools import tools
 from utilities.items import FindItem, MoveItem
 from System.Collections.Generic import List
+from System import Int32
 
 fishIDs = [ 0x09CF, 0x09CE, 0x09CC, 0x09CD ]
 
@@ -119,7 +120,7 @@ def FightEnemy():
         corpseFilter = Items.Filter()
         corpseFilter.Movable = False
         corpseFilter.RangeMax = 2
-        corpseFilter.Graphics = List[int]( [ 0x2006 ] )
+        corpseFilter.Graphics = List[Int32]( [ 0x2006 ] )
         corpses = Items.ApplyFilter( corpseFilter )
         corpse = None
         for corpse in corpses:

@@ -1,9 +1,12 @@
 '''
-Author: TheWarDoctor95
-Other Contributors:
-Last Contribution By: TheWarDoctor95 - April 26, 2019
+Trains Carpentry to its skill cap.
 
-Description: Trains Carpentry to its cap
+Board supply:   pulls REFILL_BOARDS boards from the supply box when the player
+                drops below LOW_BOARDS.
+Output:         after each craft, the item type is discovered from the backpack
+                diff and moved to the output box by ItemID — no hardcoded IDs,
+                no full-inventory scan.  Resets automatically when the skill
+                tier changes to a new item.
 '''
 
 import sys, os
@@ -11,133 +14,258 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from glossary.colors import colors
 from glossary.crafting.carpentry import FindCarpentryTool, carpentryCraftables
-from glossary.items.containers import FindTrashBarrel
-from utilities.items import FindItem, FindNumberOfItems, MoveItem
+from utilities.items import FindNumberOfItems
 
-# Set to serial of bag or 'pet' for the mount that you are on
-# Set to None if you don't want to keep slayers
-slayerBag = 'pet'
-petName = 'Beetlejuice'
+# ── Config ────────────────────────────────────────────────────────────────────
+LOW_BOARDS    = 50     # pull more boards when player has fewer than this
+REFILL_BOARDS = 200    # how many boards to pull each time
+PAUSE_MOVE    = 1200   # ms between Items.Move calls
+WEIGHT_BUFFER = 50     # stones below MaxWeight to trigger offload
 
-def FindPet():
-    '''
-    Dismounts and finds the pet you were mounted on
-    '''
+BOARD_IDS     = [0x1BD7, 0x1BDD]   # plain boards, hue 0 only
+MAKE_LAST_BTN = None               # set once known (record a macro pressing Make Last)
 
-    global petName
+# Known item IDs per craft tier.  None = unknown, discovered after first craft.
+# Verify with Object Inspector and fill in any that are still None.
+TIER_ITEM_IDS = {
+    'ballot box':    None,    # discovered dynamically on first craft
+    'wooden shield': 0x1B7A,
+    'quarter staff': 0x0E89,
+    'gnarled staff': 0x13F8,
+}
 
-    if Player.Mount != None:
-        Mobiles.UseMobile( Player.Serial )
-        Misc.Pause( 700 )
-
-    petFilter = Mobiles.Filter()
-    petFilter.Enabled = True
-    petFilter.RangeMin = 0
-    petFilter.RangeMax = 1
-    petFilter.Name = petName
-
-    pet = Mobiles.ApplyFilter( petFilter )[ 0 ]
-    return pet
+TOO_MANY_PHRASES = [
+    "That container cannot hold any more items",
+    "That container cannot hold more weight",
+    "Your backpack cannot hold that",
+    "There is not enough room",
+]
 
 
-def TrainCarpentry():
-    '''
-    Trains Carpentry to its skill cap
-    '''
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
-    if Player.GetRealSkillValue( 'Carpentry' ) == Player.GetSkillCap( 'Carpentry' ):
-        Player.HeadMessage( colors[ 'green' ], 'Your Carpentry is already at its skill cap!' )
+def log(msg, color=None):
+    Misc.SendMessage('[carpentry] ' + msg, color or colors['cyan'])
+
+
+def prompt_container(msg):
+    log(msg)
+    serial = Target.PromptTarget(msg)
+    if not serial or serial == 0:
+        return None
+    box = Items.FindBySerial(serial)
+    if box is None:
+        log('Could not find that item.', colors['red'])
+    return box
+
+
+def count_boards():
+    total = 0
+    for bid in BOARD_IDS:
+        total += FindNumberOfItems(bid, Player.Backpack, 0x0000)[bid]
+    return total
+
+
+def journal_too_many():
+    return any(Journal.Search(p) for p in TOO_MANY_PHRASES)
+
+
+def pull_boards(boards_box):
+    """Pull up to REFILL_BOARDS plain boards from boards_box into backpack.
+    Returns True on success, False if backpack became full mid-pull."""
+    Journal.Clear()
+    remaining = REFILL_BOARDS
+    for bid in BOARD_IDS:
+        if remaining <= 0:
+            break
+        stack = Items.FindByID(bid, 0, boards_box.Serial)
+        while stack is not None and remaining > 0:
+            Items.Move(stack, Player.Backpack, min(stack.Amount, remaining))
+            Misc.Pause(PAUSE_MOVE)
+            if journal_too_many():
+                return False
+            remaining -= min(stack.Amount, remaining)
+            stack = Items.FindByID(bid, 0, boards_box.Serial)
+    return True
+
+
+def dump_to_output(output_box, item_id):
+    """Move all items of item_id from backpack to output_box.
+    Falls back to dropping on the ground if the box is full.
+    Returns count moved/dropped."""
+    if item_id is None:
+        return 0
+    moved = 0
+    crafted = Items.FindByID(item_id, -1, Player.Backpack.Serial)
+    while crafted is not None:
+        Journal.Clear()
+        Items.Move(crafted, output_box, crafted.Amount)
+        Misc.Pause(PAUSE_MOVE)
+        if journal_too_many():
+            log('Output box full – dropping on ground.', colors['yellow'])
+            pos = Player.Position
+            Items.MoveOnGround(crafted, crafted.Amount, pos.X, pos.Y, pos.Z)
+            Misc.Pause(PAUSE_MOVE)
+        moved += 1
+        crafted = Items.FindByID(item_id, -1, Player.Backpack.Serial)
+    if moved:
+        log('Cleared %d item(s).' % moved)
+    return moved
+
+
+# ── Main training loop ────────────────────────────────────────────────────────
+
+def TrainCarpentry(boards_box, output_box):
+    skill = Player.GetRealSkillValue('Carpentry')
+    cap   = Player.GetSkillCap('Carpentry')
+    log('Carpentry %.1f / %.1f' % (skill, cap))
+
+    if skill >= cap:
+        log('Already at skill cap – nothing to do.')
         return
 
-    tool = FindCarpentryTool( Player.Backpack )
-    if tool == None:
-        Player.HeadMessage( colors[ 'red' ], 'No tools to train with!' )
+    tool = FindCarpentryTool(Player.Backpack)
+    if tool is None:
+        log('No carpentry tool found in backpack – stopping.', colors['red'])
         return
 
-    trashBarrel = FindTrashBarrel( Items )
-    if trashBarrel == None:
-        Player.HeadMessage( colors[ 'red' ], 'No trash barrel nearby!' )
-        return
+    log('Tool: %s (0x%X)' % (tool.Name, tool.Serial))
+
+    current_item_name = None   # name of the item we are currently crafting
+    current_item_id   = None   # ItemID discovered after first successful craft
+
+    # ── Startup cleanup ───────────────────────────────────────────────────────
+    Items.UseItem(Player.Backpack)
+    Items.WaitForContents(Player.Backpack, 3000)
+    Misc.Pause(500)
+    known_ids = {iid for iid in TIER_ITEM_IDS.values() if iid is not None}
+    to_clear = [i for i in (Player.Backpack.Contains or []) if i.ItemID in known_ids]
+    if to_clear:
+        log('Clearing %d leftover crafted item(s) from previous run.' % len(to_clear))
+        for item in to_clear:
+            Journal.Clear()
+            Items.Move(item, output_box, item.Amount)
+            Misc.Pause(PAUSE_MOVE)
+            if journal_too_many():
+                pos = Player.Position
+                Items.MoveOnGround(item, item.Amount, pos.X, pos.Y, pos.Z)
+                Misc.Pause(PAUSE_MOVE)
 
     Journal.Clear()
-    while not Player.IsGhost and Player.GetRealSkillValue( 'Carpentry' ) < Player.GetSkillCap( 'Carpentry' ):
-        # Make sure the tool isn't broken. If it is broken, this will return None
-        tool = Items.FindBySerial( tool.Serial )
-        if tool == None:
-            tool = FindCarpentryTool( Player.Backpack )
-            if tool == None:
-                Player.HeadMessage( colors[ 'red' ], 'Ran out of tools!' )
+
+    while not Player.IsGhost and Player.GetRealSkillValue('Carpentry') < Player.GetSkillCap('Carpentry'):
+
+        # ── Refresh tool ──────────────────────────────────────────────────────
+        tool = Items.FindBySerial(tool.Serial)
+        if tool is None:
+            tool = FindCarpentryTool(Player.Backpack)
+            if tool is None:
+                log('Ran out of tools – stopping.', colors['red'])
                 break
 
-        # Select the item to craft
-        itemToCraft = None
-        if Player.GetRealSkillValue( 'Carpentry' ) < 40.0:
-            Player.HeadMessage( colors[ 'red' ], 'Use gold to train with an NPC' )
+        # ── Weight check ──────────────────────────────────────────────────────
+        if Player.Weight >= Player.MaxWeight - WEIGHT_BUFFER:
+            log('Heavy (%d/%d) – offloading.' % (Player.Weight, Player.MaxWeight), colors['yellow'])
+            dump_to_output(output_box, current_item_id)
+
+        # ── Board supply check ────────────────────────────────────────────────
+        boards = count_boards()
+        if boards < LOW_BOARDS:
+            log('Boards low (%d) – pulling %d.' % (boards, REFILL_BOARDS))
+            if not pull_boards(boards_box):
+                log('Backpack full during pull – offloading first.', colors['yellow'])
+                dump_to_output(output_box, current_item_id)
+                if not pull_boards(boards_box):
+                    log('Still cannot pull boards – stopping.', colors['red'])
+                    break
+
+        # ── Select item to craft ──────────────────────────────────────────────
+        skill = Player.GetRealSkillValue('Carpentry')
+        if skill < 40.0:
+            log('Skill below 40 – use an NPC trainer first.', colors['red'])
             break
-        elif Player.GetRealSkillValue( 'Carpentry' ) < 68.0:
-            itemToCraft = carpentryCraftables[ 'wooden shield' ]
-        elif Player.GetRealSkillValue( 'Carpentry' ) < 74.0:
-            itemToCraft = carpentryCraftables[ 'fishing pole' ]
-        elif Player.GetRealSkillValue( 'Carpentry' ) < 80.0:
-            itemToCraft = carpentryCraftables[ 'quarter staff' ]
+        elif skill < 67.0:
+            itemToCraft = carpentryCraftables['ballot box']
+        elif skill < 74.0:
+            itemToCraft = carpentryCraftables['wooden shield']
+        elif skill < 80.0:
+            itemToCraft = carpentryCraftables['quarter staff']
         else:
-            itemToCraft = carpentryCraftables[ 'gnarled staff' ]
+            itemToCraft = carpentryCraftables['gnarled staff']
 
-        enoughResourcesToCraftWith = True
-        numberOfItems = {}
-        for resource in itemToCraft.resourcesNeeded:
-            if resource == 'boards':
-                numberOfBoards = FindNumberOfItems( 0x1BD7, Player.Backpack, 0x0000 )[ 0x1BD7 ]
-                numberOfBoards += FindNumberOfItems( 0x1BDD, Player.Backpack, 0x0000 )[ 0x1BDD ]
-                if numberOfBoards < itemToCraft.resourcesNeeded[ 'boards' ]:
-                    enoughResourcesToCraftWith = False
+        # Reset discovered ID when tier changes; pre-seed from TIER_ITEM_IDS if known
+        if itemToCraft.name != current_item_name:
+            log('Tier: %s' % itemToCraft.name)
+            current_item_name = itemToCraft.name
+            current_item_id   = TIER_ITEM_IDS.get(itemToCraft.name)
+
+        if count_boards() < itemToCraft.resourcesNeeded.get('boards', 0):
+            log('Not enough boards for %s – stopping.' % itemToCraft.name, colors['red'])
+            break
+
+        # ── Craft ─────────────────────────────────────────────────────────────
+        before = {item.Serial for item in (Player.Backpack.Contains or [])}
+
+        expected_gump = itemToCraft.gumpPath[0].gumpID
+        gump_opened = False
+        for attempt in range(3):
+            Journal.Clear()
+            Items.UseItem(tool)
+            Misc.Pause(200)
+            if Journal.Search('You must wait to perform another action'):
+                log('Server busy – retrying (%d/3).' % (attempt + 1), colors['yellow'])
+                Misc.Pause(1500)
+                continue
+            # Gump may have opened during the short pause — check before waiting
+            if Gumps.CurrentGump() == expected_gump or Gumps.WaitForGump(expected_gump, 3000):
+                gump_opened = True
+                break
+            Misc.Pause(1000)
+
+        if not gump_opened:
+            actual = Gumps.CurrentGump()
+            log('Gump never opened (expected %d, got %d).' % (expected_gump, actual), colors['red'])
+            if Gumps.HasGump():
+                Gumps.CloseGump(actual)
+            continue
+
+        Misc.Pause(1000)   # let gump fully render before sending actions
+
+        use_make_last = MAKE_LAST_BTN is not None and current_item_id is not None
+        if use_make_last:
+            Gumps.SendAction(expected_gump, MAKE_LAST_BTN)
+        else:
+            # First button: gump is already open, send directly
+            Gumps.SendAction(itemToCraft.gumpPath[0].gumpID, itemToCraft.gumpPath[0].buttonID)
+            # Remaining buttons: wait for gump to update after each press
+            for path in itemToCraft.gumpPath[1:]:
+                Gumps.WaitForGump(path.gumpID, 3000)
+                Misc.Pause(1000)
+                Gumps.SendAction(path.gumpID, path.buttonID)
+
+        # Wait for craft result then close
+        Gumps.WaitForGump(expected_gump, 5000)
+        Gumps.SendAction(expected_gump, 0)
+        Misc.Pause(400)
+
+        # ── Discover crafted item type from backpack diff ─────────────────────
+        if current_item_id is None:
+            for item in (Player.Backpack.Contains or []):
+                if item.Serial not in before and item.ItemID not in BOARD_IDS:
+                    current_item_id = item.ItemID
+                    TIER_ITEM_IDS[current_item_name] = current_item_id
+                    log('Discovered item type: 0x%04X (%s)' % (current_item_id, current_item_name))
                     break
-            elif resource == 'cloth':
-                numberOfItems[ 'cloth' ] = FindNumberOfItems( 0x1766, Player.Backpack, 0x0000 )[ 0x1766 ]
-                if numberOfBoards < itemToCraft.resourcesNeeded[ 'cloth' ]:
-                    enoughResourcesToCraftWith = False
-                    break
 
-        if not enoughResourcesToCraftWith:
-            Player.HeadMessage( colors[ 'red' ], 'Out of resources to craft with!' )
-            return
+    dump_to_output(output_box, current_item_id)
+    log('Done. Carpentry: %.1f / %.1f' % (
+        Player.GetRealSkillValue('Carpentry'), Player.GetSkillCap('Carpentry')))
 
-        Items.UseItem( tool )
-        for path in itemToCraft.gumpPath:
-            Gumps.WaitForGump( path.gumpID, 2000 )
-            Gumps.SendAction( path.gumpID, path.buttonID )
 
-        # Close the Carpentry gump (signals that crafting has completed, since the gump will have reopened)
-        Gumps.WaitForGump( itemToCraft.gumpPath[ 0 ].gumpID, 5000 )
-        Gumps.SendAction( itemToCraft.gumpPath[ 0 ].gumpID, 0 )
+# ── Entry point ───────────────────────────────────────────────────────────────
 
-        # Wait a moment for the item to appear in the player's backpack
-        Misc.Pause( 200 )
-
-        # Move the item out of the player's backpack
-        itemType = None
-        if itemToCraft.name == 'wooden shield':
-            itemType = 0x1B7A
-        elif itemToCraft.name == 'fishing pole':
-            itemType = 0x0000
-        elif itemToCraft.name == 'quarter staff':
-            itemType = 0x0E89
-        elif itemToCraft.name == 'gnarled staff':
-            itemType = 0x13F8
-        item = FindItem( itemType, Player.Backpack )
-
-        if item != None:
-            if slayerBag != None and Journal.SearchByType( 'You have successfully crafted a slayer', 'Regular' ):
-                Journal.Clear()
-                if slayerBag == 'pet':
-                    pet = FindPet()
-                    MoveItem( Items, Misc, item, pet.Backpack )
-                    Mobiles.UseMobile( pet )
-                    Misc.Pause( 500 )
-                else:
-                    MoveItem( Items, Misc, item, slayerBag )
-            else:
-                MoveItem( Items, Misc, item, trashBarrel )
-
-# Start Carpentry training
-TrainCarpentry()
+boards_box = prompt_container('Target the BOARDS supply container:')
+if boards_box is not None:
+    output_box = prompt_container('Target the OUTPUT container (for crafted items):')
+    if output_box is not None:
+        TrainCarpentry(boards_box, output_box)

@@ -20,7 +20,7 @@ if False:
 # Config  (mirrors mining_config.py – edit here or in that file, keep in sync)
 # ─────────────────────────────────────────────────────────────────────────────
 class cfg:
-    weight_transfer_threshold = 400   # stones before transferring ore to mount
+    weight_headroom           = 50    # transfer when Player.Weight >= Player.MaxWeight - this value
     smelt_batch_size          = 20    # ore units per smelt pass (unused in loop; server handles stacks)
     pause_after_mine          = 1600  # ms – mine swing + server round-trip
     pause_after_smelt         = 1500  # ms – after each smelt operation
@@ -28,6 +28,10 @@ class cfg:
     pause_after_drop_settle   = 2500  # ms – wait after all ore is on ground before smelting
     loop_delay                = 100   # ms – bottom of every main loop iteration
     max_silent_ok             = 2     # rotate direction after this many swings with no journal response
+
+    travel_method    = 'gate'  # 'gate' or 'recall'
+    bank_rune_slot   = None    # runebook slot (0-15) for bank; None = use default rune
+    mine_rune_slot   = None    # runebook slot (0-15) to return to after banking; None = stop at bank
 
     # Body graphic IDs — verify with Object Inspector if your shard differs.
     pack_beetle_body   = 0x00EF     # giant/pack beetle
@@ -73,8 +77,11 @@ INGOT_IDS  = [0x1BF2, 0x1BEF, 0x1BE0, 0x1BE1, 0x1BE8, 0x1BE9, 0x1BEA, 0x1BEB,
 # Forge object IDs (player-placed and built-in map forges)
 FORGE_IDS  = [0x0FB1, 0x0FAF, 0x0FAD, 0x0FAE, 0x0FB0]
 
-RUNEBOOK_ITEM_ID  = 0x22C5
-GATE_TRAVEL_DELAY = 4000   # ms to wait for gate to open / travel to complete
+RUNEBOOK_ITEM_ID    = 0x22C5
+GATE_TRAVEL_DELAY   = 4000   # ms to wait for gate to open / travel to complete
+RECALL_TRAVEL_DELAY = 2000   # ms to wait after recall lands
+RUNEBOOK_GUMP_ID    = 89
+GATE_BUTTON_BASE    = 100    # confirmed: gump button = 100 + slot_index (0-based)
 
 # ── Session state (persists for the life of this script run) ──────────────────
 forge_serial         = None
@@ -188,13 +195,23 @@ def smelt_from_backpack():
                     break
             Journal.Clear()
             if failed:
-                break
+                # Drop the unsmelttable stack at player's feet and try the next one.
+                ore_to_drop = Items.FindBySerial(prev_serial)
+                if ore_to_drop is not None:
+                    pos = Player.Position
+                    Items.MoveOnGround(ore_to_drop, ore_to_drop.Amount, pos.X, pos.Y, pos.Z)
+                    Misc.Pause(cfg.pause_after_transfer)
+                ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
+                continue
             count += 1
             ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
-            # If the same item is still there, the smelt silently failed – bail out
+            # If the same serial is still there the smelt silently failed – drop and continue.
             if ore is not None and ore.Serial == prev_serial:
-                log("Ore unchanged after smelt attempt – skipping stack.", 0x3B)
-                break
+                log("Ore unchanged after smelt attempt – dropping and continuing.", 0x3B)
+                pos = Player.Position
+                Items.MoveOnGround(ore, ore.Amount, pos.X, pos.Y, pos.Z)
+                Misc.Pause(cfg.pause_after_transfer)
+                ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
     return count
 
 
@@ -364,7 +381,7 @@ def handle_overweight():
         Mobiles.UseMobile(remount_target.Serial)
         Misc.Pause(1500)
 
-    return Player.Weight < cfg.weight_transfer_threshold
+    return Player.Weight < Player.MaxWeight - cfg.weight_headroom
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -525,10 +542,117 @@ def read_journal_status():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Banking
+# Travel helpers
 # ─────────────────────────────────────────────────────────────────────────────
 
 MOONGATE_ID = 0x0F6C
+
+
+def _wait_for_mana_drop(mana_before, timeout_ms=3000):
+    """Return True if Player.Mana drops below mana_before within timeout_ms."""
+    Timer.Create("mana_drop", timeout_ms)
+    while Timer.Check("mana_drop"):
+        if Player.Mana < mana_before:
+            return True
+        Misc.Pause(50)
+    return False
+
+
+def _find_or_prompt_runebook():
+    """Return a runebook from the player's backpack, prompting if not found."""
+    rb = Items.FindByID(RUNEBOOK_ITEM_ID, -1, Player.Backpack.Serial)
+    if rb is not None:
+        return rb
+    log("No runebook in backpack – target it now...", 0x25)
+    rb_serial = Target.PromptTarget("Target the runebook:")
+    rb = Items.FindBySerial(rb_serial)
+    if rb is None or rb.ItemID != RUNEBOOK_ITEM_ID:
+        log("That is not a runebook.", 0x25)
+        return None
+    return rb
+
+
+def travel_via_gate(runebook, slot=None):
+    """
+    Travel via Gate Travel.
+    slot=None  – cast spell and target the runebook directly (uses its default rune).
+    slot=int   – open the runebook gump and click the Gate button for that slot
+                 (button ID = GATE_BUTTON_BASE + slot, confirmed via util_runebook_explorer).
+    Returns True if the gate was found and stepped through.
+    """
+    mana_before = Player.Mana
+    Journal.Clear()
+
+    if slot is None:
+        Spells.CastMagery("Gate Travel")
+        if not Target.WaitForTarget(4000, False):
+            log("Gate Travel: target cursor never appeared.", 0x25)
+            return False
+        Target.TargetExecute(runebook.Serial)
+    else:
+        Items.UseItem(runebook)
+        Misc.Pause(500)
+        if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
+            log("Gate Travel: runebook gump did not open.", 0x25)
+            return False
+        Gumps.SendAction(RUNEBOOK_GUMP_ID, GATE_BUTTON_BASE + slot)
+
+    if not _wait_for_mana_drop(mana_before):
+        log("Gate Travel: mana did not drop – fizzled or missing reagents.", 0x25)
+        return False
+
+    gate = None
+    Timer.Create("gate_find", 5000)
+    while Timer.Check("gate_find"):
+        gate = Items.FindByID(MOONGATE_ID, -1, -1, 3)
+        if gate is not None:
+            break
+        Misc.Pause(200)
+
+    if gate is None:
+        log("Gate opened but no moongate found nearby.", 0x25)
+        return False
+
+    log("Stepping through gate (0x%X)..." % gate.Serial)
+    Items.UseItem(gate)
+    Misc.Pause(GATE_TRAVEL_DELAY)
+    return True
+
+
+def travel_via_recall(runebook, slot=None):
+    """
+    Travel via Recall spell.
+    Targets the runebook directly (uses its default rune).
+    Slot-specific recall button IDs are not yet confirmed — run util_runebook_explorer.py
+    to find them, then implement slot support here.
+    """
+    if slot is not None:
+        log("Slot-specific recall not yet confirmed – using default rune.", 0x3B)
+    mana_before = Player.Mana
+    Journal.Clear()
+    Spells.CastMagery("Recall")
+    if not Target.WaitForTarget(4000, False):
+        log("Recall: target cursor never appeared.", 0x25)
+        return False
+    Target.TargetExecute(runebook.Serial)
+    if not _wait_for_mana_drop(mana_before):
+        log("Recall: mana did not drop – fizzled.", 0x25)
+        return False
+    Misc.Pause(RECALL_TRAVEL_DELAY)
+    log("Recall complete.")
+    return True
+
+
+def travel_to(runebook, slot=None):
+    """Dispatch to gate or recall based on cfg.travel_method."""
+    if cfg.travel_method == 'recall':
+        return travel_via_recall(runebook, slot)
+    return travel_via_gate(runebook, slot)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Banking
+# ─────────────────────────────────────────────────────────────────────────────
 
 def _bank_stacks(source_serial, item_ids, label):
     """Move every matching stack from source_serial into the open bank box. Returns total amount."""
@@ -547,11 +671,9 @@ def _bank_stacks(source_serial, item_ids, label):
 
 def bank_ingots():
     """
-    Gate to bank and deposit based on detected beetle type:
-      Fire beetle  – deposit ingots from player backpack.
-      Pack beetle  – dismount, pull ore + ingots from beetle to bank,
-                     then deposit player backpack ingots as well.
-      No beetle    – deposit player backpack ingots only.
+    Gate to bank, deposit harvest, then gate back to the mine if cfg.mine_rune_slot is set.
+    Returns True  – travel back succeeded; caller should continue the mining loop.
+    Returns False – no mine rune configured or travel failed; caller should stop.
     """
     # ── Detect beetle type before gating ─────────────────────────────────────
     pack, fire = find_beetles()
@@ -563,51 +685,15 @@ def bank_ingots():
         log("No beetle detected – depositing player backpack ingots only.", 0x3B)
 
     # ── Find runebook ─────────────────────────────────────────────────────────
-    runebook = Items.FindByID(RUNEBOOK_ITEM_ID, -1, Player.Backpack.Serial)
+    runebook = _find_or_prompt_runebook()
     if runebook is None:
-        log("No runebook in backpack – target it now...", 0x25)
-        rb_serial = Target.PromptTarget("Target the runebook with your bank rune set as default")
-        runebook  = Items.FindBySerial(rb_serial)
-        if runebook is None or runebook.ItemID != RUNEBOOK_ITEM_ID:
-            log("That is not a runebook – banking aborted.", 0x25)
-            return
+        return False
 
-    # ── Cast Gate Travel targeting the runebook ───────────────────────────────
-    log("Casting Gate Travel to bank...")
-    Journal.Clear()
-    Spells.CastMagery("Gate Travel")
-    Target.WaitForTarget(4000, False)
-    Target.TargetExecute(runebook.Serial)
-
-    Timer.Create("gate_cast_timeout", 6000)
-    while Timer.Check("gate_cast_timeout"):
-        if Journal.Search("You open a magical gate"):
-            log("Gate opened successfully.")
-            break
-        Misc.Pause(100)
-    else:
-        log("Gate Travel confirmation not seen – spell may have failed.", 0x25)
-        return
-
-    Misc.Pause(500)
-
-    # ── Find the moongate and step through ────────────────────────────────────
-    log("Looking for moongate...")
-    gate = None
-    Timer.Create("gate_find_timeout", 4000)
-    while Timer.Check("gate_find_timeout"):
-        gate = Items.FindByID(MOONGATE_ID, -1, -1, 3)
-        if gate is not None:
-            break
-        Misc.Pause(200)
-
-    if gate is None:
-        log("No moongate found within 3 tiles – cannot step through.", 0x25)
-        return
-
-    log("Stepping through gate (serial 0x%X)..." % gate.Serial)
-    Items.UseItem(gate)
-    Misc.Pause(GATE_TRAVEL_DELAY)
+    # ── Travel to bank ────────────────────────────────────────────────────────
+    log("Traveling to bank (slot %s)..." % str(cfg.bank_rune_slot))
+    if not travel_to(runebook, cfg.bank_rune_slot):
+        log("Failed to travel to bank – aborting.", 0x25)
+        return False
 
     # ── Open bank ─────────────────────────────────────────────────────────────
     Journal.Clear()
@@ -620,13 +706,12 @@ def bank_ingots():
 
     if Player.Bank is None:
         log("Could not open bank – are you near a banker?", 0x25)
-        return
+        return False
 
     Misc.Pause(500)
 
     # ── Deposit based on beetle type ──────────────────────────────────────────
     if pack is not None:
-        # Dismount so the beetle is accessible.
         was_mounted = Player.Mount is not None
         if was_mounted:
             Mobiles.UseMobile(Player.Serial)
@@ -644,10 +729,21 @@ def bank_ingots():
         if was_mounted:
             Mobiles.UseMobile(pack.Serial)
             Misc.Pause(1500)
-
     else:
-        # Fire beetle or no beetle — deposit player ingots.
         _bank_stacks(Player.Backpack.Serial, INGOT_IDS, "ingots from backpack")
+
+    # ── Return to mine ────────────────────────────────────────────────────────
+    if cfg.mine_rune_slot is None:
+        log("No mine rune slot configured – stopping at bank.", 0x3B)
+        return False
+
+    log("Returning to mine (runebook slot %d)..." % cfg.mine_rune_slot)
+    if not travel_to(runebook, cfg.mine_rune_slot):
+        log("Failed to travel back to mine – stopping.", 0x25)
+        return False
+
+    log("Back at mine – resuming.", 0x3F)
+    return True
 
 
 def check_loop_command():
@@ -714,17 +810,23 @@ def run_mining_loop():
             ensure_forge()
             Journal.Clear()
         elif cmd == "bank":
-            bank_ingots()
-            log("Bank complete – stopping.", 0x026C)
-            break
+            if not bank_ingots():
+                log("Bank complete – stopping.", 0x026C)
+                break
+            log("Bank complete – resuming mining.", 0x3F)
+            Journal.Clear()
 
         # ── Weight threshold check ────────────────────────────────────────────
-        if not smelting_in_progress and Player.Weight >= cfg.weight_transfer_threshold:
+        if not smelting_in_progress and Player.Weight >= Player.MaxWeight - cfg.weight_headroom:
             log("Weight %d / %d – acting on beetle type."
                 % (Player.Weight, Player.MaxWeight), 0x25)
             if not handle_overweight():
-                log("Still overweight after action – stopping.", 0x25)
-                break
+                log("Still overweight after smelt/transfer – attempting bank run.", 0x25)
+                if not bank_ingots():
+                    log("Bank run complete – stopping.", 0x026C)
+                    break
+                log("Returned from bank – resuming mining.", 0x3F)
+                Journal.Clear()
 
         # ── Mine current direction ────────────────────────────────────────────
         dx, dy    = cfg.mining_directions[dir_index]

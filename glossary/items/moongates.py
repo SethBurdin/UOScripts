@@ -3,6 +3,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from utilities.items import myItem
 from System.Collections.Generic import List
+from System import Int32
 
 moongates = {
     'blue moongate': myItem( 'blue moongate', 0x0F6C, 0x0000, 'moongate', None )
@@ -21,6 +22,6 @@ def FindMoongates( Items ):
     moongateFilter.RangeMin = 0
     moongateFilter.RangeMax = 1
     moongateFilter.Movable = False
-    moongateFilter.Graphics = List[int]( moongateIDs )
+    moongateFilter.Graphics = List[Int32]( moongateIDs )
 
     return Items.ApplyFilter( moongateFilter )

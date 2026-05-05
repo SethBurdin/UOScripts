@@ -3,6 +3,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from utilities.items import myItem
 from System.Collections.Generic import List
+from System import Int32
 
 containers = {
     'backpack': myItem( 'backpack', 0x0E75, 0x0000, 'container', 1 ),
@@ -32,8 +33,8 @@ def FindTrashBarrel( Items ):
     trashBarrelFilter.Movable = False
     trashBarrelFilter.RangeMax = 0
     trashBarrelFilter.RangeMax = 2
-    trashBarrelFilter.Graphics = List[int]( [ containers[ 'trash barrel' ].itemID ] )
-    trashBarrelFilter.Hues = List[int]( [ containers[ 'trash barrel' ].color ] )
+    trashBarrelFilter.Graphics = List[Int32]( [ containers[ 'trash barrel' ].itemID ] )
+    trashBarrelFilter.Hues = List[Int32]( [ containers[ 'trash barrel' ].color ] )
 
     trashBarrel = Items.ApplyFilter( trashBarrelFilter )
 
@@ -55,7 +56,7 @@ def FindHatch( Items ):
     hatchFilter.Movable = False
     hatchFilter.RangeMax = 0
     hatchFilter.RangeMax = 2
-    hatchFilter.Graphics = List[int]( [ containers[ 'hatch' ].itemID ] )
+    hatchFilter.Graphics = List[Int32]( [ containers[ 'hatch' ].itemID ] )
 
     hatch = Items.ApplyFilter( hatchFilter )
 
