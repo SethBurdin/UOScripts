@@ -33,10 +33,10 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from glossary.colors import colors
+from glossary.runebook_handler import gate_via_book
 
 # ── Config ──────────────────────────────────────────────────────────────────────
 LOCATIONS_FILE   = os.path.join( os.path.dirname( __file__ ), 'runebook_locations.json' )
-RUNEBOOK_GUMP_ID = 89
 POLL_MS          = 300   # main-loop poll interval (ms)
 PARTY_CHAT_TYPE  = 'Party'   # Journal entry Type for party chat; set '' to disable filter
 
@@ -47,7 +47,8 @@ MANA_GREAT_HEAL  = 11    # Greater Heal (Circle 4)
 MANA_HEAL        = 4     # Heal         (Circle 2)
 
 # Timing
-GATE_WAIT_MS     = 3000   # wait after pressing gate button before checking journal
+GATE_WAIT_MS          = 3000  # wait after pressing gate button before checking journal
+GATE_POSITION_RANGE   = 3     # max tiles to probe per cardinal direction at startup
 SPELL_TARGET_MS  = 4000   # Target.WaitForTarget timeout
 HEAL_WAIT_MS     = 2000   # pause between heal casts
 REZ_ACCEPT_MS    = 30000  # max time to wait for the ghost to accept rez
@@ -172,13 +173,64 @@ def FindRuneByName( runes, partial ):
     return None
 
 
-# 3-tile gate-casting rotation.
-# After a gate is opened it occupies the caster's tile, blocking a second
-# cast from the same spot.  Cycling through these (dx, dy) offsets from the
-# gatekeeper's starting position lets successive gates be cast immediately.
-# Layout (viewed from above, runebook container to the North):
-#   West tile (-1,0) | Center (0,0) | East tile (+1,0)
-GATE_OFFSETS = [ (0, 0), (-1, 0), (1, 0) ]
+# ── Gate position discovery ─────────────────────────────────────────────────────
+
+def _ReturnToStart( start_x, start_y ):
+    for _ in range( 20 ):
+        pos = Player.Position
+        if pos.X == start_x and pos.Y == start_y:
+            return
+        if   pos.X < start_x: Player.Walk( 'East' )
+        elif pos.X > start_x: Player.Walk( 'West' )
+        elif pos.Y < start_y: Player.Walk( 'South' )
+        elif pos.Y > start_y: Player.Walk( 'North' )
+        Misc.Pause( 400 )
+
+
+def ProbeGatePositions():
+    '''
+    Walk up to GATE_POSITION_RANGE tiles in each cardinal direction to discover
+    which tiles are actually reachable from the starting position.
+    Returns a list of (x, y) absolute tile coords, always including the start.
+    Player is returned to the starting position after each probe direction.
+    '''
+    start_x = Player.Position.X
+    start_y = Player.Position.Y
+    found   = [ (start_x, start_y) ]
+
+    for direction, dx, dy in [ ('East', 1, 0), ('West', -1, 0), ('South', 0, 1), ('North', 0, -1) ]:
+        for step in range( 1, GATE_POSITION_RANGE + 1 ):
+            expected_x = start_x + dx * step
+            expected_y = start_y + dy * step
+            Player.Walk( direction )
+            Misc.Pause( 400 )
+            pos = Player.Position
+            if pos.X != expected_x or pos.Y != expected_y:
+                break   # blocked — stop probing this direction
+            candidate = ( pos.X, pos.Y )
+            if candidate not in found:
+                found.append( candidate )
+        _ReturnToStart( start_x, start_y )
+
+    Misc.SendMessage( 'Gate positions mapped: %d tile(s).' % len( found ), colors['cyan'] )
+    for i, ( x, y ) in enumerate( found ):
+        Misc.SendMessage( '  [%d] (%d, %d)' % ( i, x, y ), colors['yellow'] )
+    return found
+
+
+def StepToPosition( tx, ty ):
+    '''Walk to absolute tile (tx, ty) from current position, one step at a time.'''
+    for _ in range( 10 ):
+        pos = Player.Position
+        if pos.X == tx and pos.Y == ty:
+            return
+        dx = tx - pos.X
+        dy = ty - pos.Y
+        if abs( dx ) >= abs( dy ):
+            Player.Walk( 'East' if dx > 0 else 'West' )
+        else:
+            Player.Walk( 'South' if dy > 0 else 'North' )
+        Misc.Pause( 400 )
 
 
 # ── Mana management ─────────────────────────────────────────────────────────────
@@ -220,12 +272,11 @@ def StepToGateTile( base_x, base_y, dx ):
 
 # ── Gate travel ─────────────────────────────────────────────────────────────────
 
-def HandleGate( runes, arg, base_pos, gate_idx ):
+def HandleGate( runes, arg, gate_positions, gate_idx ):
     '''
     arg is everything after "gate " -- either "X Y" (tile coords) or a partial rune name.
-    Attempts to open the book to the chosen rune and cast Gate Travel.
-    base_pos : (base_x, base_y) captured at startup.
-    gate_idx : mutable list [int] -- current rotation slot; advanced after each cast.
+    gate_positions : list of (x, y) absolute tile coords discovered at startup.
+    gate_idx       : mutable list [int] -- current rotation slot; advanced after each cast.
     '''
     # Resolve the rune
     rune  = None
@@ -258,27 +309,20 @@ def HandleGate( runes, arg, base_pos, gate_idx ):
     EnsureMana( MANA_GATE )
 
     # Step to the next rotation tile so the previous gate doesn't block this cast
-    base_x, base_y = base_pos
-    dx = GATE_OFFSETS[ gate_idx[0] ][0]
-    StepToGateTile( base_x, base_y, dx )
+    tx, ty = gate_positions[ gate_idx[0] ]
+    StepToPosition( tx, ty )
 
-    # Find and open the runebook
     book = Items.FindBySerial( rune['serial_dec'] )
     if book is None:
         Misc.SendMessage( 'Runebook 0x%08X not found.' % rune['serial_dec'], colors['red'] )
         Player.ChatParty( 'Gatekeeper: runebook not in range.' )
         return
 
-    Items.UseItem( book )
-    if not Gumps.WaitForGump( RUNEBOOK_GUMP_ID, 5000 ):
-        Misc.SendMessage( 'Runebook gump timed out.', colors['red'] )
+    Journal.Clear()
+    if not gate_via_book( book, rune['gate_button'], GATE_WAIT_MS ):
+        Misc.SendMessage( 'Runebook gump timed out.' , colors['red'] )
         Player.ChatParty( 'Gatekeeper: could not open runebook.' )
         return
-
-    # Clear journal, press gate button, then check for confirmation message
-    Journal.Clear()
-    Gumps.SendAction( RUNEBOOK_GUMP_ID, rune['gate_button'] )
-    Misc.Pause( GATE_WAIT_MS )
 
     gate_confirmed = Journal.Search( 'You open a magical gate' )
 
@@ -291,7 +335,7 @@ def HandleGate( runes, arg, base_pos, gate_idx ):
     Player.ChatParty( 'Gatekeeper: opened gate to %s.' % rune['name'] )
 
     # Advance rotation for the next cast
-    gate_idx[0] = ( gate_idx[0] + 1 ) % len( GATE_OFFSETS )
+    gate_idx[0] = ( gate_idx[0] + 1 ) % len( gate_positions )
 
     MeditateToMana( Player.ManaMax )
 
@@ -424,9 +468,9 @@ def Main():
     )
     Player.ChatParty( 'Gatekeeper online.' )
 
-    # Snapshot starting position for gate-tile rotation
-    base_pos = ( Player.Position.X, Player.Position.Y )
-    gate_idx  = [0]   # mutable so HandleGate can advance it (IronPython 2 compat)
+    # Walk the area to discover reachable gate-casting positions
+    gate_positions = ProbeGatePositions()
+    gate_idx       = [0]   # mutable so HandleGate can advance it (IronPython 2 compat)
 
     # Discard pre-existing entries; watermark advances so entries are never re-read
     Journal.Clear()
@@ -458,7 +502,7 @@ def Main():
                     break
 
         if found_cmd == 'gate' and found_arg:
-            HandleGate( runes, found_arg, base_pos, gate_idx )
+            HandleGate( runes, found_arg, gate_positions, gate_idx )
         elif found_cmd == 'rez':
             HandleRez()
         elif found_cmd == 'heal':

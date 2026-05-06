@@ -53,6 +53,12 @@ class cfg:
         ( 1,  1),   # southeast
     ]
 
+    # Auto mode
+    auto_mining_rune_filter = 'Mining Spot'  # partial match (case-insensitive) for runes to visit
+    auto_home_runebook      = 'home'         # label of the runebook to gate home when overweight
+    auto_mining_runebook    = None           # label of the runebook containing mining spots;
+                                             # None = first runebook found in backpack
+
 # ── Journal signals ───────────────────────────────────────────────────────────
 # Partial strings – Journal.Search does a substring match (case-sensitive).
 JOURNAL_NO_ORE     = "no metal here to mine"
@@ -887,13 +893,136 @@ def run_mining_loop():
         Misc.Pause(cfg.loop_delay)
 
 
+import sys as _sys, os as _os
+_sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+from glossary.runebook_handler import (
+    find_runebook_by_label, find_runes_matching, travel_to_slot, travel_to_runebook
+)
+
+
 # ─────────────────────────────────────────────────────────────────────────────
-# Entry point – start mining immediately
+# Mode selection
+# ─────────────────────────────────────────────────────────────────────────────
+
+def select_mode():
+    """Show a 10-second prompt. Player types '1' for manual, anything else = auto."""
+    log("Type '1' in chat for manual mode. Auto-mining starts in 10 seconds...", 0x0481)
+    Player.HeadMessage(0x0481, "1 = Manual  |  Auto in 10s")
+    Journal.Clear()
+    Timer.Create("mode_select", 10000)
+    while Timer.Check("mode_select"):
+        if Journal.SearchByType("1", "Regular"):
+            Journal.Clear()
+            log("Manual mode.", 0x0481)
+            return 'manual'
+        Misc.Pause(200)
+    log("Auto mode.", 0x0481)
+    return 'auto'
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Auto mode helpers
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _find_mining_runebook():
+    if cfg.auto_mining_runebook is not None:
+        return find_runebook_by_label(cfg.auto_mining_runebook)
+    return Items.FindByID(RUNEBOOK_ITEM_ID, -1, Player.Backpack.Serial)
+
+
+def auto_mine_spot(home_rb):
+    """
+    Mine all 8 directions at the current location until exhausted.
+    Gates home via home_rb if overweight, returning False so the caller knows
+    the player relocated. Returns True when the spot is normally exhausted.
+    """
+    if Player.Mount is not None:
+        Mobiles.UseMobile(Player.Serial)
+        Misc.Pause(1500)
+
+    pos = Player.Position
+    log("Auto-mining at (%d, %d)." % (pos.X, pos.Y))
+    Journal.Clear()
+
+    num_dirs     = len(cfg.mining_directions)
+    dir_index    = 0
+    consec_fails = 0
+
+    while consec_fails < num_dirs:
+        if Player.Weight >= Player.MaxWeight - cfg.weight_headroom:
+            log("Overweight — gating home.", 0x25)
+            travel_to_runebook(home_rb, 2000)
+            return False
+
+        dx, dy = cfg.mining_directions[dir_index]
+        result  = mine_at(dx, dy)
+        if result == 'no_tool':
+            log("No pickaxe — stopping.", 0x25)
+            return False
+
+        status = read_journal_status()
+        if status in ('no_ore', 'cant_mine'):
+            consec_fails += 1
+            dir_index = (dir_index + 1) % num_dirs
+        elif status == 'pack_full':
+            log("Pack full — gating home.", 0x25)
+            travel_to_runebook(home_rb, 2000)
+            return False
+        else:
+            consec_fails = 0
+
+        Misc.Pause(cfg.loop_delay)
+
+    log("Spot exhausted.")
+    return True
+
+
+def run_auto_mode():
+    mining_rb = _find_mining_runebook()
+    if mining_rb is None:
+        log("No runebook in backpack.", 0x25)
+        return
+
+    home_rb = find_runebook_by_label(cfg.auto_home_runebook)
+    if home_rb is None:
+        log("No runebook labeled '%s' in backpack." % cfg.auto_home_runebook, 0x25)
+        return
+
+    spots = find_runes_matching(mining_rb, cfg.auto_mining_rune_filter)
+    if not spots:
+        log("No runes matching '%s'." % cfg.auto_mining_rune_filter, 0x25)
+        return
+
+    log("%d mining spot(s) found." % len(spots), 0x0481)
+
+    for slot, name in spots:
+        log("Traveling to %s (slot %d)..." % (name, slot))
+        if not travel_to_slot(mining_rb, slot, 2000):
+            log("Travel failed — skipping %s." % name, 0x25)
+            continue
+
+        if not auto_mine_spot(home_rb):
+            # Went home — re-acquire runebooks from new location
+            mining_rb = _find_mining_runebook()
+            home_rb   = find_runebook_by_label(cfg.auto_home_runebook)
+            if mining_rb is None or home_rb is None:
+                log("Lost runebooks after gating home — stopping.", 0x25)
+                return
+
+    log("=== Auto mining complete ===", 0x026C)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Entry point
 # ─────────────────────────────────────────────────────────────────────────────
 
 def main():
     log("=== Mining Script ===", 0x0481)
-    run_mining_loop()
+    mode = select_mode()
+    if mode == 'manual':
+        run_mining_loop()
+    else:
+        run_auto_mode()
 
 
 main()

@@ -30,7 +30,7 @@ from utilities.items import FindItem
 
 SCAN_RANGE        = 3     # tiles from player to check for corpses
 SCAN_INTERVAL_MS  = 500   # ms between scan passes (used in future loop)
-ACTION_DELAY_MS   = 4000   # ms delay between all actions
+ACTION_DELAY_MS   = 2000   # ms delay between all actions
 SKIN_WAIT_MS      = 800  # ms to wait after using the skinning tool
 MOVE_PAUSE_MS     = ACTION_DELAY_MS  # ms between each item move to the beetle
 

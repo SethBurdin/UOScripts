@@ -10,12 +10,13 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from glossary.colors import colors
+from glossary.runebook_handler import find_runebook_by_label, travel_to_runebook, travel_to_named_rune
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 PET_FOLLOW_RANGE     = 2      # tiles — beyond this the pet is recalled
 HEALTH_THRESHOLD     = 0.90   # heal/cure when pet HP ratio drops below this
 CHECK_INTERVAL        = 1500  # ms between main loop ticks
-FOLLOW_CHECK_INTERVAL = 1500  # ms between "all follow me" repeats while waiting for pet
+FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting for pet
 FOLLOW_MAX_CHECKS     = 1     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
 PET_SCAN_RANGE        = 30    # tile radius to search for a friendly mobile
 GUARD_BREAK_DISTANCE  = 4     # tiles player must move from guard origin before pet is immediately recalled
@@ -41,11 +42,7 @@ HOME_RUNEBOOK_NAME    = "home"      # label on the runebook item (case-insensiti
 FARM_RUNE_NAME        = "ww"        # label of the rune to return to after banking (case-insensitive)
 RECALL_SETTLE_DELAY   = 2000        # ms to wait after recall lands
 
-RUNEBOOK_ITEM_ID   = 0x22C5
-GOLD_ITEM_ID       = 0x0EED
-RUNEBOOK_GUMP_ID   = 89
-RECALL_BUTTON_BASE = 50   # confirmed: recall slot N = 50 + N  (macro: slot0=50, slot1=51, slot12=62, slot13=63)
-GATE_BUTTON_BASE   = 100  # confirmed: gate slot N = 100 + N
+GOLD_ITEM_ID = 0x0EED
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -55,63 +52,6 @@ def log(msg, color=68):
 
 
 # ─── Auto-bank gold ───────────────────────────────────────────────────────────
-
-def find_home_runebook():
-    rb = Items.FindByID(RUNEBOOK_ITEM_ID, -1, Player.Backpack.Serial)
-    if rb is None:
-        return None
-    props = Items.GetPropStringList(rb.Serial) or []
-    if any(p.strip().lower() == HOME_RUNEBOOK_NAME for p in props):
-        return rb
-    return None
-
-
-def recall_to_named_rune(runebook, rune_name):
-    """
-    Open the runebook gump, locate rune_name in the text list, then recall using
-    the confirmed fixed formula: button = 50 + absolute_slot_index.
-
-    LastGumpGetLineList returns all gump text elements (labels, charges, page tabs,
-    rune names, etc.) not just rune names. The rune names form a contiguous block;
-    we find the target and walk backward through that block to determine its
-    0-based slot index within the 16-slot runebook.
-    """
-    Items.UseItem(runebook)
-    if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
-        log("Runebook gump did not open.", colors['red'])
-        return False
-
-    lines = Gumps.LastGumpGetLineList()
-    target = rune_name.strip().lower()
-
-    target_idx = None
-    for i, line in enumerate(lines):
-        if line.strip().lower() == target:
-            target_idx = i
-            break
-
-    if target_idx is None:
-        log("Rune '%s' not found. Lines: %s" % (rune_name, lines), colors['red'])
-        # Do NOT send any gump action here — unknown buttons can drop runes.
-        return False
-
-    # Walk backward through the rune name block to count its 0-based slot index.
-    # Stop at empty strings, digit-only entries (page tabs), or known fixed gump labels.
-    _GUMP_LABELS = {"rename book", "charges", "max charges"}
-    slot = 0
-    i = target_idx - 1
-    while i >= 0:
-        entry = lines[i].strip()
-        if not entry or entry.isdigit() or entry.lower() in _GUMP_LABELS:
-            break
-        slot += 1
-        i -= 1
-
-    button_id = RECALL_BUTTON_BASE + slot
-    log("Recalling to '%s' (slot %d → button %d)." % (rune_name, slot, button_id), colors['cyan'])
-    Gumps.SendAction(RUNEBOOK_GUMP_ID, button_id)
-    Misc.Pause(RECALL_SETTLE_DELAY)
-    return True
 
 
 def transfer_loot_to_chest():
@@ -145,6 +85,16 @@ def transfer_gold():
         log("No gold to deposit.", colors['yellow'])
 
 
+def do_banking(rb):
+    """Travel home, deposit everything, then return to the farm rune."""
+    if not travel_to_runebook(rb, RECALL_SETTLE_DELAY):
+        log("Failed to travel home — banking aborted.", colors['red'])
+        return False
+    transfer_gold()
+    transfer_loot_to_chest()
+    return True
+
+
 def bank_gold_if_heavy():
     if Player.MaxWeight == 0:
         return
@@ -152,31 +102,15 @@ def bank_gold_if_heavy():
     if ratio < WEIGHT_BANK_THRESHOLD:
         return
 
-    log("Weight at %.0f%% — recalling home to deposit gold." % (ratio * 100), colors['yellow'])
+    log("Weight at %.0f%% — banking." % (ratio * 100), colors['yellow'])
 
-    rb = find_home_runebook()
+    rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
     if rb is None:
         log("No runebook named '%s' in backpack — cannot bank." % HOME_RUNEBOOK_NAME, colors['red'])
         return
 
-    mana_before = Player.Mana
-    Journal.Clear()
-    Spells.CastMagery("Recall")
-    if not Target.WaitForTarget(4000, False):
-        log("Recall: target cursor never appeared.", colors['red'])
-        return
-    Target.TargetExecute(rb.Serial)
-
-    Timer.Create("recall_mana", 3000)
-    while Timer.Check("recall_mana"):
-        if Player.Mana < mana_before:
-            break
-        Misc.Pause(50)
-
-    Misc.Pause(RECALL_SETTLE_DELAY)
-    transfer_gold()
-    transfer_loot_to_chest()
-    recall_to_named_rune(rb, FARM_RUNE_NAME)
+    if do_banking(rb):
+        travel_to_named_rune(rb, FARM_RUNE_NAME, RECALL_SETTLE_DELAY)
 
 
 def find_pet():
@@ -250,7 +184,19 @@ def main():
     is_guarding = False
     guard_pos   = None  # player tile when "all guard me" was last issued
 
+    Journal.Clear()
+    log("Say 'bank' to deposit and stop.", colors['cyan'])
+
     while not Player.IsGhost:
+        if Journal.Search("bank"):
+            Journal.Clear()
+            log("Bank command — depositing and stopping.", colors['yellow'])
+            rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
+            if rb is not None:
+                do_banking(rb)
+            log("Done. Script stopped.", colors['cyan'])
+            break
+
         bank_gold_if_heavy()
 
         # Break guard the moment the player moves far enough from the guard origin.
