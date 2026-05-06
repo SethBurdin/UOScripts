@@ -20,6 +20,20 @@ FOLLOW_MAX_CHECKS     = 1     # max polls waiting for pet to arrive (total wait 
 PET_SCAN_RANGE        = 30    # tile radius to search for a friendly mobile
 GUARD_BREAK_DISTANCE  = 4     # tiles player must move from guard origin before pet is immediately recalled
 
+# Items auto-looted by Razor's AutoLoot agent that should be transferred to the
+# storage chest on each banking trip. Add/remove item IDs to match your AutoLoot list.
+TRANSFER_ITEMS = [
+    0x1079,   # hides
+    0x26B4,   # red scales
+    0x26B5,   # yellow scales
+    0x26B6,   # black scales
+    0x26B7,   # green scales
+    0x26B8,   # white scales
+    0x26B9,   # blue scales
+    0x14EB,   # treasure map
+    0x14EC,   # treasure map (decoded)
+]
+
 # Auto-bank gold
 WEIGHT_BANK_THRESHOLD = 0.90        # recall home when weight ratio >= this
 GOLD_DEST_SERIAL      = 0x400B404A  # serial of the container to deposit gold into — EDIT THIS
@@ -100,6 +114,19 @@ def recall_to_named_rune(runebook, rune_name):
     return True
 
 
+def transfer_loot_to_chest():
+    dest = Items.FindBySerial(GOLD_DEST_SERIAL)
+    if dest is None:
+        log("Storage chest (0x%X) not found — skipping loot transfer." % GOLD_DEST_SERIAL, colors['red'])
+        return
+    for item_id in TRANSFER_ITEMS:
+        item = Items.FindByID(item_id, -1, Player.Backpack.Serial)
+        while item is not None:
+            Items.Move(item, dest, item.Amount)
+            Misc.Pause(800)
+            item = Items.FindByID(item_id, -1, Player.Backpack.Serial)
+
+
 def transfer_gold():
     dest = Items.FindBySerial(GOLD_DEST_SERIAL)
     if dest is None:
@@ -148,6 +175,7 @@ def bank_gold_if_heavy():
 
     Misc.Pause(RECALL_SETTLE_DELAY)
     transfer_gold()
+    transfer_loot_to_chest()
     recall_to_named_rune(rb, FARM_RUNE_NAME)
 
 

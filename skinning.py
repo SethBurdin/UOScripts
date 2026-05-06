@@ -30,8 +30,8 @@ from utilities.items import FindItem
 
 SCAN_RANGE        = 3     # tiles from player to check for corpses
 SCAN_INTERVAL_MS  = 500   # ms between scan passes (used in future loop)
-ACTION_DELAY_MS   = 900   # ms delay between all actions
-SKIN_WAIT_MS      = 2500  # ms to wait after using the skinning tool
+ACTION_DELAY_MS   = 4000   # ms delay between all actions
+SKIN_WAIT_MS      = 800  # ms to wait after using the skinning tool
 MOVE_PAUSE_MS     = ACTION_DELAY_MS  # ms between each item move to the beetle
 
 DEBUG = True
@@ -131,7 +131,7 @@ def scan_nearby_corpses(scan_range=SCAN_RANGE):
         name = corpse.Name or '(unnamed)'
 
         # Fetch properties so we can log richer info
-        Items.WaitForProps(corpse.Serial, 1500)
+        Items.WaitForProps(corpse.Serial, 500)
         props = Items.GetPropStringList(corpse.Serial) or []
         prop_summary = ' | '.join(props[:3]) if props else '(no props)'
 
