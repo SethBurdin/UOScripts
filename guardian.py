@@ -16,6 +16,7 @@ from glossary.runebook_handler import find_runebook_by_label, travel_to_runebook
 # ─── Config ───────────────────────────────────────────────────────────────────
 PET_FOLLOW_RANGE     = 2      # tiles — beyond this the pet is recalled
 HEALTH_THRESHOLD     = 0.90   # heal/cure when pet HP ratio drops below this
+GUARD_HEALTH_THRESHOLD = 0.70 # say "all guard me" when pet HP ratio drops below this
 CHECK_INTERVAL        = 1500  # ms between main loop ticks
 FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting for pet
 FOLLOW_MAX_CHECKS     = 3     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
@@ -34,6 +35,16 @@ TRANSFER_ITEMS = [
     0x26B9,   # blue scales
     0x14EB,   # treasure map
     0x14EC,   # treasure map (decoded)
+    # gems
+    0x0F26,   # diamond
+    0x0F25,   # amber
+    0x0F0F,   # star sapphire
+    0x0F10,   # emerald
+    0x0F15,   # citrine
+    0x0F11,   # sapphire
+    0x0F13,   # ruby
+    0x0F18,   # tourmaline
+    0x0F16,   # amethyst
 ]
 
 # Auto-bank gold
@@ -150,12 +161,25 @@ def cure_pet(pet):
     Misc.Pause(1200)
 
 
-def check_pet_health(pet):
-    if Player.Name.lower() == 'kspot':
+def guard_pet_if_low(pet):
+    """Say 'all guard me' three times when pet HP drops below GUARD_HEALTH_THRESHOLD.
+    Applies to all players including kspot."""
+    if pet.HitsMax == 0:
         return
+    if float(pet.Hits) / pet.HitsMax < GUARD_HEALTH_THRESHOLD:
+        log("%s HP low (%.0f%%) — all guard me x3" % (
+            pet.Name, float(pet.Hits) / pet.HitsMax * 100), colors['yellow'])
+        for _ in range(3):
+            Player.ChatSay(690, 'all guard me')
+            Misc.Pause(400)
+
+
+def check_pet_health(pet):
     if pet.HitsMax == 0:
         return
     hp_ratio = float(pet.Hits) / pet.HitsMax
+    if Player.Name.lower() == 'kspot':
+        return
     if pet.Poisoned and hp_ratio < HEALTH_THRESHOLD:
         cure_pet(pet)
     elif hp_ratio < HEALTH_THRESHOLD:
@@ -219,6 +243,7 @@ def main():
             Misc.Pause(CHECK_INTERVAL)
             continue
 
+        guard_pet_if_low(pet)
         check_pet_health(pet)
 
         if Player.DistanceTo(pet) > PET_FOLLOW_RANGE:

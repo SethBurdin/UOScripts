@@ -186,6 +186,21 @@ SMELT_FAIL_PHRASES = [
     "too few",            "Too few",
 ]
 
+def _try_discard_ore(serial):
+    """
+    Try to move an unsmelttable ore stack out of the backpack.
+    Returns True if the stack is gone, False if it is still in the backpack
+    (e.g. indoors where ground placement is blocked).
+    """
+    ore = Items.FindBySerial(serial)
+    if ore is None:
+        return True
+    pos = Player.Position
+    Items.MoveOnGround(ore, ore.Amount, pos.X, pos.Y, pos.Z)
+    Misc.Pause(cfg.pause_after_transfer)
+    return Items.FindBySerial(serial) is None
+
+
 def smelt_from_backpack():
     """Smelt every ore stack currently in the player's backpack. Returns count."""
     count = 0
@@ -198,8 +213,7 @@ def smelt_from_backpack():
             Target.WaitForTarget(3000, False)
             Target.TargetExecute(forge_serial)
             Misc.Pause(cfg.pause_after_smelt)
-            # If the server says there's not enough ore in this stack, skip it
-            # rather than looping forever on a stack we can't smelt.
+
             failed = False
             for phrase in SMELT_FAIL_PHRASES:
                 if Journal.Search(phrase):
@@ -207,23 +221,21 @@ def smelt_from_backpack():
                     failed = True
                     break
             Journal.Clear()
+
             if failed:
-                # Drop the unsmelttable stack at player's feet and try the next one.
-                ore_to_drop = Items.FindBySerial(prev_serial)
-                if ore_to_drop is not None:
-                    pos = Player.Position
-                    Items.MoveOnGround(ore_to_drop, ore_to_drop.Amount, pos.X, pos.Y, pos.Z)
-                    Misc.Pause(cfg.pause_after_transfer)
+                if not _try_discard_ore(prev_serial):
+                    log("Cannot discard stack 0x%08X (indoors?) – skipping ore type." % prev_serial, 0x3B)
+                    break  # can't drop here; move on to next ore ID
                 ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
                 continue
+
             count += 1
             ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
-            # If the same serial is still there the smelt silently failed – drop and continue.
             if ore is not None and ore.Serial == prev_serial:
-                log("Ore unchanged after smelt attempt – dropping and continuing.", 0x3B)
-                pos = Player.Position
-                Items.MoveOnGround(ore, ore.Amount, pos.X, pos.Y, pos.Z)
-                Misc.Pause(cfg.pause_after_transfer)
+                log("Ore unchanged after smelt – discarding.", 0x3B)
+                if not _try_discard_ore(prev_serial):
+                    log("Cannot discard stack 0x%08X – skipping ore type." % prev_serial, 0x3B)
+                    break
                 ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
     return count
 
@@ -1003,7 +1015,10 @@ def auto_mine_spot(home_rb):
             return False
 
         status = read_journal_status()
-        if status in ('no_ore', 'cant_mine'):
+        if status == 'no_ore':
+            log("No metal at this spot – moving on.")
+            return True
+        elif status == 'cant_mine':
             consec_fails += 1
             dir_index = (dir_index + 1) % num_dirs
         elif status == 'pack_full':
@@ -1015,7 +1030,7 @@ def auto_mine_spot(home_rb):
 
         Misc.Pause(cfg.loop_delay)
 
-    log("Spot exhausted.")
+    log("Spot exhausted – all directions blocked.")
     return True
 
 
