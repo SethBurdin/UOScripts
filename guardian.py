@@ -63,6 +63,13 @@ def log(msg, color=68):
     Misc.SendMessage("[guardian] " + msg, color)
 
 
+def _cmd(msg):
+    """Say a pet command twice with a short pause between."""
+    Player.ChatSay(690, msg)
+    Misc.Pause(400)
+    Player.ChatSay(690, msg)
+
+
 # ─── Auto-bank gold ───────────────────────────────────────────────────────────
 
 
@@ -170,7 +177,7 @@ def guard_pet_if_low(pet):
         log("%s HP low (%.0f%%) — all guard me x3" % (
             pet.Name, float(pet.Hits) / pet.HitsMax * 100), colors['yellow'])
         for _ in range(3):
-            Player.ChatSay(690, 'all guard me')
+            _cmd('all guard me')
             Misc.Pause(400)
 
 
@@ -189,7 +196,7 @@ def check_pet_health(pet):
 def recall_pet(pet):
     log("Pet too far (%d tiles) — all follow me" % Player.DistanceTo(pet), colors['yellow'])
     for i in range(FOLLOW_MAX_CHECKS):
-        Player.ChatSay(690, 'all follow me')
+        _cmd('all follow me')
         Misc.Pause(FOLLOW_CHECK_INTERVAL)
         fresh = Mobiles.FindBySerial(pet.Serial)
         if fresh is None:
@@ -232,14 +239,14 @@ def main():
             if max(abs(pos.X - guard_pos[0]), abs(pos.Y - guard_pos[1])) > GUARD_BREAK_DISTANCE:
                 is_guarding = False
                 guard_pos   = None
-                Player.ChatSay(690, 'all follow me')
+                _cmd('all follow me')
 
         pet = find_pet()
         if pet is None:
             log("No pet found — calling out...", colors['yellow'])
             is_guarding = False
             guard_pos   = None
-            Player.ChatSay(690, 'all follow me')
+            _cmd('all follow me')
             Misc.Pause(CHECK_INTERVAL)
             continue
 
@@ -256,7 +263,7 @@ def main():
 
         if not is_guarding:
             pos = Player.Position
-            Player.ChatSay(690, 'all guard me')
+            _cmd('all guard me')
             is_guarding = True
             guard_pos   = (pos.X, pos.Y)
 

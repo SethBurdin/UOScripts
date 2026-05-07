@@ -89,6 +89,11 @@ INGOT_IDS  = [0x1BF2, 0x1BEF, 0x1BE0, 0x1BE1, 0x1BE8, 0x1BE9, 0x1BEA, 0x1BEB,
 FORGE_IDS  = [0x0FB1, 0x0FAF, 0x0FAD, 0x0FAE, 0x0FB0]
 
 RUNEBOOK_ITEM_ID    = 0x22C5
+TINKER_TOOL_IDS     = [0x1EBC, 0x1EB8]  # tinker's tools, tool kit
+TINKERING_GUMP_ID   = None   # record a macro opening tinker's tools to confirm
+PICKAXE_CAT_BTN     = 8      # OSI category button — confirm for this shard via macro
+PICKAXE_ITEM_BTN    = 114    # OSI item button — confirm for this shard via macro
+PICKAXE_INGOT_COST  = 4
 GATE_TRAVEL_DELAY   = 4000   # ms to wait for gate to open / travel to complete
 RECALL_TRAVEL_DELAY = 2000   # ms to wait after recall lands
 RUNEBOOK_GUMP_ID    = 89
@@ -371,6 +376,66 @@ def smelt_with_fire_beetle(fire_beetle):
         forge_serial = prev_forge
 
 
+def try_craft_pickaxe():
+    """
+    Attempt to craft a pickaxe via tinkering if:
+      - Tinkering skill > 50
+      - A tinker's tool is in the backpack
+      - At least 4 ingots are in the backpack
+      - TINKERING_GUMP_ID is configured
+    Returns True if a new pickaxe is now in the backpack.
+    """
+    if TINKERING_GUMP_ID is None:
+        log("TINKERING_GUMP_ID not set – skipping craft. Record a macro to find it.", 0x25)
+        return False
+    if Player.GetSkillValue('Tinkering') <= 50:
+        log("Tinkering %.1f <= 50 – cannot craft pickaxe." % Player.GetSkillValue('Tinkering'), 0x25)
+        return False
+
+    tinker_tool = None
+    for tid in TINKER_TOOL_IDS:
+        tinker_tool = Items.FindByID(tid, -1, Player.Backpack.Serial)
+        if tinker_tool is not None:
+            break
+    if tinker_tool is None:
+        log("No tinker's tools in backpack.", 0x25)
+        return False
+
+    ingot_count = 0
+    for iid in INGOT_IDS:
+        stack = Items.FindByID(iid, -1, Player.Backpack.Serial)
+        if stack is not None:
+            ingot_count += stack.Amount
+    if ingot_count < PICKAXE_INGOT_COST:
+        log("Not enough ingots (%d / %d) to craft pickaxe." % (ingot_count, PICKAXE_INGOT_COST), 0x25)
+        return False
+
+    log("Crafting pickaxe (Tinkering %.1f)..." % Player.GetSkillValue('Tinkering'))
+    before = {item.Serial for item in (Player.Backpack.Contains or [])}
+
+    Items.UseItem(tinker_tool)
+    if not Gumps.WaitForGump(TINKERING_GUMP_ID, 5000):
+        log("Tinkering gump did not open.", 0x25)
+        return False
+
+    Misc.Pause(500)
+    Gumps.SendAction(TINKERING_GUMP_ID, PICKAXE_CAT_BTN)
+    Gumps.WaitForGump(TINKERING_GUMP_ID, 3000)
+    Misc.Pause(500)
+    Gumps.SendAction(TINKERING_GUMP_ID, PICKAXE_ITEM_BTN)
+    Gumps.WaitForGump(TINKERING_GUMP_ID, 5000)
+    Gumps.SendAction(TINKERING_GUMP_ID, 0)
+    Misc.Pause(600)
+
+    for item in (Player.Backpack.Contains or []):
+        if item.Serial not in before and item.ItemID == PICKAXE_ID:
+            log("Pickaxe crafted (0x%X)." % item.Serial)
+            return True
+
+    log("Pickaxe craft failed – no new pickaxe found.", 0x25)
+    return False
+
+
 def _can_travel():
     """Return True if the player has enough Magery or Chivalry to gate/recall home."""
     return (Player.GetSkillValue('Chivalry') > 30 or
@@ -508,9 +573,10 @@ def mine_at(dx, dy):
 
     def _swing(tz, tile_id):
         Journal.Clear()
-        Target.ClearQueue()
+        Target.Cancel()      # dismiss any visually-open cursor
+        Target.ClearQueue()  # clear any stale queued cursor
         Items.UseItem(tool)
-        if not Target.WaitForTarget(3000, False):
+        if not Target.WaitForTarget(3000, True):  # True = cancel stale cursor, wait fresh
             log("Target cursor never appeared – treating as cant_mine.", 0x3B)
             return False
         Target.TargetExecute(tx, ty, tz, tile_id)
@@ -878,7 +944,10 @@ def run_mining_loop():
         Player.HeadMessage(0x3F, "Mining %s" % label)
         mine_result = mine_at(dx, dy)
         if mine_result == "no_tool":
-            log("Stopping – no mining tool found.")
+            if try_craft_pickaxe():
+                continue
+            log("No pickaxe and craft failed – gating home to bank.", 0x25)
+            bank_ingots()
             break
 
         # ── Evaluate journal ──────────────────────────────────────────────────
@@ -1011,7 +1080,10 @@ def auto_mine_spot(home_rb):
         dx, dy = cfg.mining_directions[dir_index]
         result  = mine_at(dx, dy)
         if result == 'no_tool':
-            log("No pickaxe — stopping.", 0x25)
+            if try_craft_pickaxe():
+                continue
+            log("No pickaxe and craft failed – gating home to bank.", 0x25)
+            bank_ingots()
             return False
 
         status = read_journal_status()
