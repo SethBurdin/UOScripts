@@ -14,7 +14,7 @@ from glossary.colors import colors
 from glossary.runebook_handler import find_runebook_by_label, travel_to_runebook, travel_to_named_rune
 
 # ─── Config ───────────────────────────────────────────────────────────────────
-PET_FOLLOW_RANGE     = 2      # tiles — beyond this the pet is recalled
+PET_FOLLOW_RANGE     = 1      # tiles — beyond this the pet is recalled
 HEALTH_THRESHOLD     = 0.90   # heal/cure when pet HP ratio drops below this
 GUARD_HEALTH_THRESHOLD = 0.70 # say "all guard me" when pet HP ratio drops below this
 CHECK_INTERVAL        = 1500  # ms between main loop ticks
