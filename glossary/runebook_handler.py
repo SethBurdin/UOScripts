@@ -88,7 +88,7 @@ def _open_and_find_slot(runebook, rune_name):
     return slot
 
 
-def _wait_for_mana_drop(mana_before, timeout_ms=3000):
+def _wait_for_mana_drop(mana_before, timeout_ms=6000):
     Timer.Create("rb_mana_wait", timeout_ms)
     while Timer.Check("rb_mana_wait"):
         if Player.Mana < mana_before:

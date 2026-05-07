@@ -53,6 +53,9 @@ class cfg:
         ( 1,  1),   # southeast
     ]
 
+    home_container_serial = None  # serial of the house container to deposit into;
+                                  # None = prompted on first bank run and cached
+
     # Auto mode
     auto_mining_rune_filter = 'Mining Spot'  # partial match (case-insensitive) for runes to visit
     auto_home_runebook      = 'home'         # label of the runebook to gate home when overweight
@@ -61,7 +64,10 @@ class cfg:
 
 # ── Journal signals ───────────────────────────────────────────────────────────
 # Partial strings – Journal.Search does a substring match (case-sensitive).
-JOURNAL_NO_ORE     = "no metal here to mine"
+JOURNAL_NO_ORE     = ["no metal here to mine", "no Metal here to mine",
+                      "no ore here to mine",   "no Ore here to mine",
+                      "There is no metal",     "There is no ore",
+                      "find no ore",           "find no metal"]
 JOURNAL_CANT_MINE  = ["can't mine there", "cannot be seen",
                        "That is not accessable", "blocked"]
 JOURNAL_PACK_FULL  = "Your backpack is full"
@@ -172,11 +178,13 @@ def pull_ore_to_backpack(source_serial, source_label):
 
 
 SMELT_FAIL_PHRASES = [
-    "not enough metal",
-    "no metal",
-    "cannot smelt",
-    "you have no metal",
-    "there is not",
+    "not enough metal",   "Not enough metal",
+    "no metal",           "No metal",
+    "cannot smelt",       "Cannot smelt",
+    "you have no metal",  "You have no metal",
+    "there is not",       "There is not",
+    "not enough ore",     "Not enough ore",
+    "too few",            "Too few",
 ]
 
 def smelt_from_backpack():
@@ -352,11 +360,17 @@ def smelt_with_fire_beetle(fire_beetle):
         forge_serial = prev_forge
 
 
+def _can_travel():
+    """Return True if the player has enough Magery or Chivalry to gate/recall home."""
+    return (Player.GetSkillValue('Chivalry') > 30 or
+            Player.GetSkillValue('Magery')   > 30)
+
+
 def handle_overweight():
     """
-    Dismount if mounted (beetle is invisible to mobile scans while ridden),
-    detect beetle type, transfer or smelt, then remount.
-    Returns True if weight is back under threshold.
+    1. Try pack-beetle transfer first.
+    2. Smelt everything available (fire beetle or forge) — always.
+    Returns True if weight is now under threshold; False triggers a bank run.
     """
     global mount_serial
 
@@ -371,7 +385,7 @@ def handle_overweight():
     if pack is not None:
         mount_serial = pack.Serial
         if not transfer_to_mount():
-            log("Pack beetle full – falling back to smelt.", 0x25)
+            log("Pack beetle full – smelting to make room.", 0x25)
             if fire is not None:
                 smelt_with_fire_beetle(fire)
             else:
@@ -381,7 +395,6 @@ def handle_overweight():
     else:
         smelt_ore()
 
-    # Remount whichever beetle we found.
     remount_target = pack or fire
     if was_mounted and remount_target is not None:
         Mobiles.UseMobile(remount_target.Serial)
@@ -536,7 +549,7 @@ def read_journal_status():
       'pack_full' – player's backpack is full
       'ok'        – no problem signal detected
     """
-    if Journal.Search(JOURNAL_NO_ORE):
+    if any(Journal.Search(p) for p in JOURNAL_NO_ORE):
         return "no_ore"
     for phrase in JOURNAL_CANT_MINE:
         if Journal.Search(phrase):
@@ -677,25 +690,22 @@ def _bank_stacks(source_serial, item_ids, label):
 
 def bank_ingots():
     """
-    Gate to bank, deposit harvest, then gate back to the mine if cfg.mine_rune_slot is set.
-    Returns True  – travel back succeeded; caller should continue the mining loop.
-    Returns False – no mine rune configured or travel failed; caller should stop.
+    Full bank-run sequence:
+      1. Gate to bank.
+      2. Deposit backpack ingots.
+      3. Unload pack beetle (ore + ingots) if present.
+      4. Smelt remaining backpack ore at bank (fire beetle or forge).
+      5. Deposit freshly smelted ingots and any leftover ore.
+      6. Gate back to mine.
+    Returns True if mining can resume, False if no mine rune configured or travel failed.
     """
-    # ── Detect beetle type before gating ─────────────────────────────────────
     pack, fire = find_beetles()
-    if pack is not None:
-        log("Pack beetle detected – will pull ore and ingots from beetle at bank.", 0x3B)
-    elif fire is not None:
-        log("Fire beetle detected – will deposit player ingots at bank.", 0x3B)
-    else:
-        log("No beetle detected – depositing player backpack ingots only.", 0x3B)
 
-    # ── Find runebook ─────────────────────────────────────────────────────────
     runebook = _find_or_prompt_runebook()
     if runebook is None:
         return False
 
-    # ── Travel to bank ────────────────────────────────────────────────────────
+    # ── Gate to bank ──────────────────────────────────────────────────────────
     log("Traveling to bank (slot %s)..." % str(cfg.bank_rune_slot))
     if not travel_to(runebook, cfg.bank_rune_slot):
         log("Failed to travel to bank – aborting.", 0x25)
@@ -716,7 +726,10 @@ def bank_ingots():
 
     Misc.Pause(500)
 
-    # ── Deposit based on beetle type ──────────────────────────────────────────
+    # ── Deposit backpack ingots ───────────────────────────────────────────────
+    _bank_stacks(Player.Backpack.Serial, INGOT_IDS, "ingots")
+
+    # ── Unload pack beetle ────────────────────────────────────────────────────
     if pack is not None:
         was_mounted = Player.Mount is not None
         if was_mounted:
@@ -728,24 +741,32 @@ def bank_ingots():
             _bank_stacks(beetle.Backpack.Serial, ORE_IDS,   "ore from beetle")
             _bank_stacks(beetle.Backpack.Serial, INGOT_IDS, "ingots from beetle")
         else:
-            log("Could not access pack beetle backpack at bank.", 0x25)
-
-        _bank_stacks(Player.Backpack.Serial, INGOT_IDS, "ingots from backpack")
+            log("Could not access pack beetle at bank.", 0x25)
 
         if was_mounted:
             Mobiles.UseMobile(pack.Serial)
             Misc.Pause(1500)
+
+    # ── Smelt remaining backpack ore at bank ──────────────────────────────────
+    if fire is not None:
+        log("Smelting backpack ore with fire beetle...")
+        smelt_with_fire_beetle(fire)
     else:
-        _bank_stacks(Player.Backpack.Serial, INGOT_IDS, "ingots from backpack")
+        log("Smelting backpack ore at bank forge...")
+        smelt_from_backpack()
+
+    # ── Deposit smelted ingots and leftover ore ───────────────────────────────
+    _bank_stacks(Player.Backpack.Serial, INGOT_IDS, "ingots after smelt")
+    _bank_stacks(Player.Backpack.Serial, ORE_IDS,   "remaining ore")
 
     # ── Return to mine ────────────────────────────────────────────────────────
     if cfg.mine_rune_slot is None:
-        log("No mine rune slot configured – stopping at bank.", 0x3B)
+        log("No mine rune configured – stopping at bank.", 0x3B)
         return False
 
-    log("Returning to mine (runebook slot %d)..." % cfg.mine_rune_slot)
+    log("Returning to mine (slot %d)..." % cfg.mine_rune_slot)
     if not travel_to(runebook, cfg.mine_rune_slot):
-        log("Failed to travel back to mine – stopping.", 0x25)
+        log("Failed to return to mine – stopping.", 0x25)
         return False
 
     log("Back at mine – resuming.", 0x3F)
