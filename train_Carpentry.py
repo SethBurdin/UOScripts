@@ -28,7 +28,7 @@ MAKE_LAST_BTN = None               # set once known (record a macro pressing Mak
 # Known item IDs per craft tier.  None = unknown, discovered after first craft.
 # Verify with Object Inspector and fill in any that are still None.
 TIER_ITEM_IDS = {
-    'ballot box':    None,    # discovered dynamically on first craft
+    'large crate':   None,    # discovered dynamically on first craft
     'wooden shield': 0x1B7A,
     'quarter staff': 0x0E89,
     'gnarled staff': 0x13F8,
@@ -73,13 +73,13 @@ def journal_too_many():
 def pull_boards(boards_box):
     """Pull up to REFILL_BOARDS plain boards from boards_box into backpack.
     Returns True on success, False if backpack became full mid-pull."""
-    Journal.Clear()
     remaining = REFILL_BOARDS
     for bid in BOARD_IDS:
         if remaining <= 0:
             break
         stack = Items.FindByID(bid, 0, boards_box.Serial)
         while stack is not None and remaining > 0:
+            Journal.Clear()  # clear immediately before the move so only the move result is checked
             Items.Move(stack, Player.Backpack, min(stack.Amount, remaining))
             Misc.Pause(PAUSE_MOVE)
             if journal_too_many():
@@ -135,6 +135,9 @@ def TrainCarpentry(boards_box, output_box):
     current_item_id   = None   # ItemID discovered after first successful craft
 
     # ── Startup cleanup ───────────────────────────────────────────────────────
+    Items.UseItem(boards_box)
+    Items.WaitForContents(boards_box, 3000)
+    Misc.Pause(500)
     Items.UseItem(Player.Backpack)
     Items.WaitForContents(Player.Backpack, 3000)
     Misc.Pause(500)
@@ -185,7 +188,7 @@ def TrainCarpentry(boards_box, output_box):
             log('Skill below 40 – use an NPC trainer first.', colors['red'])
             break
         elif skill < 67.0:
-            itemToCraft = carpentryCraftables['ballot box']
+            itemToCraft = carpentryCraftables['large crate']
         elif skill < 74.0:
             itemToCraft = carpentryCraftables['wooden shield']
         elif skill < 80.0:
@@ -246,7 +249,8 @@ def TrainCarpentry(boards_box, output_box):
         # Wait for craft result then close
         Gumps.WaitForGump(expected_gump, 5000)
         Gumps.SendAction(expected_gump, 0)
-        Misc.Pause(400)
+        Misc.Pause(1000)
+        Journal.Clear()  # discard late-arriving craft messages before next board pull
 
         # ── Discover crafted item type from backpack diff ─────────────────────
         if current_item_id is None:

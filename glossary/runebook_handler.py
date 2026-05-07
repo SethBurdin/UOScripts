@@ -27,6 +27,10 @@ RECALL_MAGERY_MIN    = 30   # Magery required to use Recall
 GATE_MAGERY_MIN      = 90   # Magery required to use Gate (also requires overweight)
 SACRED_JOURNEY_MIN   = 30   # Chivalry required to use Sacred Journey
 
+GATE_ITEM_ID         = 0x0F6C  # Moongate portal spawned by Gate Travel spell
+GATE_SCAN_RANGE      = 3       # tiles to search for the gate after casting
+GATE_ENTER_TIMEOUT   = 5000    # ms to wait for the gate to appear
+
 _GUMP_LABELS = {
     "rename book", "charges", "max charges",
     "drop rune", "set default", "recall", "gate travel", "sacred journey",
@@ -97,19 +101,43 @@ def _wait_for_mana_drop(mana_before, timeout_ms=6000):
     return False
 
 
+def _snapshot_nearby_gate():
+    """Return the serial of any gate portal already in scan range, or None."""
+    gate = Items.FindByID(GATE_ITEM_ID, -1, -1, GATE_SCAN_RANGE)
+    return gate.Serial if gate is not None else None
+
+
+def _enter_nearby_gate(exclude_serial=None):
+    """Wait for a new gate portal to appear nearby and step through it. Returns True if entered."""
+    Timer.Create("rb_gate_enter", GATE_ENTER_TIMEOUT)
+    while Timer.Check("rb_gate_enter"):
+        gate = Items.FindByID(GATE_ITEM_ID, -1, -1, GATE_SCAN_RANGE)
+        if gate is not None and gate.Serial != exclude_serial:
+            Items.UseItem(gate)
+            Misc.Pause(600)
+            return True
+        Misc.Pause(100)
+    _log("No new gate portal found within %d tiles after %dms." % (GATE_SCAN_RANGE, GATE_ENTER_TIMEOUT), 33)
+    return False
+
+
 # ─── Public API ───────────────────────────────────────────────────────────────
 
 def find_runebook_by_label(label):
     """
     Return the first runebook in the player's backpack whose tooltip contains label
-    (case-insensitive). Returns None if not found.
+    (case-insensitive). Checks ALL runebooks, not just the first found.
+    Returns None if not found.
     """
-    rb = Items.FindByID(RUNEBOOK_ITEM_ID, -1, Player.Backpack.Serial)
-    if rb is None:
+    if Player.Backpack is None:
         return None
-    props = Items.GetPropStringList(rb.Serial) or []
-    if any(p.strip().lower() == label.strip().lower() for p in props):
-        return rb
+    target = label.strip().lower()
+    for item in (Player.Backpack.Contains or []):
+        if item.ItemID != RUNEBOOK_ITEM_ID:
+            continue
+        props = Items.GetPropStringList(item.Serial) or []
+        if any(p.strip().lower() == target for p in props):
+            return item
     return None
 
 
@@ -139,6 +167,7 @@ def travel_to_runebook(runebook, settle_delay=2000):
         return False
 
     _log("Casting %s at runebook." % spell)
+    existing_gate = _snapshot_nearby_gate() if spell == 'Gate Travel' else None
     mana_before = Player.Mana
     Spells.CastMagery(spell)
     if not Target.WaitForTarget(4000, False):
@@ -148,6 +177,9 @@ def travel_to_runebook(runebook, settle_delay=2000):
     if not _wait_for_mana_drop(mana_before):
         _log("%s fizzled — mana did not drop." % spell, 33)
         return False
+    if spell == 'Gate Travel':
+        if not _enter_nearby_gate(existing_gate):
+            return False
     Misc.Pause(settle_delay)
     return True
 
@@ -311,10 +343,13 @@ def _gate(runebook, rune_name, settle_delay):
     slot = _open_and_find_slot(runebook, rune_name)
     if slot is None:
         return False
+    existing_gate = _snapshot_nearby_gate()
     mana_before = Player.Mana
     Gumps.SendAction(RUNEBOOK_GUMP_ID, GATE_BUTTON_BASE + slot)
     if not _wait_for_mana_drop(mana_before):
         _log("Gate fizzled — mana did not drop.", 33)
+        return False
+    if not _enter_nearby_gate(existing_gate):
         return False
     Misc.Pause(settle_delay)
     return True

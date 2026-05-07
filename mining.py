@@ -63,7 +63,8 @@ class cfg:
 
 # ── Journal signals ───────────────────────────────────────────────────────────
 # Partial strings – Journal.Search does a substring match (case-sensitive).
-JOURNAL_NO_ORE     = ["no metal here to mine", "no Metal here to mine",
+JOURNAL_NO_ORE     = ["There is no metal here to mine",
+                      "no metal here to mine", "no Metal here to mine",
                       "no ore here to mine",   "no Ore here to mine",
                       "There is no metal",     "There is no ore",
                       "find no ore",           "find no metal"]
@@ -888,6 +889,7 @@ def run_mining_loop():
         Mobiles.UseMobile(Player.Serial)
         Misc.Pause(1500)
 
+    _tile_cache.clear()
     pos = Player.Position
     log("Mining started at (%d, %d, %d)." % (pos.X, pos.Y, pos.Z))
     log("Say: 'quit' to stop | 'smelt' to smelt | 'mount' to reset animal | 'forge' to reset forge | 'bank' to bank ingots", 0x0481)
@@ -961,8 +963,9 @@ def run_mining_loop():
             log("Spot unmineable (%s). Rotating to direction %d / %d  (dx=%+d, dy=%+d)."
                 % (status, dir_index + 1, num_dirs, dx2, dy2), 0x25)
             if consec_fails >= num_dirs:
-                log("All %d directions exhausted with no ore. Stopping." % num_dirs, 0x25)
-                break
+                log("All %d directions exhausted – waiting for player to move." % num_dirs, 0x25)
+                consec_fails = 0
+                dir_index    = 0
 
         elif status == "pack_full":
             if smelting_in_progress:
@@ -983,12 +986,12 @@ def run_mining_loop():
                 log("Silent swing %d/%d – no journal response." % (silent_count, cfg.max_silent_ok), 0x3B)
                 if silent_count >= cfg.max_silent_ok:
                     log("Rotating after %d silent swings." % silent_count, 0x25)
+                    _tile_cache.pop((dx, dy), None)
                     consec_fails += 1
                     dir_index    = (dir_index + 1) % num_dirs
                     silent_count = 0
                 else:
                     consec_fails = 0
-            silent_count = 0
 
         Misc.Pause(cfg.loop_delay)
 
@@ -1054,6 +1057,7 @@ def auto_mine_spot(home_rb):
         Mobiles.UseMobile(Player.Serial)
         Misc.Pause(1500)
 
+    _tile_cache.clear()
     pos = Player.Position
     log("Auto-mining at (%d, %d)." % (pos.X, pos.Y))
     Journal.Clear()
@@ -1061,6 +1065,7 @@ def auto_mine_spot(home_rb):
     num_dirs     = len(cfg.mining_directions)
     dir_index    = 0
     consec_fails = 0
+    silent_count = 0
 
     while consec_fails < num_dirs:
         if Player.Weight >= Player.MaxWeight - cfg.weight_headroom:
@@ -1084,16 +1089,32 @@ def auto_mine_spot(home_rb):
             return False
 
         status = read_journal_status()
-        if status in ('no_ore', 'cant_mine'):
+        log("Journal status: %s" % status, 0x3B)
+        if status == 'no_ore':
+            log("No metal at this spot – moving to next rune.", 0x25)
+            return True
+        elif status == 'cant_mine':
             consec_fails += 1
+            silent_count  = 0
             dir_index = (dir_index + 1) % num_dirs
-            log("Direction exhausted (%s) – trying %d/%d." % (status, dir_index + 1, num_dirs), 0x25)
+            log("Direction blocked – trying %d/%d." % (dir_index + 1, num_dirs), 0x25)
         elif status == 'pack_full':
             log("Pack full — gating home.", 0x25)
             travel_to_runebook(home_rb, 2000)
             return False
         else:
-            consec_fails = 0
+            if any(Journal.Search(p) for p in JOURNAL_ORE_SUCCESS):
+                consec_fails = 0
+                silent_count = 0
+            else:
+                silent_count += 1
+                log("Silent swing %d/%d." % (silent_count, cfg.max_silent_ok), 0x3B)
+                if silent_count >= cfg.max_silent_ok:
+                    log("Rotating after silent swings.", 0x25)
+                    _tile_cache.pop((dx, dy), None)
+                    consec_fails += 1
+                    dir_index    = (dir_index + 1) % num_dirs
+                    silent_count = 0
 
         Misc.Pause(cfg.loop_delay)
 
@@ -1124,10 +1145,49 @@ def run_auto_mode():
             mining_rb, spots = _find_mining_runebook()
             home_rb = find_runebook_by_label(cfg.auto_home_runebook)
             if mining_rb is None or home_rb is None:
-                log("Lost runebooks after gating home — stopping.", 0x25)
-                return
+                log("Lost runebooks after gating home — finishing.", 0x25)
+                break  # fall through to finish()
 
     log("=== Auto mining complete ===", 0x026C)
+    finish()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Exit sequence
+# ─────────────────────────────────────────────────────────────────────────────
+
+def finish():
+    """Gate home, smelt with fire beetle, deposit all ingots and ore, then step 2 right and 2 up."""
+    home_rb = find_runebook_by_label(cfg.auto_home_runebook)
+    if home_rb is None:
+        log("No home runebook – skipping finish.", 0x25)
+        return
+
+    log("Heading home...", 0x026C)
+    if not travel_to_runebook(home_rb, RECALL_TRAVEL_DELAY):
+        log("Could not travel home – skipping deposit.", 0x25)
+        return
+
+    _, fire = find_beetles()
+    if fire is not None:
+        log("Smelting backpack ore with fire beetle before deposit...")
+        smelt_with_fire_beetle(fire)
+
+    dest = Items.FindBySerial(_config.quick_dropbox)
+    if dest is None:
+        log("Home chest (0x%X) not found – skipping deposit." % _config.quick_dropbox, 0x25)
+    else:
+        _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
+        _deposit_stacks(Player.Backpack.Serial, ORE_IDS,   dest, "remaining ore")
+
+    for _ in range(2):
+        Player.Walk('Right')
+        Misc.Pause(400)
+    for _ in range(2):
+        Player.Walk('Up')
+        Misc.Pause(400)
+
+    log("Done.", 0x026C)
 
 
 # ─────────────────────────────────────────────────────────────────────────────

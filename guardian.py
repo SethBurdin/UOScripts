@@ -23,6 +23,10 @@ FOLLOW_MAX_CHECKS     = 3     # max polls waiting for pet to arrive (total wait 
 PET_SCAN_RANGE        = 30    # tile radius to search for a friendly mobile
 GUARD_BREAK_DISTANCE  = 1    # tiles player must move from guard origin before pet is immediately recalled
 
+# Pet context menu entry indices (right-click the pet)
+PET_CMD_FOLLOW = 2   # "Command: Follow"
+PET_CMD_GUARD  = 3   # "Command: Guard"
+
 # Items auto-looted by Razor's AutoLoot agent that should be transferred to the
 # storage chest on each banking trip. Add/remove item IDs to match your AutoLoot list.
 TRANSFER_ITEMS = [
@@ -60,6 +64,7 @@ STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "guardian_
 
 # ─── Session gold tracking ────────────────────────────────────────────────────
 
+_pet_serial    = None
 _session_start = None
 _session_gold  = 0
 
@@ -91,11 +96,15 @@ def log(msg, color=68):
     Misc.SendMessage("[guardian] " + msg, color)
 
 
-def _cmd(msg):
-    """Say a pet command twice with a short pause between."""
-    Player.ChatSay(690, msg)
+def _pet_cmd(serial, entry, target_serial=None):
+    """Issue a pet command silently via the context menu.
+    Pass target_serial for commands that open a target cursor (e.g. Follow)."""
+    if Misc.WaitForContext(serial, 2000):
+        Misc.ContextReply(serial, entry)
+        if target_serial is not None:
+            if Target.WaitForTarget(3000, False):
+                Target.TargetExecute(target_serial)
     Misc.Pause(400)
-    Player.ChatSay(690, msg)
 
 
 # ─── Auto-bank gold ───────────────────────────────────────────────────────────
@@ -163,6 +172,42 @@ def bank_gold_if_heavy():
         travel_to_named_rune(rb, FARM_RUNE_NAME, RECALL_SETTLE_DELAY)
 
 
+def discover_pet():
+    """Mount-test nearby non-human mobiles to lock in the pet serial."""
+    global _pet_serial
+
+    # Already mounted — dismount first so the pet appears in the mobile list,
+    # then fall through to the scan loop to capture the correct Mobile serial.
+    if Player.Mount is not None:
+        log("Already mounted — dismounting before scan.", colors['cyan'])
+        Mobiles.UseMobile(Player.Serial)
+        Misc.Pause(2000)
+
+    log("Scanning for mountable pet within %d tiles..." % PET_SCAN_RANGE, colors['cyan'])
+    f = Mobiles.Filter()
+    f.Enabled  = True
+    f.IsHuman  = False
+    f.RangeMin = 0
+    f.RangeMax = PET_SCAN_RANGE
+    for mob in Mobiles.ApplyFilter(f):
+        if mob.Serial == Player.Serial or mob.IsHuman:
+            continue
+        log("Trying %s (0x%X)..." % (mob.Name, mob.Serial), colors['yellow'])
+        Mobiles.UseMobile(mob.Serial)
+        Misc.Pause(1500)
+        # Player.Mount is an Item whose serial may differ from the Mobile serial,
+        # so just confirm something was mounted rather than comparing serials.
+        if Player.Mount is not None:
+            _pet_serial = mob.Serial
+            log("Pet locked: %s (0x%X) — dismounting." % (mob.Name, _pet_serial), colors['cyan'])
+            Mobiles.UseMobile(Player.Serial)
+            Misc.Pause(1500)
+            return True
+
+    log("No mountable non-human pet found nearby.", colors['red'])
+    return False
+
+
 def find_pet():
     f = Mobiles.Filter()
     f.Enabled  = True
@@ -170,16 +215,18 @@ def find_pet():
     f.IsHuman  = False
     f.RangeMin = 0
     f.RangeMax = PET_SCAN_RANGE
-    candidates = Mobiles.ApplyFilter(f)
-    nearest     = None
-    nearestDist = 9999
-    for mob in candidates:
+    nearest, nearestDist = None, 9999
+    for mob in Mobiles.ApplyFilter(f):
         if mob.Serial == Player.Serial:
             continue
-        d = Player.DistanceTo(mob)
-        if d < nearestDist:
-            nearestDist = d
-            nearest = mob
+        if _pet_serial is not None:
+            if mob.Serial == _pet_serial:
+                return mob
+        else:
+            d = Player.DistanceTo(mob)
+            if d < nearestDist:
+                nearestDist = d
+                nearest = mob
     return nearest
 
 
@@ -200,15 +247,13 @@ def cure_pet(pet):
 
 
 def guard_pet_if_low(pet):
-    """Say 'all guard me' three times when pet HP drops below GUARD_HEALTH_THRESHOLD.
-    Applies to all players including kspot."""
     if pet.HitsMax == 0:
         return
     if float(pet.Hits) / pet.HitsMax < GUARD_HEALTH_THRESHOLD:
-        log("%s HP low (%.0f%%) — all guard me x3" % (
+        log("%s HP low (%.0f%%) — guard x3" % (
             pet.Name, float(pet.Hits) / pet.HitsMax * 100), colors['yellow'])
         for _ in range(3):
-            _cmd('all guard me')
+            _pet_cmd(pet.Serial, PET_CMD_GUARD)
             Misc.Pause(400)
 
 
@@ -225,11 +270,11 @@ def check_pet_health(pet):
 
 
 def recall_pet(pet):
-    log("Pet too far (%d tiles) — all follow me" % Player.DistanceTo(pet), colors['yellow'])
+    log("Pet too far (%d tiles) — recalling." % Player.DistanceTo(pet), colors['yellow'])
     for i in range(FOLLOW_MAX_CHECKS):
-        _cmd('all follow me')
+        _pet_cmd(pet.Serial, PET_CMD_FOLLOW, Player.Serial)
         Misc.Pause(FOLLOW_CHECK_INTERVAL)
-        fresh = Mobiles.FindBySerial(pet.Serial)
+        fresh = find_pet()
         if fresh is None:
             log("Pet disappeared during recall.", colors['red'])
             return False
@@ -247,6 +292,11 @@ def main():
     _session_start = time.time()
     _session_gold  = 0
     log("Guardian started.", colors['cyan'])
+
+    if not discover_pet():
+        log("Pet discovery failed — stopping.", colors['red'])
+        return
+
     is_guarding = False
     guard_pos   = None  # player tile when "all guard me" was last issued
 
@@ -265,22 +315,21 @@ def main():
 
         bank_gold_if_heavy()
 
+        pet = find_pet()
+
         # Break guard the moment the player moves far enough from the guard origin.
-        # This fires "all follow me" immediately rather than waiting for the pet
-        # distance check, which is what lets the pet kill mobs before being recalled.
         if is_guarding and guard_pos is not None:
             pos = Player.Position
             if max(abs(pos.X - guard_pos[0]), abs(pos.Y - guard_pos[1])) > GUARD_BREAK_DISTANCE:
                 is_guarding = False
                 guard_pos   = None
-                _cmd('all follow me')
+                if pet is not None:
+                    _pet_cmd(pet.Serial, PET_CMD_FOLLOW, Player.Serial)
 
-        pet = find_pet()
         if pet is None:
-            log("No pet found — calling out...", colors['yellow'])
+            log("No pet found.", colors['yellow'])
             is_guarding = False
             guard_pos   = None
-            _cmd('all follow me')
             Misc.Pause(CHECK_INTERVAL)
             continue
 
@@ -297,7 +346,7 @@ def main():
 
         if not is_guarding:
             pos = Player.Position
-            _cmd('all guard me')
+            _pet_cmd(pet.Serial, PET_CMD_GUARD)
             is_guarding = True
             guard_pos   = (pos.X, pos.Y)
 
