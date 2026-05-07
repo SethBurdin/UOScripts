@@ -905,19 +905,19 @@ from glossary.runebook_handler import (
 # ─────────────────────────────────────────────────────────────────────────────
 
 def select_mode():
-    """Show a 10-second prompt. Player types '1' for manual, anything else = auto."""
-    log("Type '1' in chat for manual mode. Auto-mining starts in 10 seconds...", 0x0481)
-    Player.HeadMessage(0x0481, "1 = Manual  |  Auto in 10s")
+    """Show a 10-second prompt. Player types '1' for auto, timeout = manual."""
+    log("Type '1' in chat for auto mode. Manual mode starts in 10 seconds...", 0x0481)
+    Player.HeadMessage(0x0481, "1 = Auto  |  Manual in 10s")
     Journal.Clear()
     Timer.Create("mode_select", 10000)
     while Timer.Check("mode_select"):
         if Journal.SearchByType("1", "Regular"):
             Journal.Clear()
-            log("Manual mode.", 0x0481)
-            return 'manual'
+            log("Auto mode.", 0x0481)
+            return 'auto'
         Misc.Pause(200)
-    log("Auto mode.", 0x0481)
-    return 'auto'
+    log("Manual mode.", 0x0481)
+    return 'manual'
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -925,9 +925,22 @@ def select_mode():
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _find_mining_runebook():
+    """Return (runebook, spots) so the gump is only opened once."""
     if cfg.auto_mining_runebook is not None:
-        return find_runebook_by_label(cfg.auto_mining_runebook)
-    return Items.FindByID(RUNEBOOK_ITEM_ID, -1, Player.Backpack.Serial)
+        rb = find_runebook_by_label(cfg.auto_mining_runebook)
+        if rb is not None:
+            spots = find_runes_matching(rb, cfg.auto_mining_rune_filter)
+            if spots:
+                return rb, spots
+        return None, []
+    for item in Player.Backpack.Contains:
+        if item.ItemID == RUNEBOOK_ITEM_ID:
+            spots = find_runes_matching(item, cfg.auto_mining_rune_filter)
+            if spots:
+                log("Mining runebook: %s (0x%X), %d spot(s)." % (item.Name, item.Serial, len(spots)))
+                return item, spots
+    log("No runebook with '%s' runes found in backpack." % cfg.auto_mining_rune_filter, 0x25)
+    return None, []
 
 
 def auto_mine_spot(home_rb):
@@ -978,19 +991,13 @@ def auto_mine_spot(home_rb):
 
 
 def run_auto_mode():
-    mining_rb = _find_mining_runebook()
+    mining_rb, spots = _find_mining_runebook()
     if mining_rb is None:
-        log("No runebook in backpack.", 0x25)
         return
 
     home_rb = find_runebook_by_label(cfg.auto_home_runebook)
     if home_rb is None:
         log("No runebook labeled '%s' in backpack." % cfg.auto_home_runebook, 0x25)
-        return
-
-    spots = find_runes_matching(mining_rb, cfg.auto_mining_rune_filter)
-    if not spots:
-        log("No runes matching '%s'." % cfg.auto_mining_rune_filter, 0x25)
         return
 
     log("%d mining spot(s) found." % len(spots), 0x0481)
@@ -1003,8 +1010,8 @@ def run_auto_mode():
 
         if not auto_mine_spot(home_rb):
             # Went home — re-acquire runebooks from new location
-            mining_rb = _find_mining_runebook()
-            home_rb   = find_runebook_by_label(cfg.auto_home_runebook)
+            mining_rb, spots = _find_mining_runebook()
+            home_rb = find_runebook_by_label(cfg.auto_home_runebook)
             if mining_rb is None or home_rb is None:
                 log("Lost runebooks after gating home — stopping.", 0x25)
                 return

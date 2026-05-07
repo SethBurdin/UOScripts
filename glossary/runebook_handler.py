@@ -27,7 +27,10 @@ RECALL_MAGERY_MIN    = 30   # Magery required to use Recall
 GATE_MAGERY_MIN      = 90   # Magery required to use Gate (also requires overweight)
 SACRED_JOURNEY_MIN   = 30   # Chivalry required to use Sacred Journey
 
-_GUMP_LABELS = {"rename book", "charges", "max charges"}
+_GUMP_LABELS = {
+    "rename book", "charges", "max charges",
+    "drop rune", "set default", "recall", "gate travel", "sacred journey",
+}
 
 
 # ─── Internal helpers ─────────────────────────────────────────────────────────
@@ -62,11 +65,20 @@ def _slot_from_lines(lines, rune_name):
     return slot
 
 
-def _open_and_find_slot(runebook, rune_name):
-    """Open the runebook gump and return the slot index for rune_name, or None."""
+def _ensure_runebook_open(runebook):
+    """Open the runebook gump if it isn't already open. Returns True on success."""
+    if Gumps.CurrentGump() == RUNEBOOK_GUMP_ID:
+        return True
     Items.UseItem(runebook)
     if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
         _log("Runebook gump did not open.", 33)
+        return False
+    return True
+
+
+def _open_and_find_slot(runebook, rune_name):
+    """Ensure the runebook gump is open and return the slot index for rune_name, or None."""
+    if not _ensure_runebook_open(runebook):
         return None
     lines = Gumps.LastGumpGetLineList()
     slot = _slot_from_lines(lines, rune_name)
@@ -171,44 +183,50 @@ def travel_to_named_rune(runebook, rune_name, settle_delay=2000):
 
 
 # ─── Rune enumeration ────────────────────────────────────────────────────────
+# LastGumpGetLine(n) is POSITIONAL — it returns line n from the full text dump,
+# not button-associated text. Rune names sit at the END of that dump (~indices 85-100
+# for a full 16-slot book). _extract_rune_block finds them by locating the last
+# contiguous run of ≤16 name-like entries.
 
 def _extract_rune_block(lines):
     """
-    Find the rune name block inside the full gump line list.
-    The block is the last contiguous run of non-empty, non-digit, non-label entries
-    with at most 16 items (one per runebook slot).
-    Returns [(slot, name), ...] with slot as 0-based position in the block.
+    Extract rune names from the gump line list.
+
+    The gump dumps rune names AND their sextant coordinates. Coordinate strings
+    always contain a comma (e.g. "98o 26'N, 13o 42'W"). Regular rune names never do.
+    Strategy: skip empties, digit-only entries, known labels, and comma-containing
+    strings, then take the first 16 results — those are the rune names in slot order.
     """
-    runs = []
-    current = []
+    candidates = []
     for line in lines:
         entry = line.strip()
-        if entry and not entry.isdigit() and entry.lower() not in _GUMP_LABELS:
-            current.append(entry)
-        else:
-            if current:
-                runs.append(list(current))
-                current = []
-    if current:
-        runs.append(current)
-    for run in reversed(runs):
-        if len(run) <= 16:
-            return [(i, name) for i, name in enumerate(run)]
-    return []
+        if not entry:
+            continue
+        if entry[0].isdigit():      # coordinate strings start with digits (e.g. "98o 26'N")
+            continue
+        if entry.lower() in _GUMP_LABELS:
+            continue
+        candidates.append(entry)
+        if len(candidates) == 16:
+            break
+    return [(i, name) for i, name in enumerate(candidates)]
 
 
 def get_runebook_runes(runebook):
     """
-    Open the runebook gump, read all rune names with their slot indices, then close.
-    Returns [(slot, name), ...] for all occupied rune slots (0-based).
+    Open the runebook gump, extract all rune names and their slot indices.
+    The gump is left open — the next travel call will open a fresh one.
+    Returns [(slot, name), ...] for all occupied slots (0-based).
     """
     Items.UseItem(runebook)
     if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
         _log("Runebook gump timed out.", 33)
         return []
     lines = Gumps.LastGumpGetLineList()
-    Gumps.SendAction(RUNEBOOK_GUMP_ID, 0)  # close gump
-    return _extract_rune_block(lines)
+    _log("Raw gump lines (%d): %s" % (len(lines), lines))
+    runes = _extract_rune_block(lines)
+    _log("Parsed %d rune(s): %s" % (len(runes), [n for _, n in runes]))
+    return runes
 
 
 def find_runes_matching(runebook, partial):
@@ -239,9 +257,7 @@ def travel_to_slot(runebook, slot, settle_delay=2000):
         _log("Cannot travel: skills too low.", 33)
         return False
 
-    Items.UseItem(runebook)
-    if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
-        _log("Runebook gump timed out.", 33)
+    if not _ensure_runebook_open(runebook):
         return False
 
     mana_before = Player.Mana
