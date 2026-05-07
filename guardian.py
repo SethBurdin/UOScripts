@@ -9,6 +9,7 @@ if False:
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
+import config
 from glossary.colors import colors
 from glossary.runebook_handler import find_runebook_by_label, travel_to_runebook, travel_to_named_rune
 
@@ -19,7 +20,7 @@ CHECK_INTERVAL        = 1500  # ms between main loop ticks
 FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting for pet
 FOLLOW_MAX_CHECKS     = 3     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
 PET_SCAN_RANGE        = 30    # tile radius to search for a friendly mobile
-GUARD_BREAK_DISTANCE  = 4     # tiles player must move from guard origin before pet is immediately recalled
+GUARD_BREAK_DISTANCE  = 2    # tiles player must move from guard origin before pet is immediately recalled
 
 # Items auto-looted by Razor's AutoLoot agent that should be transferred to the
 # storage chest on each banking trip. Add/remove item IDs to match your AutoLoot list.
@@ -37,7 +38,7 @@ TRANSFER_ITEMS = [
 
 # Auto-bank gold
 WEIGHT_BANK_THRESHOLD = 0.90        # recall home when weight ratio >= this
-GOLD_DEST_SERIAL      = 0x400B404A  # serial of the container to deposit gold into — EDIT THIS
+GOLD_DEST_SERIAL      = config.quick_dropbox
 HOME_RUNEBOOK_NAME    = "home"      # label on the runebook item (case-insensitive)
 FARM_RUNE_NAME        = "ww"        # label of the rune to return to after banking (case-insensitive)
 RECALL_SETTLE_DELAY   = 2000        # ms to wait after recall lands

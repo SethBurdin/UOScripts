@@ -53,8 +53,7 @@ class cfg:
         ( 1,  1),   # southeast
     ]
 
-    home_container_serial = None  # serial of the house container to deposit into;
-                                  # None = prompted on first bank run and cached
+    home_container_serial = None  # resolved at runtime from config.quick_dropbox
 
     # Auto mode
     auto_mining_rune_filter = 'Mining Spot'  # partial match (case-insensitive) for runes to visit
@@ -368,8 +367,8 @@ def _can_travel():
 
 def handle_overweight():
     """
-    1. Try pack-beetle transfer first.
-    2. Smelt everything available (fire beetle or forge) — always.
+    1. Try pack-beetle transfer first (offloads ore).
+    2. If still overweight after transfer, smelt with fire beetle or forge.
     Returns True if weight is now under threshold; False triggers a bank run.
     """
     global mount_serial
@@ -384,16 +383,13 @@ def handle_overweight():
 
     if pack is not None:
         mount_serial = pack.Serial
-        if not transfer_to_mount():
-            log("Pack beetle full – smelting to make room.", 0x25)
-            if fire is not None:
-                smelt_with_fire_beetle(fire)
-            else:
-                smelt_ore()
-    elif fire is not None:
-        smelt_with_fire_beetle(fire)
-    else:
-        smelt_ore()
+        transfer_to_mount()
+
+    if Player.Weight >= Player.MaxWeight - cfg.weight_headroom:
+        if fire is not None:
+            smelt_with_fire_beetle(fire)
+        else:
+            smelt_ore()
 
     remount_target = pack or fire
     if was_mounted and remount_target is not None:
@@ -673,18 +669,18 @@ def travel_to(runebook, slot=None):
 # Banking
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _bank_stacks(source_serial, item_ids, label):
-    """Move every matching stack from source_serial into the open bank box. Returns total amount."""
+def _deposit_stacks(source_serial, item_ids, dest, label):
+    """Move every matching stack from source_serial into dest. Returns total amount."""
     total = 0
     for iid in item_ids:
         stack = Items.FindByID(iid, -1, source_serial)
         while stack is not None:
             total += stack.Amount
-            Items.Move(stack, Player.Bank, stack.Amount)
+            Items.Move(stack, dest, stack.Amount)
             Misc.Pause(cfg.pause_after_transfer)
             stack = Items.FindByID(iid, -1, source_serial)
     if total:
-        log("Banked %d %s." % (total, label))
+        log("Deposited %d %s." % (total, label))
     return total
 
 
@@ -726,8 +722,13 @@ def bank_ingots():
 
     Misc.Pause(500)
 
+    dest = Items.FindBySerial(_config.quick_dropbox)
+    if dest is None:
+        log("House container (0x%X) not found – cannot deposit." % _config.quick_dropbox, 0x25)
+        return False
+
     # ── Deposit backpack ingots ───────────────────────────────────────────────
-    _bank_stacks(Player.Backpack.Serial, INGOT_IDS, "ingots")
+    _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
 
     # ── Unload pack beetle ────────────────────────────────────────────────────
     if pack is not None:
@@ -738,26 +739,26 @@ def bank_ingots():
 
         beetle = Mobiles.FindBySerial(pack.Serial)
         if beetle is not None and beetle.Backpack is not None:
-            _bank_stacks(beetle.Backpack.Serial, ORE_IDS,   "ore from beetle")
-            _bank_stacks(beetle.Backpack.Serial, INGOT_IDS, "ingots from beetle")
+            _deposit_stacks(beetle.Backpack.Serial, ORE_IDS,   dest, "ore from beetle")
+            _deposit_stacks(beetle.Backpack.Serial, INGOT_IDS, dest, "ingots from beetle")
         else:
-            log("Could not access pack beetle at bank.", 0x25)
+            log("Could not access pack beetle at home.", 0x25)
 
         if was_mounted:
             Mobiles.UseMobile(pack.Serial)
             Misc.Pause(1500)
 
-    # ── Smelt remaining backpack ore at bank ──────────────────────────────────
+    # ── Smelt remaining backpack ore ──────────────────────────────────────────
+    # Fire beetle travels with the player so it works at home.
+    # smelt_from_backpack() targets forge_serial (the mine forge) which is out of
+    # range at home and would silently fail — skip it without a fire beetle.
     if fire is not None:
         log("Smelting backpack ore with fire beetle...")
         smelt_with_fire_beetle(fire)
-    else:
-        log("Smelting backpack ore at bank forge...")
-        smelt_from_backpack()
 
     # ── Deposit smelted ingots and leftover ore ───────────────────────────────
-    _bank_stacks(Player.Backpack.Serial, INGOT_IDS, "ingots after smelt")
-    _bank_stacks(Player.Backpack.Serial, ORE_IDS,   "remaining ore")
+    _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots after smelt")
+    _deposit_stacks(Player.Backpack.Serial, ORE_IDS,   dest, "remaining ore")
 
     # ── Return to mine ────────────────────────────────────────────────────────
     if cfg.mine_rune_slot is None:
@@ -916,6 +917,7 @@ def run_mining_loop():
 
 import sys as _sys, os as _os
 _sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+import config as _config
 from glossary.runebook_handler import (
     find_runebook_by_label, find_runes_matching, travel_to_slot, travel_to_runebook
 )
@@ -984,9 +986,15 @@ def auto_mine_spot(home_rb):
 
     while consec_fails < num_dirs:
         if Player.Weight >= Player.MaxWeight - cfg.weight_headroom:
-            log("Overweight — gating home.", 0x25)
-            travel_to_runebook(home_rb, 2000)
-            return False
+            log("Overweight – smelting/transferring first.", 0x25)
+            if not handle_overweight():
+                log("Still overweight after smelt – running bank run.", 0x25)
+                returned = bank_ingots()
+                if not returned:
+                    travel_to_runebook(home_rb, 2000)
+                    return False
+                # bank_ingots returned us to the mine rune — resume this spot
+                Journal.Clear()
 
         dx, dy = cfg.mining_directions[dir_index]
         result  = mine_at(dx, dy)
