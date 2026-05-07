@@ -6,7 +6,7 @@
 if False:
     from razorenhanced_stubs import *
 
-import sys, os
+import sys, os, json, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import config
@@ -56,6 +56,34 @@ RECALL_SETTLE_DELAY   = 2000        # ms to wait after recall lands
 
 GOLD_ITEM_ID = 0x0EED
 
+STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "guardian_stats.json")
+
+# ─── Session gold tracking ────────────────────────────────────────────────────
+
+_session_start = None
+_session_gold  = 0
+
+
+def _append_gold_stat(gold_this_trip):
+    global _session_gold
+    _session_gold += gold_this_trip
+    elapsed = time.time() - _session_start
+    gph = int(_session_gold / elapsed * 3600) if elapsed > 0 else 0
+    entry = {
+        "rune":          FARM_RUNE_NAME,
+        "time":          time.strftime("%Y-%m-%d %H:%M:%S"),
+        "gold_per_hour": gph,
+    }
+    try:
+        with open(STATS_FILE, "r") as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        data = []
+    data.append(entry)
+    with open(STATS_FILE, "w") as f:
+        json.dump(data, f, indent=2)
+    log("Gold/hr: %d  (session: %d gold, %.1f min)" % (gph, _session_gold, elapsed / 60), colors['cyan'])
+
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -102,6 +130,7 @@ def transfer_gold():
         log("Deposited %d gold into 0x%X." % (total, GOLD_DEST_SERIAL), colors['cyan'])
     else:
         log("No gold to deposit.", colors['yellow'])
+    return total
 
 
 def do_banking(rb):
@@ -109,8 +138,10 @@ def do_banking(rb):
     if not travel_to_runebook(rb, RECALL_SETTLE_DELAY):
         log("Failed to travel home — banking aborted.", colors['red'])
         return False
-    transfer_gold()
+    gold = transfer_gold()
     transfer_loot_to_chest()
+    if gold and _session_start is not None:
+        _append_gold_stat(gold)
     return True
 
 
@@ -212,6 +243,9 @@ def recall_pet(pet):
 # ─── Main loop ────────────────────────────────────────────────────────────────
 
 def main():
+    global _session_start, _session_gold
+    _session_start = time.time()
+    _session_gold  = 0
     log("Guardian started.", colors['cyan'])
     is_guarding = False
     guard_pos   = None  # player tile when "all guard me" was last issued

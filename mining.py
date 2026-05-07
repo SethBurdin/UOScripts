@@ -90,9 +90,8 @@ FORGE_IDS  = [0x0FB1, 0x0FAF, 0x0FAD, 0x0FAE, 0x0FB0]
 
 RUNEBOOK_ITEM_ID    = 0x22C5
 TINKER_TOOL_IDS     = [0x1EBC, 0x1EB8]  # tinker's tools, tool kit
-TINKERING_GUMP_ID   = None   # record a macro opening tinker's tools to confirm
-PICKAXE_CAT_BTN     = 8      # OSI category button — confirm for this shard via macro
-PICKAXE_ITEM_BTN    = 114    # OSI item button — confirm for this shard via macro
+TINKERING_GUMP_ID   = 2653346093  # confirmed via macro (same as carpentry gump)
+PICKAXE_ITEM_BTN    = 114         # confirmed via macro — no category step needed
 PICKAXE_INGOT_COST  = 4
 GATE_TRAVEL_DELAY   = 4000   # ms to wait for gate to open / travel to complete
 RECALL_TRAVEL_DELAY = 2000   # ms to wait after recall lands
@@ -385,9 +384,6 @@ def try_craft_pickaxe():
       - TINKERING_GUMP_ID is configured
     Returns True if a new pickaxe is now in the backpack.
     """
-    if TINKERING_GUMP_ID is None:
-        log("TINKERING_GUMP_ID not set – skipping craft. Record a macro to find it.", 0x25)
-        return False
     if Player.GetSkillValue('Tinkering') <= 50:
         log("Tinkering %.1f <= 50 – cannot craft pickaxe." % Player.GetSkillValue('Tinkering'), 0x25)
         return False
@@ -414,13 +410,12 @@ def try_craft_pickaxe():
     before = {item.Serial for item in (Player.Backpack.Contains or [])}
 
     Items.UseItem(tinker_tool)
+    Misc.Pause(800)
+
     if not Gumps.WaitForGump(TINKERING_GUMP_ID, 5000):
         log("Tinkering gump did not open.", 0x25)
         return False
 
-    Misc.Pause(500)
-    Gumps.SendAction(TINKERING_GUMP_ID, PICKAXE_CAT_BTN)
-    Gumps.WaitForGump(TINKERING_GUMP_ID, 3000)
     Misc.Pause(500)
     Gumps.SendAction(TINKERING_GUMP_ID, PICKAXE_ITEM_BTN)
     Gumps.WaitForGump(TINKERING_GUMP_ID, 5000)
@@ -432,7 +427,7 @@ def try_craft_pickaxe():
             log("Pickaxe crafted (0x%X)." % item.Serial)
             return True
 
-    log("Pickaxe craft failed – no new pickaxe found.", 0x25)
+    log("Pickaxe craft failed – check PICKAXE_ITEM_BTN (%d) for this shard." % PICKAXE_ITEM_BTN, 0x25)
     return False
 
 
@@ -573,11 +568,13 @@ def mine_at(dx, dy):
 
     def _swing(tz, tile_id):
         Journal.Clear()
-        Target.Cancel()      # dismiss any visually-open cursor
-        Target.ClearQueue()  # clear any stale queued cursor
+        Target.Cancel()
+        Target.ClearQueue()
+        Misc.Pause(250)      # let cancel propagate before sending a new use-item packet
         Items.UseItem(tool)
-        if not Target.WaitForTarget(3000, True):  # True = cancel stale cursor, wait fresh
+        if not Target.WaitForTarget(3000, False):
             log("Target cursor never appeared – treating as cant_mine.", 0x3B)
+            Target.Cancel()  # clean up if cursor arrived late
             return False
         Target.TargetExecute(tx, ty, tz, tile_id)
         Misc.Pause(cfg.pause_after_mine)
