@@ -21,7 +21,7 @@ CHECK_INTERVAL        = 1500  # ms between main loop ticks
 FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting for pet
 FOLLOW_MAX_CHECKS     = 3     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
 PET_SCAN_RANGE        = 30    # tile radius to search for a friendly mobile
-GUARD_BREAK_DISTANCE  = 2    # tiles player must move from guard origin before pet is immediately recalled
+GUARD_BREAK_DISTANCE  = 1    # tiles player must move from guard origin before pet is immediately recalled
 
 # Items auto-looted by Razor's AutoLoot agent that should be transferred to the
 # storage chest on each banking trip. Add/remove item IDs to match your AutoLoot list.

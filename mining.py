@@ -1084,12 +1084,10 @@ def auto_mine_spot(home_rb):
             return False
 
         status = read_journal_status()
-        if status == 'no_ore':
-            log("No metal at this spot – moving on.")
-            return True
-        elif status == 'cant_mine':
+        if status in ('no_ore', 'cant_mine'):
             consec_fails += 1
             dir_index = (dir_index + 1) % num_dirs
+            log("Direction exhausted (%s) – trying %d/%d." % (status, dir_index + 1, num_dirs), 0x25)
         elif status == 'pack_full':
             log("Pack full — gating home.", 0x25)
             travel_to_runebook(home_rb, 2000)
