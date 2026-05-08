@@ -79,7 +79,9 @@ JOURNAL_ORE_SUCCESS = ["backpack", "put", "ore"]
 DIR_LABELS = ["West", "East", "North", "South", "NW", "NE", "SW", "SE"]
 
 # ── Item IDs ─────────────────────────────────────────────────────────────────
-PICKAXE_ID = 0x0E86   # pickaxe (double-click to mine)
+PICKAXE_ID  = 0x0E86   # pickaxe (double-click to mine)
+HATCHET_ID  = 0x0F43   # hatchet — verify with Object Inspector if wrong
+MINING_TOOL_IDS = [PICKAXE_ID, HATCHET_ID]
 # Raw ore – all four pile graphic IDs; hue distinguishes the metal type.
 # 0x19B7/0x19B8 = standard piles; 0x19B9/0x19BA = alternate graphics some shards use.
 ORE_IDS    = [0x19B7, 0x19B8, 0x19B9, 0x19BA]
@@ -119,8 +121,12 @@ def log(msg, color=0x3F):
 
 
 def get_tool():
-    """Return the first pickaxe found in the player's backpack."""
-    return Items.FindByID(PICKAXE_ID, -1, Player.Backpack.Serial)
+    """Return the first mining tool (pickaxe or hatchet) found in the player's backpack."""
+    for tid in MINING_TOOL_IDS:
+        tool = Items.FindByID(tid, -1, Player.Backpack.Serial)
+        if tool is not None:
+            return tool
+    return None
 
 
 def find_forge_nearby():
@@ -424,11 +430,11 @@ def try_craft_pickaxe():
     Misc.Pause(600)
 
     for item in (Player.Backpack.Contains or []):
-        if item.Serial not in before and item.ItemID == PICKAXE_ID:
-            log("Pickaxe crafted (0x%X)." % item.Serial)
+        if item.Serial not in before and item.ItemID in MINING_TOOL_IDS:
+            log("Tool crafted: %s (0x%X)." % (item.Name, item.Serial))
             return True
 
-    log("Pickaxe craft failed – check PICKAXE_ITEM_BTN (%d) for this shard." % PICKAXE_ITEM_BTN, 0x25)
+    log("Tool craft failed – check PICKAXE_ITEM_BTN (%d) and HATCHET_ID (0x%X) for this shard." % (PICKAXE_ITEM_BTN, HATCHET_ID), 0x25)
     return False
 
 
