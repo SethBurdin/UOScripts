@@ -26,6 +26,7 @@ MOVE_PAUSE_MS  = 1200
 GUMP_TIMEOUT   = 5000
 
 TOO_MANY_PHRASES = [
+    "That container cannot hold more items",
     "That container cannot hold any more items",
     "That container cannot hold more weight",
     "Your backpack cannot hold that",

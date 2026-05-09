@@ -204,7 +204,14 @@ def discover_pet():
             Misc.Pause(1500)
             return True
 
-    log("No mountable non-human pet found nearby.", colors['red'])
+    log("No mountable non-human pet found — target your pet manually.", colors['yellow'])
+    serial = Target.PromptTarget("Click your pet:")
+    if serial and serial != 0:
+        _pet_serial = serial
+        mob  = Mobiles.FindBySerial(serial)
+        name = mob.Name if mob is not None else ('0x%X' % serial)
+        log("Pet locked via prompt: %s (0x%X)" % (name, serial), colors['cyan'])
+        return True
     return False
 
 
@@ -272,7 +279,7 @@ def check_pet_health(pet):
 def recall_pet(pet):
     log("Pet too far (%d tiles) — recalling." % Player.DistanceTo(pet), colors['yellow'])
     for i in range(FOLLOW_MAX_CHECKS):
-        _pet_cmd(pet.Serial, PET_CMD_FOLLOW, Player.Serial)
+        Player.ChatSay("all follow me")
         Misc.Pause(FOLLOW_CHECK_INTERVAL)
         fresh = find_pet()
         if fresh is None:
@@ -323,8 +330,7 @@ def main():
             if max(abs(pos.X - guard_pos[0]), abs(pos.Y - guard_pos[1])) > GUARD_BREAK_DISTANCE:
                 is_guarding = False
                 guard_pos   = None
-                if pet is not None:
-                    _pet_cmd(pet.Serial, PET_CMD_FOLLOW, Player.Serial)
+                Player.ChatSay("all follow me")
 
         if pet is None:
             log("No pet found.", colors['yellow'])

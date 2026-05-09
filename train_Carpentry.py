@@ -37,6 +37,7 @@ TIER_ITEM_IDS = {
 }
 
 TOO_MANY_PHRASES = [
+    "That container cannot hold more items",
     "That container cannot hold any more items",
     "That container cannot hold more weight",
     "Your backpack cannot hold that",
