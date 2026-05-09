@@ -15,7 +15,7 @@ from glossary.runebook_handler import find_runebook_by_label, travel_to_runebook
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 PET_FOLLOW_RANGE     = 1      # tiles — beyond this the pet is recalled
-HEALTH_THRESHOLD     = 0.90   # heal/cure when pet HP ratio drops below this
+HEALTH_THRESHOLD     = 0.60   # heal/cure when pet HP ratio drops below this
 GUARD_HEALTH_THRESHOLD = 0.70 # say "all guard me" when pet HP ratio drops below this
 CHECK_INTERVAL        = 1500  # ms between main loop ticks
 FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting for pet
@@ -304,7 +304,7 @@ def main():
     log("Say 'bank' to deposit and stop.", colors['cyan'])
 
     while not Player.IsGhost:
-        if Journal.Search("bank"):
+        if Journal.Search(Player.Name + ": bank"):
             Journal.Clear()
             log("Bank command — depositing and stopping.", colors['yellow'])
             rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
@@ -341,8 +341,13 @@ def main():
             guard_pos   = None
             arrived = recall_pet(pet)
             if not arrived:
-                Misc.Pause(CHECK_INTERVAL)
-                continue
+                # Pet may have settled just outside PET_FOLLOW_RANGE (UO natural follow
+                # distance is ~2 tiles). Refresh and fall through to guard if close enough.
+                fresh = find_pet()
+                if fresh is None or Player.DistanceTo(fresh) > PET_FOLLOW_RANGE + 1:
+                    Misc.Pause(CHECK_INTERVAL)
+                    continue
+                pet = fresh
 
         if not is_guarding:
             pos = Player.Position

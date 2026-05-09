@@ -426,7 +426,7 @@ carpentryCraftables = {
         retainsColor = True,
         minSkill = { 'Carpentry': 73.6 },
         resourcesNeeded = { 'boards': 6 },
-        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 2 ), GumpSelection( 2653346093, 9 ) )
     ),
     'gnarled staff': CarpentryCraftable(
         name = 'gnarled staff',
@@ -434,7 +434,7 @@ carpentryCraftables = {
         retainsColor = True,
         minSkill = { 'Carpentry': 78.9 },
         resourcesNeeded = { 'boards': 7 },
-        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 2 ), GumpSelection( 2653346093, 16 ) )
     ),
     'wooden shield': CarpentryCraftable(
         name = 'wooden shield',
@@ -442,7 +442,7 @@ carpentryCraftables = {
         retainsColor = True,
         minSkill = { 'Carpentry': 52.6 },
         resourcesNeeded = { 'boards': 9 },
-        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 29 ), GumpSelection( 2653346093, 2 ) )
     ),
     'club': CarpentryCraftable(
         name = 'club',
@@ -592,7 +592,15 @@ carpentryCraftables = {
         retainsColor = True,
         minSkill = { 'Carpentry': 47.3 },
         resourcesNeeded = { 'boards': 5 },
-        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 128 ) )
+        gumpPath = ( GumpSelection( 2653346093, 36 ), GumpSelection( 2653346093, 58 ) )
+    ),
+    'bokuto': CarpentryCraftable(
+        name = 'bokuto',
+        retainsMark = True,
+        retainsColor = True,
+        minSkill = { 'Carpentry': 71.0 },
+        resourcesNeeded = { 'boards': 6 },
+        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 23 ) )
     ),
     'pentagram': CarpentryCraftable(
         name = 'pentagram',

@@ -15,6 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from glossary.colors import colors
 from glossary.crafting.carpentry import FindCarpentryTool, carpentryCraftables
 from utilities.items import FindNumberOfItems
+from crate_manager import make_new_output
 
 # ── Config ────────────────────────────────────────────────────────────────────
 LOW_BOARDS    = 50     # pull more boards when player has fewer than this
@@ -28,8 +29,9 @@ MAKE_LAST_BTN = None               # set once known (record a macro pressing Mak
 # Known item IDs per craft tier.  None = unknown, discovered after first craft.
 # Verify with Object Inspector and fill in any that are still None.
 TIER_ITEM_IDS = {
-    'large crate':   None,    # discovered dynamically on first craft
+    'ballot box':    None,
     'wooden shield': 0x1B7A,
+    'bokuto':        None,
     'quarter staff': 0x0E89,
     'gnarled staff': 0x13F8,
 }
@@ -91,10 +93,11 @@ def pull_boards(boards_box):
 
 def dump_to_output(output_box, item_id):
     """Move all items of item_id from backpack to output_box.
-    Falls back to dropping on the ground if the box is full.
-    Returns count moved/dropped."""
+    If the box fills up, makes one attempt to craft and place a new crate.
+    Falls back to dropping on the ground if that also fails.
+    Returns (count_moved, current_output_box) — output_box may have changed."""
     if item_id is None:
-        return 0
+        return 0, output_box
     moved = 0
     crafted = Items.FindByID(item_id, -1, Player.Backpack.Serial)
     while crafted is not None:
@@ -102,15 +105,22 @@ def dump_to_output(output_box, item_id):
         Items.Move(crafted, output_box, crafted.Amount)
         Misc.Pause(PAUSE_MOVE)
         if journal_too_many():
-            log('Output box full – dropping on ground.', colors['yellow'])
-            pos = Player.Position
-            Items.MoveOnGround(crafted, crafted.Amount, pos.X, pos.Y, pos.Z)
-            Misc.Pause(PAUSE_MOVE)
+            new_box = make_new_output()
+            if new_box is not None:
+                output_box = new_box
+                Journal.Clear()
+                Items.Move(crafted, output_box, crafted.Amount)
+                Misc.Pause(PAUSE_MOVE)
+            if new_box is None or journal_too_many():
+                log('Dropping on ground.', colors['red'])
+                pos = Player.Position
+                Items.MoveOnGround(crafted, crafted.Amount, pos.X + 1, pos.Y, pos.Z)
+                Misc.Pause(PAUSE_MOVE)
         moved += 1
         crafted = Items.FindByID(item_id, -1, Player.Backpack.Serial)
     if moved:
         log('Cleared %d item(s).' % moved)
-    return moved
+    return moved, output_box
 
 
 # ── Main training loop ────────────────────────────────────────────────────────
@@ -169,7 +179,7 @@ def TrainCarpentry(boards_box, output_box):
         # ── Weight check ──────────────────────────────────────────────────────
         if Player.Weight >= Player.MaxWeight - WEIGHT_BUFFER:
             log('Heavy (%d/%d) – offloading.' % (Player.Weight, Player.MaxWeight), colors['yellow'])
-            dump_to_output(output_box, current_item_id)
+            _, output_box = dump_to_output(output_box, current_item_id)
 
         # ── Board supply check ────────────────────────────────────────────────
         boards = count_boards()
@@ -177,7 +187,7 @@ def TrainCarpentry(boards_box, output_box):
             log('Boards low (%d) – pulling %d.' % (boards, REFILL_BOARDS))
             if not pull_boards(boards_box):
                 log('Backpack full during pull – offloading first.', colors['yellow'])
-                dump_to_output(output_box, current_item_id)
+                _, output_box = dump_to_output(output_box, current_item_id)
                 if not pull_boards(boards_box):
                     log('Still cannot pull boards – stopping.', colors['red'])
                     break
@@ -187,16 +197,18 @@ def TrainCarpentry(boards_box, output_box):
         if skill < 40.0:
             log('Skill below 40 – use an NPC trainer first.', colors['red'])
             break
-        elif skill < 67.0:
-            itemToCraft = carpentryCraftables['large crate']
-        elif skill < 74.0:
+        elif skill < 65.0:
+            itemToCraft = carpentryCraftables['ballot box']   # TODO: record gump path
+        elif skill < 72.0:
             itemToCraft = carpentryCraftables['wooden shield']
-        elif skill < 80.0:
+        elif skill < 79.0:
+            itemToCraft = carpentryCraftables['bokuto']        # TODO: record gump path
+        elif skill < 90.0:
             itemToCraft = carpentryCraftables['quarter staff']
         else:
             itemToCraft = carpentryCraftables['gnarled staff']
 
-        # Reset discovered ID when tier changes; pre-seed from TIER_ITEM_IDS if known
+        # Reset discovered ID when tier changes
         if itemToCraft.name != current_item_name:
             log('Tier: %s' % itemToCraft.name)
             current_item_name = itemToCraft.name
@@ -210,45 +222,48 @@ def TrainCarpentry(boards_box, output_box):
         before = {item.Serial for item in (Player.Backpack.Contains or [])}
 
         expected_gump = itemToCraft.gumpPath[0].gumpID
-        gump_opened = False
-        for attempt in range(3):
+        item_btn      = itemToCraft.gumpPath[-1]
+
+        if Gumps.HasGump() and Gumps.CurrentGump() == expected_gump:
+            # Gump is still open on the items page from the previous craft — send item button directly.
             Journal.Clear()
-            Items.UseItem(tool)
-            Misc.Pause(200)
-            if Journal.Search('You must wait to perform another action'):
-                log('Server busy – retrying (%d/3).' % (attempt + 1), colors['yellow'])
-                Misc.Pause(1500)
-                continue
-            # Gump may have opened during the short pause — check before waiting
-            if Gumps.CurrentGump() == expected_gump or Gumps.WaitForGump(expected_gump, 3000):
-                gump_opened = True
-                break
-            Misc.Pause(1000)
-
-        if not gump_opened:
-            actual = Gumps.CurrentGump()
-            log('Gump never opened (expected %d, got %d).' % (expected_gump, actual), colors['red'])
-            if Gumps.HasGump():
-                Gumps.CloseGump(actual)
-            continue
-
-        Misc.Pause(1000)   # let gump fully render before sending actions
-
-        use_make_last = MAKE_LAST_BTN is not None and current_item_id is not None
-        if use_make_last:
-            Gumps.SendAction(expected_gump, MAKE_LAST_BTN)
+            Gumps.SendAction(item_btn.gumpID, item_btn.buttonID)
         else:
-            # First button: gump is already open, send directly
-            Gumps.SendAction(itemToCraft.gumpPath[0].gumpID, itemToCraft.gumpPath[0].buttonID)
-            # Remaining buttons: wait for gump to update after each press
-            for path in itemToCraft.gumpPath[1:]:
-                Gumps.WaitForGump(path.gumpID, 3000)
+            # Gump is closed — open the tool and navigate fully.
+            gump_opened = False
+            for attempt in range(3):
+                Journal.Clear()
+                Items.UseItem(tool)
+                Misc.Pause(200)
+                if Journal.Search('You must wait to perform another action'):
+                    log('Server busy – retrying (%d/3).' % (attempt + 1), colors['yellow'])
+                    Misc.Pause(1500)
+                    continue
+                if Gumps.CurrentGump() == expected_gump or Gumps.WaitForGump(expected_gump, 3000):
+                    gump_opened = True
+                    break
                 Misc.Pause(1000)
-                Gumps.SendAction(path.gumpID, path.buttonID)
 
-        # Wait for craft result then close
+            if not gump_opened:
+                actual = Gumps.CurrentGump()
+                log('Gump never opened (expected %d, got %d).' % (expected_gump, actual), colors['red'])
+                if Gumps.HasGump():
+                    Gumps.CloseGump(actual)
+                continue
+
+            Misc.Pause(1000)
+            if MAKE_LAST_BTN is not None and current_item_id is not None:
+                Gumps.SendAction(expected_gump, MAKE_LAST_BTN)
+            else:
+                Gumps.SendAction(itemToCraft.gumpPath[0].gumpID, itemToCraft.gumpPath[0].buttonID)
+                for path in itemToCraft.gumpPath[1:]:
+                    Gumps.WaitForGump(path.gumpID, 3000)
+                    Misc.Pause(1000)
+                    Gumps.SendAction(path.gumpID, path.buttonID)
+
+        # Wait for craft result — leave gump open on items page for the next craft.
+        # Do NOT send button 0: on this gump it hits MAKE LAST, repeating the previous item.
         Gumps.WaitForGump(expected_gump, 5000)
-        Gumps.SendAction(expected_gump, 0)
         Misc.Pause(1000)
         Journal.Clear()  # discard late-arriving craft messages before next board pull
 
@@ -261,7 +276,7 @@ def TrainCarpentry(boards_box, output_box):
                     log('Discovered item type: 0x%04X (%s)' % (current_item_id, current_item_name))
                     break
 
-    dump_to_output(output_box, current_item_id)
+    _, output_box = dump_to_output(output_box, current_item_id)
     log('Done. Carpentry: %.1f / %.1f' % (
         Player.GetRealSkillValue('Carpentry'), Player.GetSkillCap('Carpentry')))
 
