@@ -58,7 +58,7 @@ class cfg:
     # Auto mode
     auto_mining_rune_filter = 'Mining Spot'  # partial match (case-insensitive) for runes to visit
     auto_home_runebook      = 'home'         # label of the runebook to gate home when overweight
-    auto_mining_runebook    = None           # label of the runebook containing mining spots;
+    auto_mining_runebook    = 'mining'       # label of the runebook containing mining spots;
                                              # None = first runebook found in backpack
 
 # ── Journal signals ───────────────────────────────────────────────────────────
@@ -809,6 +809,11 @@ def bank_ingots():
         log("House container (0x%X) not found – cannot deposit." % _config.quick_dropbox, 0x25)
         return False
 
+    # ── Craft pickaxe if needed (while ingots are still in backpack) ─────────
+    if get_tool() is None:
+        log("No mining tool — attempting to craft pickaxe before depositing ingots.")
+        try_craft_pickaxe()
+
     # ── Deposit backpack ingots ───────────────────────────────────────────────
     _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
 
@@ -1129,33 +1134,34 @@ def auto_mine_spot(home_rb):
 
 
 def run_auto_mode():
-    mining_rb, spots = _find_mining_runebook()
-    if mining_rb is None:
-        return
+    while True:
+        mining_rb, spots = _find_mining_runebook()
+        if mining_rb is None:
+            return
 
-    home_rb = find_runebook_by_label(cfg.auto_home_runebook)
-    if home_rb is None:
-        log("No runebook labeled '%s' in backpack." % cfg.auto_home_runebook, 0x25)
-        return
+        home_rb = find_runebook_by_label(cfg.auto_home_runebook)
+        if home_rb is None:
+            log("No runebook labeled '%s' in backpack." % cfg.auto_home_runebook, 0x25)
+            return
 
-    log("%d mining spot(s) found." % len(spots), 0x0481)
+        log("%d mining spot(s) found. Starting cycle..." % len(spots), 0x0481)
 
-    for slot, name in spots:
-        log("Traveling to %s (slot %d)..." % (name, slot))
-        if not travel_to_slot(mining_rb, slot, 2000):
-            log("Travel failed — skipping %s." % name, 0x25)
-            continue
+        for slot, name in spots:
+            log("Traveling to %s (slot %d)..." % (name, slot))
+            if not travel_to_slot(mining_rb, slot, 2000):
+                log("Travel failed — skipping %s." % name, 0x25)
+                continue
 
-        if not auto_mine_spot(home_rb):
-            # Went home — re-acquire runebooks from new location
-            mining_rb, spots = _find_mining_runebook()
-            home_rb = find_runebook_by_label(cfg.auto_home_runebook)
-            if mining_rb is None or home_rb is None:
-                log("Lost runebooks after gating home — finishing.", 0x25)
-                break  # fall through to finish()
+            if not auto_mine_spot(home_rb):
+                # Went home mid-cycle — re-acquire runebooks from new location
+                mining_rb, spots = _find_mining_runebook()
+                home_rb = find_runebook_by_label(cfg.auto_home_runebook)
+                if mining_rb is None or home_rb is None:
+                    log("Lost runebooks after gating home — stopping.", 0x25)
+                    return
 
-    log("=== Auto mining complete ===", 0x026C)
-    finish()
+        log("=== Cycle complete — heading home and repeating ===", 0x026C)
+        finish()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
