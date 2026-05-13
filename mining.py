@@ -39,8 +39,9 @@ class cfg:
 
     # Optional hardcoded serials — set these to skip the mobile scan entirely.
     # Useful when auto-detect is unreliable (e.g. beetle is out of scan range).
-    fire_beetle_serial = 0x0000169A
+    fire_beetle_serial = None
     pack_beetle_serial = None
+    locked_pet = None
 
     mining_directions = [
         (-1,  0),   # west
@@ -54,6 +55,7 @@ class cfg:
     ]
 
     home_container_serial = None  # resolved at runtime from config.quick_dropbox
+    pickaxe_box_serial    = 0x4005AA6E  # serial of the box at home holding spare pickaxes
 
     # Auto mode
     auto_mining_rune_filter = 'Mining Spot'  # partial match (case-insensitive) for runes to visit
@@ -80,8 +82,8 @@ DIR_LABELS = ["West", "East", "North", "South", "NW", "NE", "SW", "SE"]
 
 # ── Item IDs ─────────────────────────────────────────────────────────────────
 PICKAXE_ID  = 0x0E86   # pickaxe (double-click to mine)
-HATCHET_ID  = 0x0F43   # hatchet — verify with Object Inspector if wrong
-MINING_TOOL_IDS = [PICKAXE_ID, HATCHET_ID]
+# HATCHET_ID  = 0x0F43   # hatchet — verify with Object Inspector if wrong
+MINING_TOOL_IDS = [PICKAXE_ID]
 # Raw ore – all four pile graphic IDs; hue distinguishes the metal type.
 # 0x19B7/0x19B8 = standard piles; 0x19B9/0x19BA = alternate graphics some shards use.
 ORE_IDS    = [0x19B7, 0x19B8, 0x19B9, 0x19BA]
@@ -89,7 +91,7 @@ INGOT_IDS  = [0x1BF2, 0x1BEF, 0x1BE0, 0x1BE1, 0x1BE8, 0x1BE9, 0x1BEA, 0x1BEB,
               0x1BEC, 0x1BED, 0x1BEE, 0x1BE2, 0x1BE3, 0x1BE4, 0x1BE5, 0x1BE6,
               0x1BE7]
 # Forge object IDs (player-placed and built-in map forges)
-FORGE_IDS  = [0x0FB1, 0x0FAF, 0x0FAD, 0x0FAE, 0x0FB0]
+FORGE_IDS  = [0x0FB1, 0x0FAF, 0x0FAD, 0x0FAE, 0x0FB0, 0x2DD8]
 
 RUNEBOOK_ITEM_ID    = 0x22C5
 TINKER_TOOL_IDS     = [0x1EBC, 0x1EB8]  # tinker's tools, tool kit
@@ -100,6 +102,7 @@ GATE_TRAVEL_DELAY   = 4000   # ms to wait for gate to open / travel to complete
 RECALL_TRAVEL_DELAY = 2000   # ms to wait after recall lands
 RUNEBOOK_GUMP_ID    = 89
 GATE_BUTTON_BASE    = 100    # confirmed: gump button = 100 + slot_index (0-based)
+
 
 # ── Session state (persists for the life of this script run) ──────────────────
 forge_serial         = None
@@ -186,6 +189,49 @@ def pull_ore_to_backpack(source_serial, source_label):
         log("No ore in %s." % source_label, 0x3B)
     return pulled
 
+def push_ore_to_inventory():
+    """
+    Move all ore from the player's backpack into the pack animal's backpack.
+    Returns 'ok', 'none' (no pack animal found), or 'full' (pack animal backpack is full).
+    """
+    global pack_beetle_serial
+    if pack_beetle_serial is None:
+        find_beetles()
+    if pack_beetle_serial is None:
+        log("No pack animal – cannot push ore.", 0x25)
+        return 'none'
+    mob = Mobiles.FindBySerial(pack_beetle_serial)
+    if mob is None or mob.Backpack is None:
+        log("Pack animal (0x%X) not accessible." % pack_beetle_serial, 0x25)
+        pack_beetle_serial = None
+        return 'none'
+    pushed = 0
+    for oid in ORE_IDS:
+        ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
+        while ore is not None:
+            prev_serial = ore.Serial
+            Items.Move(ore, mob.Backpack, ore.Amount)
+            Misc.Pause(cfg.pause_after_transfer)
+            ore_after = Items.FindByID(oid, -1, Player.Backpack.Serial)
+            if ore_after is not None and ore_after.Serial == prev_serial:
+                log("%s's pack is full after %d stack(s)." % (mob.Name, pushed), 0x25)
+                return 'full'
+            pushed += 1
+            ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
+    if pushed:
+        log("Pushed %d stack(s) to %s." % (pushed, mob.Name))
+    else:
+        log("No ore in backpack to push.", 0x3B)
+    return 'ok'
+
+
+PACK_FULL_PHRASES = [
+    "That container cannot hold more items",
+    "That container cannot hold any more items",
+    "That container cannot hold more weight",
+    "Your backpack cannot hold that",
+    "There is not enough room",
+]
 
 SMELT_FAIL_PHRASES = [
     "not enough metal",   "Not enough metal",
@@ -276,6 +322,8 @@ def _smelt_ore_impl():
     # ── Smelt player backpack first ───────────────────────────────────────────
     log("Smelting player backpack...")
     smelt_from_backpack()
+    if pack_beetle_serial is not None:
+        pull_ore_to_backpack(pack_beetle_serial, "pack beetle")
 
     # ── Smelt animal pack one stack at a time ─────────────────────────────────
     mount = None
@@ -319,13 +367,13 @@ def _smelt_ore_impl():
 # ─────────────────────────────────────────────────────────────────────────────
 # Beetle detection
 # ─────────────────────────────────────────────────────────────────────────────
-
 def find_beetles():
     """
-    Locate a pack beetle and/or fire beetle.
-    Priority: cfg hardcoded serials → body-ID scan → cached session serials.
-    The Friend filter is intentionally omitted — it matches Razor's friends list,
-    not UO pets, and excludes beetles that haven't been manually listed there.
+    Locate a pack animal and/or fire beetle.
+    Priority:
+      1. Body-ID scan for fire beetle (0x00A9) and pack beetle (0x00EF).
+      2. If no pack found by body ID, fall back to find_pack_animal() which
+         accepts any follower with a backpack regardless of body type.
     Returns (pack_mobile_or_None, fire_mobile_or_None).
     """
     global pack_beetle_serial, fire_beetle_serial
@@ -333,39 +381,33 @@ def find_beetles():
     pack = None
     fire = None
 
-    # ── Hardcoded serials in cfg take priority ────────────────────────────────
-    if cfg.fire_beetle_serial is not None:
-        fire = Mobiles.FindBySerial(cfg.fire_beetle_serial)
-    if cfg.pack_beetle_serial is not None:
-        pack = Mobiles.FindBySerial(cfg.pack_beetle_serial)
+    # ── Body-ID scan ──────────────────────────────────────────────────────────
+    filt = Mobiles.Filter()
+    filt.RangeMax = 10
+    filt.IsHuman  = False
+    for mob in Mobiles.ApplyFilter(filt):
+        if mob.Serial == Player.Serial:
+            continue
+        if mob.Body == cfg.fire_beetle_body:
+            fire = mob
+            fire_beetle_serial = mob.Serial
+        elif mob.Body == cfg.pack_beetle_body:
+            pack = mob
+            pack_beetle_serial = mob.Serial
 
-    # ── Body-ID scan for anything not already found ───────────────────────────
-    if pack is None or fire is None:
-        filt = Mobiles.Filter()
-        filt.RangeMax = 10
-        filt.IsHuman  = False
-        for mob in Mobiles.ApplyFilter(filt):
-            if mob.Serial == Player.Serial:
-                continue
-            if fire is None and mob.Body == cfg.fire_beetle_body:
-                fire = mob
-                fire_beetle_serial = mob.Serial
-            elif pack is None and mob.Body == cfg.pack_beetle_body and mob.Backpack is not None:
-                pack = mob
-                pack_beetle_serial = mob.Serial
-
-    # ── Session serial cache as last resort ───────────────────────────────────
-    if pack is None and pack_beetle_serial is not None:
-        pack = Mobiles.FindBySerial(pack_beetle_serial)
-    if fire is None and fire_beetle_serial is not None:
-        fire = Mobiles.FindBySerial(fire_beetle_serial)
+    # ── Fallback: any nearby non-human with a backpack (skip fire beetle) ────────
+    if pack is None:
+        mob = find_pack_animal()
+        if mob is not None and mob.Serial != fire_beetle_serial:
+            pack = mob
+            pack_beetle_serial = mob.Serial
 
     if pack is not None:
-        log("Pack beetle: %s (0x%X)" % (pack.Name, pack.Serial), 0x3B)
+        log("Pack animal: %s (0x%X)" % (pack.Name, pack.Serial), 0x3B)
     if fire is not None:
         log("Fire beetle: %s (0x%X)" % (fire.Name, fire.Serial), 0x3B)
     if pack is None and fire is None:
-        log("No pack or fire beetle detected.", 0x25)
+        log("No pack animal or fire beetle detected.", 0x25)
 
     return pack, fire
 
@@ -409,6 +451,30 @@ def try_craft_pickaxe():
         stack = Items.FindByID(iid, -1, Player.Backpack.Serial)
         if stack is not None:
             ingot_count += stack.Amount
+
+    # Ingots are usually on the pack beetle after a transfer — pull just enough to craft.
+    if ingot_count < PICKAXE_INGOT_COST:
+        needed = PICKAXE_INGOT_COST - ingot_count
+        source = None
+        if mount_serial is not None:
+            source = Mobiles.FindBySerial(mount_serial)
+        if source is None:
+            source = find_pack_animal()
+        if source is not None and source.Backpack is not None:
+            Items.UseItem(source.Backpack)
+            Items.WaitForContents(source.Backpack, 3000)
+            Misc.Pause(400)
+            for iid in INGOT_IDS:
+                if needed <= 0:
+                    break
+                stack = Items.FindByID(iid, -1, source.Backpack.Serial)
+                if stack is not None:
+                    pull = min(stack.Amount, needed)
+                    Items.Move(stack, Player.Backpack, pull)
+                    Misc.Pause(cfg.pause_after_transfer)
+                    ingot_count += pull
+                    needed -= pull
+
     if ingot_count < PICKAXE_INGOT_COST:
         log("Not enough ingots (%d / %d) to craft pickaxe." % (ingot_count, PICKAXE_INGOT_COST), 0x25)
         return False
@@ -438,6 +504,19 @@ def try_craft_pickaxe():
     return False
 
 
+def _remount_if_needed():
+    """Remount on the pack/fire beetle if the player is currently dismounted."""
+    if Player.Mount is not None:
+        return
+    if pack_beetle_serial is None and fire_beetle_serial is None:
+        find_beetles()
+    remount_serial = pack_beetle_serial or fire_beetle_serial
+    if remount_serial is not None:
+        log("Remounting...", 0x3B)
+        Mobiles.UseMobile(remount_serial)
+        Misc.Pause(1500)
+
+
 def _can_travel():
     """Return True if the player has enough Magery or Chivalry to gate/recall home."""
     return (Player.GetSkillValue('Chivalry') > 30 or
@@ -450,7 +529,7 @@ def handle_overweight():
     2. If still overweight after transfer, smelt with fire beetle or forge.
     Returns True if weight is now under threshold; False triggers a bank run.
     """
-    global mount_serial
+    global fire_beetle_serial, pack_beetle_serial
 
     was_mounted = Player.Mount is not None
     if was_mounted:
@@ -460,9 +539,8 @@ def handle_overweight():
 
     pack, fire = find_beetles()
 
-    if pack is not None:
-        mount_serial = pack.Serial
-        transfer_to_mount()
+    if pack_beetle_serial is not None:
+        push_ore_to_inventory()
 
     if Player.Weight >= Player.MaxWeight - cfg.weight_headroom:
         if fire is not None:
@@ -484,18 +562,23 @@ def handle_overweight():
 
 def find_pack_animal():
     """
-    Auto-detect a pack animal by scanning nearby followers for one that has
-    a container (backpack). Returns the Mobile, or None if none found.
+    Auto-detect a pack animal by scanning nearby non-human mobiles for one that has
+    a backpack. Friend filter is intentionally omitted — it matches Razor's friends
+    list, not UO followers, and would exclude pack animals not manually listed there.
+    Any non-human mobile with a backpack in range is a pack animal.
+    Returns the Mobile, or None if none found.
     """
+    global mount_serial
+
     filter = Mobiles.Filter()
-    filter.RangeMax   = 3
+    filter.RangeMax   = 5
     filter.IsHuman    = False
-    filter.Friend     = True   # followers / pets only
     nearby = Mobiles.ApplyFilter(filter)
     for mob in nearby:
         if mob.Serial == Player.Serial:
             continue
         if mob.Backpack is not None:
+            mount_serial = mob.Serial
             return mob
     return None
 
@@ -765,7 +848,7 @@ def _deposit_stacks(source_serial, item_ids, dest, label):
         log("Deposited %d %s." % (total, label))
     return total
 
-
+## Needs support for rune named bank.
 def bank_ingots():
     """
     Full bank-run sequence:
@@ -784,6 +867,7 @@ def bank_ingots():
         return False
 
     # ── Gate to bank ──────────────────────────────────────────────────────────
+    _remount_if_needed()
     log("Traveling to bank (slot %s)..." % str(cfg.bank_rune_slot))
     if not travel_to(runebook, cfg.bank_rune_slot):
         log("Failed to travel to bank – aborting.", 0x25)
@@ -852,6 +936,7 @@ def bank_ingots():
         log("No mine rune configured – stopping at bank.", 0x3B)
         return False
 
+    _remount_if_needed()
     log("Returning to mine (slot %d)..." % cfg.mine_rune_slot)
     if not travel_to(runebook, cfg.mine_rune_slot):
         log("Failed to return to mine – stopping.", 0x25)
@@ -888,7 +973,7 @@ def run_mining_loop():
       4. Evaluate journal; rotate direction on failure; smelt / transfer on full.
       5. Reset the consecutive-fail counter after any successful mine.
     """
-    global mount_serial, forge_serial
+    global mount_serial, forge_serial, pack_beetle_serial, fire_beetle_serial
 
     num_dirs     = len(cfg.mining_directions)
     dir_index    = 0
@@ -936,6 +1021,11 @@ def run_mining_loop():
         if not smelting_in_progress and Player.Weight >= Player.MaxWeight - cfg.weight_headroom:
             log("Weight %d / %d – acting on beetle type."
                 % (Player.Weight, Player.MaxWeight), 0x25)
+            if pack_beetle_serial:
+                if push_ore_to_inventory() == 'full':
+                    log("Pack animal full – going home to smelt.", 0x25)
+                    _home_deposit()
+                    break
             if not handle_overweight():
                 log("Still overweight after smelt/transfer – attempting bank run.", 0x25)
                 if not bank_ingots():
@@ -956,9 +1046,9 @@ def run_mining_loop():
         if mine_result == "no_tool":
             if try_craft_pickaxe():
                 continue
-            log("No pickaxe and craft failed – gating home to bank.", 0x25)
-            bank_ingots()
-            break
+            log("Craft failed – trying pickaxe box at home.", 0x25)
+            grab_pickaxe_from_box()  # goes home, deposits, grabs pickaxe if available
+            break  # player is now at home; restart script to resume
 
         # ── Evaluate journal ──────────────────────────────────────────────────
         status = read_journal_status()
@@ -1022,6 +1112,7 @@ from glossary.runebook_handler import (
 def select_mode():
     """Show a 10-second prompt. Player types '1' for auto, timeout = manual."""
     log("Type '1' in chat for auto mode. Manual mode starts in 10 seconds...", 0x0481)
+    log("Type '2' in chat for Manual Mode. Manual mode starts in 10 seconds...", 0x0481)
     Player.HeadMessage(0x0481, "1 = Auto  |  Manual in 10s")
     Journal.Clear()
     Timer.Create("mode_select", 10000)
@@ -1030,6 +1121,10 @@ def select_mode():
             Journal.Clear()
             log("Auto mode.", 0x0481)
             return 'auto'
+        if Journal.SearchByType("2", "Regular"):
+            Journal.Clear()
+            log("Manual mode.", 0x0481)
+            return 'manual'
         Misc.Pause(200)
     log("Manual mode.", 0x0481)
     return 'manual'
@@ -1080,11 +1175,19 @@ def auto_mine_spot(home_rb):
 
     while consec_fails < num_dirs:
         if Player.Weight >= Player.MaxWeight - cfg.weight_headroom:
-            log("Overweight – smelting/transferring first.", 0x25)
+            log("Overweight – acting on beetle type.", 0x25)
+            if pack_beetle_serial is None and fire_beetle_serial is None:
+                find_beetles()
+            if pack_beetle_serial:
+                if push_ore_to_inventory() == 'full':
+                    log("Pack animal full – going home to smelt.", 0x25)
+                    _home_deposit()
+                    return False
             if not handle_overweight():
                 log("Still overweight after smelt – running bank run.", 0x25)
                 returned = bank_ingots()
                 if not returned:
+                    _remount_if_needed()
                     travel_to_runebook(home_rb, 2000)
                     return False
                 # bank_ingots returned us to the mine rune — resume this spot
@@ -1095,9 +1198,9 @@ def auto_mine_spot(home_rb):
         if result == 'no_tool':
             if try_craft_pickaxe():
                 continue
-            log("No pickaxe and craft failed – gating home to bank.", 0x25)
-            bank_ingots()
-            return False
+            log("Craft failed – trying pickaxe box at home.", 0x25)
+            grab_pickaxe_from_box()  # goes home, deposits, grabs pickaxe if available
+            return False  # run_auto_mode will re-navigate to a mining spot
 
         status = read_journal_status()
         log("Journal status: %s" % status, 0x3B)
@@ -1111,6 +1214,7 @@ def auto_mine_spot(home_rb):
             log("Direction blocked – trying %d/%d." % (dir_index + 1, num_dirs), 0x25)
         elif status == 'pack_full':
             log("Pack full — gating home.", 0x25)
+            _remount_if_needed()
             travel_to_runebook(home_rb, 2000)
             return False
         else:
@@ -1147,6 +1251,7 @@ def run_auto_mode():
         log("%d mining spot(s) found. Starting cycle..." % len(spots), 0x0481)
 
         for slot, name in spots:
+            _remount_if_needed()
             log("Traveling to %s (slot %d)..." % (name, slot))
             if not travel_to_slot(mining_rb, slot, 2000):
                 log("Travel failed — skipping %s." % name, 0x25)
@@ -1168,38 +1273,85 @@ def run_auto_mode():
 # Exit sequence
 # ─────────────────────────────────────────────────────────────────────────────
 
-def finish():
-    """Gate home, smelt with fire beetle, deposit all ingots and ore, then step 2 right and 2 up."""
+def _home_deposit():
+    """
+    Travel home, walk to drop position, smelt with fire beetle, deposit ingots and ore.
+    Shared by finish(), grab_pickaxe_from_box(), and the tinkering fallback.
+    Returns True if home was reached (deposit attempted regardless of container availability).
+    """
     home_rb = find_runebook_by_label(cfg.auto_home_runebook)
     if home_rb is None:
-        log("No home runebook – skipping finish.", 0x25)
-        return
-
+        log("No home runebook – cannot go home.", 0x25)
+        return False
+    _remount_if_needed()
     log("Heading home...", 0x026C)
     if not travel_to_runebook(home_rb, RECALL_TRAVEL_DELAY):
-        log("Could not travel home – skipping deposit.", 0x25)
-        return
-
-    _, fire = find_beetles()
-    if fire is not None:
-        log("Smelting backpack ore with fire beetle before deposit...")
-        smelt_with_fire_beetle(fire)
-
-    dest = Items.FindBySerial(_config.quick_dropbox)
-    if dest is None:
-        log("Home chest (0x%X) not found – skipping deposit." % _config.quick_dropbox, 0x25)
-    else:
-        _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
-        _deposit_stacks(Player.Backpack.Serial, ORE_IDS,   dest, "remaining ore")
-
+        log("Could not travel home.", 0x25)
+        return False
     for _ in range(2):
         Player.Walk('Right')
         Misc.Pause(400)
     for _ in range(2):
         Player.Walk('Up')
         Misc.Pause(400)
+    pack, fire = find_beetles()
+    if fire is not None:
+        log("Smelting backpack ore with fire beetle...")
+        smelt_with_fire_beetle(fire)
+        if pack is not None and pack.Backpack is not None:
+            Items.UseItem(pack.Backpack)
+            Items.WaitForContents(pack.Backpack, 3000)
+            Misc.Pause(600)
+            log("Smelting pack animal ore with fire beetle...")
+            for oid in ORE_IDS:
+                ore = Items.FindByID(oid, -1, pack.Backpack.Serial)
+                while ore is not None:
+                    Items.Move(ore, Player.Backpack, ore.Amount)
+                    Misc.Pause(cfg.pause_after_transfer)
+                    smelt_with_fire_beetle(fire)
+                    ore = Items.FindByID(oid, -1, pack.Backpack.Serial)
+    dest = Items.FindBySerial(_config.quick_dropbox)
+    if dest is None:
+        log("Drop container (0x%X) not found." % _config.quick_dropbox, 0x25)
+    else:
+        _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
+        _deposit_stacks(Player.Backpack.Serial, ORE_IDS,   dest, "remaining ore")
+    return True
 
-    log("Done.", 0x026C)
+
+def grab_pickaxe_from_box():
+    """
+    Travel home, deposit ore/ingots, then grab one pickaxe from cfg.pickaxe_box_serial.
+    Returns True if a pickaxe is now in the backpack.
+    """
+    if cfg.pickaxe_box_serial is None:
+        log("No pickaxe box serial configured (cfg.pickaxe_box_serial).", 0x25)
+        return False
+    if not _home_deposit():
+        return False
+    box = Items.FindBySerial(cfg.pickaxe_box_serial)
+    if box is None:
+        log("Pickaxe box (0x%X) not found at home." % cfg.pickaxe_box_serial, 0x25)
+        return False
+    Items.UseItem(box)
+    Items.WaitForContents(box, 3000)
+    Misc.Pause(600)
+    for tid in MINING_TOOL_IDS:
+        tool = Items.FindByID(tid, -1, cfg.pickaxe_box_serial)
+        if tool is not None:
+            Items.Move(tool, Player.Backpack, 1)
+            Misc.Pause(cfg.pause_after_transfer)
+            if get_tool() is not None:
+                log("Grabbed pickaxe from box.")
+                return True
+    log("No pickaxes in box (0x%X)." % cfg.pickaxe_box_serial, 0x25)
+    return False
+
+
+def finish():
+    """Gate home, smelt, deposit all ingots and ore."""
+    if _home_deposit():
+        log("Done.", 0x026C)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1209,6 +1361,12 @@ def finish():
 def main():
     log("=== Mining Script ===", 0x0481)
     mode = select_mode()
+    beetle = find_beetles()
+    ## need to find beetle type. and determine if we store or smelt through both mining loops. could also account for other non rideable pack animals.
+    ## Need to make sure if tinker skill that it makes a new pickaxe before it drops off.
+    ## Pass beetle as needed so we only need to detect beetle the first time.
+    ## If we can detect if it's bonded, we can then decide whether we need to mount the pet before moving on or gate based on magery.
+    ## 
     if mode == 'manual':
         run_mining_loop()
     else:

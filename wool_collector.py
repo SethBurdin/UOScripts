@@ -27,6 +27,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from glossary.colors import colors
 from glossary.items.tools import tools
+from glossary.runebook_handler import (
+    find_runebook_by_label, find_runes_matching, travel_to_slot,
+    travel_to_runebook, RUNEBOOK_ITEM_ID,
+)
 from utilities.items import FindItem, MoveItem
 import config
 from System.Collections.Generic import List
@@ -39,6 +43,11 @@ CLOTH_ID  = 0x0F9A   # bolts of cloth   (produced by loom)
 
 # Body IDs for sheep variants (unshorn & shorn)
 SHEEP_BODY_IDS = [ 0x00CF, 0x00D0 ]
+
+# ── Runebook patrol config ─────────────────────────────────────────────────────
+SHEEP_RUNEBOOK_LABEL = 'sheep'    # label of the runebook to use for patrol
+SHEEP_RUNE_FILTER    = 'Sheep'    # partial match (case-insensitive) for rune names
+RECALL_CAST_DELAY    = 3000       # ms to wait after travel for map to settle
 
 # ── Prompt helper ─────────────────────────────────────────────────────────────
 
@@ -213,52 +222,20 @@ def MoveToSheep( animal, maxRange = 1, timeoutMs = 15000 ):
 def CollectWool():
     '''
     Shears every nearby sheep using a dagger or skinning knife.
-    Skips sheep that have already been sheared this run.
     '''
     tool = GetShearTool()
     if tool is None:
         Misc.SendMessage( 'No dagger or skinning knife found in your backpack!', colors[ 'red' ] )
         return
 
-    sheep = FindNearbySheep()
-    if len( sheep ) == 0:
+    if not FindNearbySheep():
         Misc.SendMessage( 'No sheep found within range.', colors[ 'yellow' ] )
         return
 
-    Misc.SendMessage( 'Found %d sheep. Shearing...' % len( sheep ), colors[ 'green' ] )
-
-    shearedSerials = set()
-    for animal in sheep:
-        fresh = Mobiles.FindBySerial( animal.Serial )
-        if fresh is None or fresh.Serial in shearedSerials:
-            continue
-
-        if Player.DistanceTo( fresh ) > 1:
-            Misc.SendMessage( 'Moving to sheep...', colors[ 'cyan' ] )
-            if not MoveToSheep( fresh ):
-                Misc.SendMessage( 'Could not reach sheep — skipping.', colors[ 'yellow' ] )
-                continue
-
-        Journal.Clear()
-        Items.UseItem( tool )
-        Target.WaitForTarget( 3000, False )
-        Target.TargetExecute( fresh )
-
-        # Wait for shear result or timeout
-        Timer.Create( 'shear_timeout', 1000 )
-        while Timer.Check( 'shear_timeout' ):
-            if ( Journal.Search( 'You place' ) or
-                 Journal.SearchByType( 'already shorn', 'Regular' ) or
-                 Journal.SearchByType( 'wool',         'Regular' ) ):
-                break
-            Misc.Pause( 100 )
-
-        shearedSerials.add( fresh.Serial )
-        Misc.Pause( config.dragDelayMilliseconds )
-
+    count = _shear_all_nearby( tool )
     wool = Items.FindByID( WOOL_ID, -1, Player.Backpack.Serial )
     woolCount = wool.Amount if wool is not None else 0
-    Misc.SendMessage( 'Done shearing! Wool in inventory: %d.' % woolCount, colors[ 'green' ] )
+    Misc.SendMessage( 'Sheared %d sheep. Wool in inventory: %d.' % ( count, woolCount ), colors[ 'green' ] )
 
 
 # ── Activity 2: Use Spinning Wheel ────────────────────────────────────────────
@@ -394,139 +371,86 @@ def UseLoom():
     Misc.SendMessage( 'Done weaving! Cloth in inventory: %d.' % clothCount, colors[ 'green' ] )
 
 
-# ── Runebook gump constants ──────────────────────────────────────────────────
-RUNEBOOK_GUMP_ID  = 1431013363
-RUNEBOOK_ITEM_ID  = 0x22C5
-RECALL_CAST_DELAY = 3000   # ms to wait after casting Recall for travel to complete
-
-
-def GetRuneNames( runebook ):
+def _shear_all_nearby( tool ):
     '''
-    Opens the runebook gump and reads the rune names from the line list.
-    Returns a list of non-empty rune name strings.
+    Moves to and shears every unshorn sheep within range using tool.
+    Returns the number of sheep sheared.
     '''
-    Items.UseItem( runebook )
-    Misc.Pause( config.dragDelayMilliseconds )
-    Gumps.WaitForGump( RUNEBOOK_GUMP_ID, 5000 )
-
-    lineList = Gumps.LastGumpGetLineList()
-    # Strip the 3 header lines
-    lineList = lineList[ 3 : ]
-
-    # Skip past 'Set default' / 'Drop rune' entries and the two charge count lines
-    endIdx = 0
-    for line in lineList:
-        if line in ( 'Set default', 'Drop rune' ):
-            endIdx += 1
-        else:
-            break
-    endIdx += 2   # charge count + max charge
-
-    runeNames = lineList[ endIdx : endIdx + 16 ]
-    runeNames = [ n for n in runeNames if n != 'Empty' and n.strip() != '' ]
-
-    # Close the gump
-    Gumps.SendAction( RUNEBOOK_GUMP_ID, 0 )
-    return runeNames
-
-
-def RecallToRune( runebook, runeIndex ):
-    '''
-    Opens the runebook and recalls to the rune at the given 0-based index.
-    Waits for travel to complete.
-    '''
-    Items.UseItem( runebook )
-    
-    Gumps.WaitForGump( RUNEBOOK_GUMP_ID, 5000 )
-    Misc.Pause( 200 )
-
-    # Rune recall buttons: 5, 11, 17, 23 ... (5 + index * 6)
-    Gumps.SendAction( RUNEBOOK_GUMP_ID, 5 + runeIndex * 6 )
-    Misc.Pause( RECALL_CAST_DELAY )
+    sheep = FindNearbySheep()
+    if not sheep:
+        return 0
+    sheared = set()
+    for animal in sheep:
+        fresh = Mobiles.FindBySerial( animal.Serial )
+        if fresh is None or fresh.Serial in sheared:
+            continue
+        if Player.DistanceTo( fresh ) > 1:
+            if not MoveToSheep( fresh ):
+                Misc.SendMessage( 'Could not reach sheep — skipping.', colors[ 'yellow' ] )
+                continue
+        Journal.Clear()
+        Items.UseItem( tool )
+        Target.WaitForTarget( 3000, False )
+        Target.TargetExecute( fresh )
+        Timer.Create( 'shear_timeout', 5000 )
+        while Timer.Check( 'shear_timeout' ):
+            if ( Journal.SearchByType( 'You shear',     'Regular' ) or
+                 Journal.SearchByType( 'already shorn', 'Regular' ) or
+                 Journal.SearchByType( 'wool',          'Regular' ) ):
+                break
+            Misc.Pause( 100 )
+        sheared.add( fresh.Serial )
+        Misc.Pause( config.dragDelayMilliseconds )
+    return len( sheared )
 
 
 def PatrolRunebook():
     '''
-    Prompts to select a runebook, then presents its rune list as a menu so
-    the player can pick which runes to patrol.  Recalls to each chosen rune,
-    shears all nearby sheep, then continues to the next stop.
+    Finds the runebook labeled SHEEP_RUNEBOOK_LABEL in the backpack, filters
+    runes whose names contain SHEEP_RUNE_FILTER, then travels to each in order
+    using the best available skill (Sacred Journey / Gate / Recall / charge).
+    Shears all nearby sheep at each stop before moving on.
     '''
     tool = GetShearTool()
     if tool is None:
         Misc.SendMessage( 'No dagger or skinning knife found in your backpack!', colors[ 'red' ] )
         return
 
-    # ── Select runebook ───────────────────────────────────────────────────────
-    Misc.SendMessage( 'Target your runebook...', colors[ 'cyan' ] )
-    rbSerial = Target.PromptTarget( 'Target the runebook to patrol' )
-    runebook  = Items.FindBySerial( rbSerial )
-    if runebook is None or runebook.ItemID != RUNEBOOK_ITEM_ID:
-        Misc.SendMessage( 'That is not a runebook!', colors[ 'red' ] )
+    # ── Locate runebook ───────────────────────────────────────────────────────
+    runebook = find_runebook_by_label( SHEEP_RUNEBOOK_LABEL )
+    if runebook is None:
+        Misc.SendMessage( "No runebook labeled '%s' found — target one manually." % SHEEP_RUNEBOOK_LABEL, colors[ 'yellow' ] )
+        rb_serial = Target.PromptTarget( 'Target the runebook to patrol:' )
+        runebook  = Items.FindBySerial( rb_serial )
+        if runebook is None or runebook.ItemID != RUNEBOOK_ITEM_ID:
+            Misc.SendMessage( 'That is not a runebook.', colors[ 'red' ] )
+            return
+
+    # ── Find matching runes ───────────────────────────────────────────────────
+    spots = find_runes_matching( runebook, SHEEP_RUNE_FILTER )
+    if not spots:
+        Misc.SendMessage( "No runes matching '%s' found in runebook." % SHEEP_RUNE_FILTER, colors[ 'yellow' ] )
         return
 
-    # ── Read rune names ───────────────────────────────────────────────────────
-    Misc.SendMessage( 'Reading runebook...', colors[ 'cyan' ] )
-    runeNames = GetRuneNames( runebook )
-    if len( runeNames ) == 0:
-        Misc.SendMessage( 'Runebook has no runes!', colors[ 'red' ] )
-        return
-
-    # ── Ask player which runes to visit ───────────────────────────────────────
-    runeOptions = runeNames + [ 'ALL runes' ]
-    runeChoice  = Prompt( 'SELECT RUNE(S) TO PATROL:', runeOptions )
-
-    if runeChoice == len( runeOptions ):
-        # Last option = all runes
-        indicesToVisit = list( range( len( runeNames ) ) )
-    else:
-        indicesToVisit = [ runeChoice - 1 ]
-
-    Misc.SendMessage( 'Patrolling %d rune(s)...' % len( indicesToVisit ), colors[ 'green' ] )
+    Misc.SendMessage( '%d sheep spot(s) found. Starting patrol...' % len( spots ), colors[ 'green' ] )
 
     # ── Patrol loop ───────────────────────────────────────────────────────────
-    for idx in indicesToVisit:
-        runeName = runeNames[ idx ]
-        Misc.SendMessage( 'Recalling to: %s' % runeName, colors[ 'cyan' ] )
-        RecallToRune( runebook, idx )
+    for slot, name in spots:
+        Misc.SendMessage( 'Traveling to %s (slot %d)...' % ( name, slot ), colors[ 'cyan' ] )
+        if not travel_to_slot( runebook, slot, RECALL_CAST_DELAY ):
+            Misc.SendMessage( 'Travel failed — skipping %s.' % name, colors[ 'yellow' ] )
+            continue
 
-        # Re-fetch tool in case it broke during a previous shear
         tool = GetShearTool()
         if tool is None:
             Misc.SendMessage( 'No shearing tool left!', colors[ 'red' ] )
             return
 
-        sheep = FindNearbySheep()
-        if len( sheep ) == 0:
-            Misc.SendMessage( 'No sheep at %s — moving on.' % runeName, colors[ 'yellow' ] )
-            continue
-
-        Misc.SendMessage( 'Found %d sheep at %s. Shearing...' % ( len( sheep ), runeName ), colors[ 'green' ] )
-        shearedSerials = set()
-        for animal in sheep:
-            fresh = Mobiles.FindBySerial( animal.Serial )
-            if fresh is None or fresh.Serial in shearedSerials:
-                continue
-
-            if Player.DistanceTo( fresh ) > 1:
-                if not MoveToSheep( fresh ):
-                    Misc.SendMessage( 'Could not reach sheep — skipping.', colors[ 'yellow' ] )
-                    continue
-
-            Journal.Clear()
-            Items.UseItem( tool )
-            Target.WaitForTarget( 3000, False )
-            Target.TargetExecute( fresh )
-
-            Timer.Create( 'shear_timeout', 5000 )
-            while Timer.Check( 'shear_timeout' ):
-                if ( Journal.SearchByType( 'You shear',     'Regular' ) or
-                     Journal.SearchByType( 'already shorn', 'Regular' ) or
-                     Journal.SearchByType( 'wool',          'Regular' ) ):
-                    break
-                Misc.Pause( 100 )
-
-            shearedSerials.add( fresh.Serial )
-            Misc.Pause( config.dragDelayMilliseconds )
+        count = _shear_all_nearby( tool )
+        if count == 0:
+            Misc.SendMessage( 'No sheep at %s — moving on.' % name, colors[ 'yellow' ] )
+        else:
+            Misc.SendMessage( 'Sheared %d sheep at %s.' % ( count, name ), colors[ 'green' ] )
 
     wool = Items.FindByID( WOOL_ID, -1, Player.Backpack.Serial )
     woolCount = wool.Amount if wool is not None else 0
@@ -554,38 +478,10 @@ def AutoShear():
             Misc.SendMessage( 'No shearing tool left — stopping Auto-Shear.', colors[ 'red' ] )
             return
 
-        sheep = FindNearbyUnshornSheep()
+        count = _shear_all_nearby( tool )
+        if count > 0:
+            Misc.SendMessage( 'Sheared %d sheep.' % count, colors[ 'cyan' ] )
 
-        if len( sheep ) > 0:
-            Misc.SendMessage( 'Found %d unshorn sheep — shearing.' % len( sheep ), colors[ 'cyan' ] )
-            shearedThisCycle = set()
-
-            for animal in sheep:
-                fresh = Mobiles.FindBySerial( animal.Serial )
-                if fresh is None or fresh.Serial in shearedThisCycle:
-                    continue
-
-                if Player.DistanceTo( fresh ) > 1:
-                    if not MoveToSheep( fresh ):
-                        continue
-
-                Journal.Clear()
-                Items.UseItem( tool )
-                Target.WaitForTarget( 3000, False )
-                Target.TargetExecute( fresh )
-
-                Timer.Create( 'shear_timeout', 5000 )
-                while Timer.Check( 'shear_timeout' ):
-                    if ( Journal.SearchByType( 'You shear',     'Regular' ) or
-                         Journal.SearchByType( 'already shorn', 'Regular' ) or
-                         Journal.SearchByType( 'wool',          'Regular' ) ):
-                        break
-                    Misc.Pause( 100 )
-
-                shearedThisCycle.add( fresh.Serial )
-                Misc.Pause( config.dragDelayMilliseconds )
-
-        # Pause before the next proximity scan
         Misc.Pause( 3000 )
 
     Misc.SendMessage( 'Auto-Shear stopped (player is a ghost).', colors[ 'yellow' ] )
@@ -605,27 +501,20 @@ def BankWool():
         Misc.SendMessage( 'No wool to deposit. Aborting.', colors[ 'red' ] )
         return
 
-    # Find the runebook to use as the Recall target (default rune = bank)
-    runebook = Items.FindByID( RUNEBOOK_ITEM_ID, -1, Player.Backpack.Serial )
+    # Find the runebook labeled 'bank' (default rune should be set to the bank)
+    runebook = find_runebook_by_label( 'bank' )
     if runebook is None:
-        Misc.SendMessage( 'No runebook in backpack. Target your runebook...', colors[ 'cyan' ] )
-        rbSerial = Target.PromptTarget( 'Target the runebook with your bank rune set as default' )
-        runebook  = Items.FindBySerial( rbSerial )
+        Misc.SendMessage( "No runebook labeled 'bank' found — target one manually.", colors[ 'yellow' ] )
+        rb_serial = Target.PromptTarget( 'Target the runebook with bank as default rune:' )
+        runebook  = Items.FindBySerial( rb_serial )
         if runebook is None or runebook.ItemID != RUNEBOOK_ITEM_ID:
             Misc.SendMessage( 'That is not a runebook!', colors[ 'red' ] )
             return
 
-    # Cast Recall and target the runebook — UO uses its default rune
-    Misc.SendMessage( 'Recalling to bank...', colors[ 'cyan' ] )
-   
-    Spells.CastMagery( "Recall" )
-    Target.WaitForTarget( 4000)
-    Target.TargetExecute( runebook.Serial )
-    # if not Target.WaitForTarget( 5000, False ):
-    #     Misc.SendMessage( 'Recall failed — no spellbook, mana, or reagents?', colors[ 'red' ] )
-    #     return
-    # Target.TargetExecute( runebook.Serial )
-    Misc.Pause( RECALL_CAST_DELAY )
+    Misc.SendMessage( 'Traveling to bank...', colors[ 'cyan' ] )
+    if not travel_to_runebook( runebook, RECALL_CAST_DELAY ):
+        Misc.SendMessage( 'Travel failed — no skills or charges available.', colors[ 'red' ] )
+        return
 
     # Open the bank box
     Journal.Clear()

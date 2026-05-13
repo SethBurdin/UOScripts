@@ -21,6 +21,7 @@ RECALL_BUTTON_BASE         = 50   # slot N → button 50 + N
 GATE_BUTTON_BASE           = 100  # slot N → button 100 + N
 SACRED_JOURNEY_BUTTON_BASE = 150  # UNCONFIRMED — record a macro of Sacred Journey
                                    # from a runebook and check the button ID
+SACRED_JOURNEY_CONFIRMED   = False # Set True once SACRED_JOURNEY_BUTTON_BASE is verified
 
 # ─── Skill thresholds ─────────────────────────────────────────────────────────
 RECALL_MAGERY_MIN    = 30   # Magery required to use Recall
@@ -70,10 +71,11 @@ def _slot_from_lines(lines, rune_name):
 
 
 def _ensure_runebook_open(runebook):
-    """Open the runebook gump if it isn't already open. Returns True on success."""
-    if Gumps.CurrentGump() == RUNEBOOK_GUMP_ID:
-        return True
+    """Always open a fresh runebook gump. Returns True on success.
+    Never reuses an existing open gump — the server may have already closed it,
+    and sending SendAction on a server-closed gump causes a disconnect."""
     Items.UseItem(runebook)
+    Misc.Pause(300)
     if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
         _log("Runebook gump did not open.", 33)
         return False
@@ -156,7 +158,7 @@ def travel_to_runebook(runebook, settle_delay=2000):
     magery     = Player.GetSkillValue('Magery')
     overweight = Player.Weight >= Player.MaxWeight
 
-    if chiv > SACRED_JOURNEY_MIN:
+    if chiv > SACRED_JOURNEY_MIN and SACRED_JOURNEY_CONFIRMED:
         spell = 'Sacred Journey'
     elif overweight and magery > GATE_MAGERY_MIN:
         spell = 'Gate Travel'
@@ -200,7 +202,7 @@ def travel_to_named_rune(runebook, rune_name, settle_delay=2000):
     magery     = Player.GetSkillValue('Magery')
     overweight = Player.Weight >= Player.MaxWeight
 
-    if chiv > SACRED_JOURNEY_MIN:
+    if chiv > SACRED_JOURNEY_MIN and SACRED_JOURNEY_CONFIRMED:
         _log("Using Sacred Journey (Chiv %.1f)." % chiv)
         return _sacred_journey(runebook, rune_name, settle_delay)
     elif overweight and magery > GATE_MAGERY_MIN:
@@ -276,7 +278,7 @@ def travel_to_slot(runebook, slot, settle_delay=2000):
     magery     = Player.GetSkillValue('Magery')
     overweight = Player.Weight >= Player.MaxWeight
 
-    if chiv > SACRED_JOURNEY_MIN:
+    if chiv > SACRED_JOURNEY_MIN and SACRED_JOURNEY_CONFIRMED:
         button_base = SACRED_JOURNEY_BUTTON_BASE
         needs_mana  = False
     elif overweight and magery > GATE_MAGERY_MIN:
@@ -286,8 +288,10 @@ def travel_to_slot(runebook, slot, settle_delay=2000):
         button_base = RECALL_BUTTON_BASE
         needs_mana  = True
     else:
-        _log("Cannot travel: skills too low.", 33)
-        return False
+        # Consume a runebook charge directly — no spell skill or reagents required.
+        _log("No spell skills — consuming runebook charge (slot %d)." % slot)
+        button_base = RECALL_BUTTON_BASE
+        needs_mana  = False
 
     if not _ensure_runebook_open(runebook):
         return False

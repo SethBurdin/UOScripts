@@ -15,8 +15,8 @@ from glossary.runebook_handler import find_runebook_by_label, travel_to_runebook
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 PET_FOLLOW_RANGE     = 1      # tiles — beyond this the pet is recalled
-HEALTH_THRESHOLD     = 0.60   # heal/cure when pet HP ratio drops below this
-GUARD_HEALTH_THRESHOLD = 0.70 # say "all guard me" when pet HP ratio drops below this
+HEALTH_THRESHOLD     = 0.85   # heal/cure when pet HP ratio drops below this
+GUARD_HEALTH_THRESHOLD = 0.90 # say "all guard me" when pet HP ratio drops below this
 CHECK_INTERVAL        = 1500  # ms between main loop ticks
 FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting for pet
 FOLLOW_MAX_CHECKS     = 3     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
@@ -60,7 +60,8 @@ RECALL_SETTLE_DELAY   = 2000        # ms to wait after recall lands
 
 GOLD_ITEM_ID = 0x0EED
 
-STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "guardian_stats.json")
+STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "local/guardian_stats.json")
+os.makedirs(os.path.dirname(STATS_FILE), exist_ok=True)
 
 # ─── Session gold tracking ────────────────────────────────────────────────────
 
@@ -75,6 +76,7 @@ def _append_gold_stat(gold_this_trip):
     elapsed = time.time() - _session_start
     gph = int(_session_gold / elapsed * 3600) if elapsed > 0 else 0
     entry = {
+        "player":        Player.Name,
         "rune":          FARM_RUNE_NAME,
         "time":          time.strftime("%Y-%m-%d %H:%M:%S"),
         "gold_per_hour": gph,

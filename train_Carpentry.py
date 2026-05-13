@@ -139,6 +139,11 @@ def get_tool():
     if spare_box is None:
         log('Tools box (0x%X) not found.' % TOOLS_BOX_SERIAL, colors['red'])
         return None
+    # Wait for any open gump (e.g. the carpentry gump left open after the last craft)
+    # to settle before using the container — otherwise Razor routes the UseItem
+    # through the active gump and the open/contents load fails.
+    if Gumps.HasGump():
+        Misc.Pause(1200)
     for attempt in range(3):
         Journal.Clear()
         Items.UseItem(spare_box)

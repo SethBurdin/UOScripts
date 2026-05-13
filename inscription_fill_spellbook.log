@@ -2916,3 +2916,381 @@
 2026-04-26 08:42:59  Added 'Night Sight' -> spellbook.
 2026-04-26 08:43:01  Added 'Weaken' -> spellbook.
 2026-04-26 08:43:01  FILL done.  Added: 57   Missing from chest: 7
+
+============================================================
+  RUN START  2026-05-09 13:52:55
+============================================================
+2026-05-09 13:53:07  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-05-09 13:53:07  Target your scroll chest now.
+2026-05-09 13:53:11  Scroll chest set to 0x40069209 (wooden box).
+2026-05-09 13:53:16  Crafted 'Reactive Armor' (left in backpack).
+2026-05-09 13:53:19  Crafted 'Clumsy' (left in backpack).
+2026-05-09 13:53:21  Crafted 'Create Food' (left in backpack).
+2026-05-09 13:53:24  Crafted 'Feeblemind' (left in backpack).
+2026-05-09 13:53:27  Crafted 'Heal' (left in backpack).
+2026-05-09 13:53:29  Crafted 'Magic Arrow' (left in backpack).
+2026-05-09 13:53:32  Crafted 'Night Sight' (left in backpack).
+2026-05-09 13:53:34  Crafted 'Weaken' (left in backpack).
+2026-05-09 13:53:37  Crafted 'Agility' (left in backpack).
+2026-05-09 13:53:39  Crafted 'Cunning' (left in backpack).
+2026-05-09 13:53:42  Crafted 'Cure' (left in backpack).
+2026-05-09 13:53:44  Crafted 'Harm' (left in backpack).
+2026-05-09 13:53:47  Crafted 'Magic Trap' (left in backpack).
+2026-05-09 13:53:49  Crafted 'Magic Untrap' (left in backpack).
+2026-05-09 13:53:52  Crafted 'Protection' (left in backpack).
+2026-05-09 13:53:54  Crafted 'Strength' (left in backpack).
+2026-05-09 13:53:58  Crafted 'Bless' (left in backpack).
+2026-05-09 13:54:00  Crafted 'Fireball' (left in backpack).
+2026-05-09 13:54:03  Crafted 'Magic Lock' (left in backpack).
+2026-05-09 13:54:07  Crafted 'Poison' (left in backpack).
+2026-05-09 13:54:11  'Telekinesis': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:16  'Teleport': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:20  'Unlock': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:24  'Wall of Stone': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:28  'Arch Cure': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:32  'Arch Protection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:37  'Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:41  'Fire Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:45  'Greater Heal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:49  'Lightning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:53  'Mana Drain': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:58  'Recall': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:54:59  Scribe's pen wore out — finding a replacement...
+2026-05-09 13:55:03  Crafted 'Dispel Field' (left in backpack).
+2026-05-09 13:55:06  Crafted 'Incognito' (left in backpack).
+2026-05-09 13:55:09  Crafted 'Magic Reflection' (left in backpack).
+2026-05-09 13:55:11  Crafted 'Mind Blast' (left in backpack).
+2026-05-09 13:55:14  Crafted 'Paralyze' (left in backpack).
+2026-05-09 13:55:15  'Poison Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:16  'Summon Creature': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:17  'Dispel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:19  'Energy Bolt': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:20  'Explosion': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:21  'Invisibility': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:22  'Mark': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:24  'Mass Curse': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:25  'Paralyze Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:26  'Reveal': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:28  'Chain Lightning': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:30  'Energy Field': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:31  'Flamestrike': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:32  'Gate Travel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:33  'Mana Vampire': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:35  'Mass Dispel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:36  'Meteor Swarm': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:37  'Polymorph': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:39  Crafted 'Earthquake' (left in backpack).
+2026-05-09 13:55:40  'Energy Vortex': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:41  'Resurrection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:42  'Summon Air Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:44  'Summon Daemon': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:45  'Summon Earth Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:46  'Summon Fire Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:47  'Summon Water Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 13:55:48  Transferring scrolls to chest...
+2026-05-09 13:55:50  Transferred 'Earthquake' to chest.
+2026-05-09 13:55:52  Transferred 'Reactive Armor' to chest.
+2026-05-09 13:55:54  Transferred 'Clumsy' to chest.
+2026-05-09 13:55:56  Transferred 'Create Food' to chest.
+2026-05-09 13:55:58  Transferred 'Feeblemind' to chest.
+2026-05-09 13:56:00  Transferred 'Heal' to chest.
+2026-05-09 13:56:02  Transferred 'Magic Arrow' to chest.
+2026-05-09 13:56:04  Transferred 'Night Sight' to chest.
+2026-05-09 13:56:06  Transferred 'Weaken' to chest.
+2026-05-09 13:56:08  Transferred 'Agility' to chest.
+2026-05-09 13:56:10  Transferred 'Cunning' to chest.
+2026-05-09 13:56:12  Transferred 'Cure' to chest.
+2026-05-09 13:56:14  Transferred 'Harm' to chest.
+2026-05-09 13:56:16  Transferred 'Magic Trap' to chest.
+2026-05-09 13:56:18  Transferred 'Magic Untrap' to chest.
+2026-05-09 13:56:20  Transferred 'Protection' to chest.
+2026-05-09 13:56:22  Transferred 'Strength' to chest.
+2026-05-09 13:56:24  Transferred 'Bless' to chest.
+2026-05-09 13:56:26  Transferred 'Fireball' to chest.
+2026-05-09 13:56:28  Transferred 'Magic Lock' to chest.
+2026-05-09 13:56:30  Transferred 'Poison' to chest.
+2026-05-09 13:56:32  Transferred 'Dispel Field' to chest.
+2026-05-09 13:56:34  Transferred 'Incognito' to chest.
+2026-05-09 13:56:36  Transferred 'Magic Reflection' to chest.
+2026-05-09 13:56:38  Transferred 'Mind Blast' to chest.
+2026-05-09 13:56:40  Transferred 'Paralyze' to chest.
+2026-05-09 13:56:40  CRAFT done.  Crafted: 26   Failed: 37   Transferred: 26
+
+============================================================
+  RUN START  2026-05-09 13:56:57
+============================================================
+2026-05-09 13:57:01  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-05-09 13:57:01  Target your scroll chest now.
+2026-05-09 13:57:05  Scroll chest set to 0x40069209 (wooden box).
+2026-05-09 13:57:11  Crafted 'Reactive Armor' (left in backpack).
+2026-05-09 13:57:13  Crafted 'Clumsy' (left in backpack).
+2026-05-09 13:57:16  Crafted 'Create Food' (left in backpack).
+2026-05-09 13:57:18  Crafted 'Feeblemind' (left in backpack).
+2026-05-09 13:57:21  Crafted 'Heal' (left in backpack).
+2026-05-09 13:57:23  Crafted 'Magic Arrow' (left in backpack).
+2026-05-09 13:57:26  Crafted 'Night Sight' (left in backpack).
+2026-05-09 13:57:28  Crafted 'Weaken' (left in backpack).
+2026-05-09 13:57:31  Crafted 'Agility' (left in backpack).
+2026-05-09 13:57:34  Crafted 'Cunning' (left in backpack).
+2026-05-09 13:57:36  Crafted 'Cure' (left in backpack).
+2026-05-09 13:57:39  Crafted 'Harm' (left in backpack).
+2026-05-09 13:57:41  Crafted 'Magic Trap' (left in backpack).
+2026-05-09 13:57:44  Crafted 'Magic Untrap' (left in backpack).
+2026-05-09 13:57:46  Crafted 'Protection' (left in backpack).
+2026-05-09 13:57:49  Crafted 'Strength' (left in backpack).
+2026-05-09 13:57:52  Crafted 'Bless' (left in backpack).
+2026-05-09 13:57:55  Crafted 'Fireball' (left in backpack).
+2026-05-09 13:57:57  Crafted 'Magic Lock' (left in backpack).
+2026-05-09 13:58:00  Crafted 'Poison' (left in backpack).
+2026-05-09 13:58:02  Crafted 'Telekinesis' (left in backpack).
+2026-05-09 13:58:05  Crafted 'Teleport' (left in backpack).
+2026-05-09 13:58:07  Crafted 'Unlock' (left in backpack).
+2026-05-09 13:58:10  Crafted 'Wall of Stone' (left in backpack).
+2026-05-09 13:58:12  Crafted 'Arch Cure' (left in backpack).
+2026-05-09 13:58:15  Crafted 'Arch Protection' (left in backpack).
+2026-05-09 13:58:18  Crafted 'Curse' (left in backpack).
+2026-05-09 13:58:20  Crafted 'Fire Field' (left in backpack).
+2026-05-09 13:58:23  Crafted 'Greater Heal' (left in backpack).
+2026-05-09 13:58:25  Crafted 'Lightning' (left in backpack).
+2026-05-09 13:58:28  Crafted 'Mana Drain' (left in backpack).
+2026-05-09 13:58:30  Crafted 'Recall' (left in backpack).
+2026-05-09 13:58:34  Crafted 'Blade Spirits' (left in backpack).
+2026-05-09 13:58:36  Crafted 'Dispel Field' (left in backpack).
+2026-05-09 13:58:39  Crafted 'Incognito' (left in backpack).
+2026-05-09 13:58:41  Crafted 'Magic Reflection' (left in backpack).
+2026-05-09 13:58:44  Crafted 'Mind Blast' (left in backpack).
+2026-05-09 13:58:46  Crafted 'Paralyze' (left in backpack).
+2026-05-09 13:58:47  Mana 41/136 — meditating...
+2026-05-09 13:59:13  Mana restored: 136/136
+2026-05-09 13:59:16  Crafted 'Poison Field' (left in backpack).
+2026-05-09 13:59:19  Crafted 'Summon Creature' (left in backpack).
+2026-05-09 13:59:21  Crafted 'Dispel' (left in backpack).
+2026-05-09 13:59:24  Crafted 'Energy Bolt' (left in backpack).
+2026-05-09 13:59:26  Crafted 'Explosion' (left in backpack).
+2026-05-09 13:59:29  Crafted 'Invisibility' (left in backpack).
+2026-05-09 13:59:31  Crafted 'Mark' (left in backpack).
+2026-05-09 13:59:34  Crafted 'Mass Curse' (left in backpack).
+2026-05-09 13:59:35  Mana 40/136 — meditating...
+2026-05-09 14:00:11  Mana restored: 136/136
+2026-05-09 14:00:14  Crafted 'Paralyze Field' (left in backpack).
+2026-05-09 14:00:17  Crafted 'Reveal' (left in backpack).
+2026-05-09 14:00:20  Crafted 'Chain Lightning' (left in backpack).
+2026-05-09 14:00:23  Crafted 'Energy Field' (left in backpack).
+2026-05-09 14:00:25  Crafted 'Flamestrike' (left in backpack).
+2026-05-09 14:00:26  Mana 10/136 — meditating...
+2026-05-09 14:01:14  Mana restored: 136/136
+2026-05-09 14:01:17  'Gate Travel': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 14:01:20  Crafted 'Mana Vampire' (left in backpack).
+2026-05-09 14:01:22  Crafted 'Mass Dispel' (left in backpack).
+2026-05-09 14:01:25  Crafted 'Meteor Swarm' (left in backpack).
+2026-05-09 14:01:25  Mana 34/136 — meditating...
+2026-05-09 14:02:04  Mana restored: 136/136
+2026-05-09 14:02:07  Crafted 'Polymorph' (left in backpack).
+2026-05-09 14:02:10  Crafted 'Earthquake' (left in backpack).
+2026-05-09 14:02:13  'Energy Vortex': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 14:02:15  'Resurrection': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 14:02:18  'Summon Air Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 14:02:20  'Summon Daemon': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 14:02:23  'Summon Earth Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 14:02:25  'Summon Fire Elemental': scroll not found after craft — reagents/blanks missing or skill fail.
+2026-05-09 14:02:28  Crafted 'Summon Water Elemental' (left in backpack).
+2026-05-09 14:02:29  Transferring scrolls to chest...
+2026-05-09 14:02:31  Transferred 'Reactive Armor' to chest.
+2026-05-09 14:02:33  Transferred 'Clumsy' to chest.
+2026-05-09 14:02:35  Transferred 'Create Food' to chest.
+2026-05-09 14:02:37  Transferred 'Feeblemind' to chest.
+2026-05-09 14:02:39  Transferred 'Heal' to chest.
+2026-05-09 14:02:41  Transferred 'Magic Arrow' to chest.
+2026-05-09 14:02:43  Transferred 'Night Sight' to chest.
+2026-05-09 14:02:45  Transferred 'Weaken' to chest.
+2026-05-09 14:02:47  Transferred 'Agility' to chest.
+2026-05-09 14:02:49  Transferred 'Cunning' to chest.
+2026-05-09 14:02:51  Transferred 'Cure' to chest.
+2026-05-09 14:02:53  Transferred 'Harm' to chest.
+2026-05-09 14:02:55  Transferred 'Magic Trap' to chest.
+2026-05-09 14:02:57  Transferred 'Magic Untrap' to chest.
+2026-05-09 14:02:59  Transferred 'Protection' to chest.
+2026-05-09 14:03:01  Transferred 'Strength' to chest.
+2026-05-09 14:03:03  Transferred 'Bless' to chest.
+2026-05-09 14:03:05  Transferred 'Fireball' to chest.
+2026-05-09 14:03:07  Transferred 'Magic Lock' to chest.
+2026-05-09 14:03:09  Transferred 'Poison' to chest.
+2026-05-09 14:03:11  Transferred 'Telekinesis' to chest.
+2026-05-09 14:03:13  Transferred 'Teleport' to chest.
+2026-05-09 14:03:15  Transferred 'Unlock' to chest.
+2026-05-09 14:03:17  Transferred 'Wall of Stone' to chest.
+2026-05-09 14:03:19  Transferred 'Arch Cure' to chest.
+2026-05-09 14:03:21  Transferred 'Arch Protection' to chest.
+2026-05-09 14:03:23  Transferred 'Curse' to chest.
+2026-05-09 14:03:25  Transferred 'Fire Field' to chest.
+2026-05-09 14:03:27  Transferred 'Greater Heal' to chest.
+2026-05-09 14:03:29  Transferred 'Lightning' to chest.
+2026-05-09 14:03:31  Transferred 'Mana Drain' to chest.
+2026-05-09 14:03:33  Transferred 'Recall' to chest.
+2026-05-09 14:03:35  Transferred 'Blade Spirits' to chest.
+2026-05-09 14:03:37  Transferred 'Dispel Field' to chest.
+2026-05-09 14:03:39  Transferred 'Incognito' to chest.
+2026-05-09 14:03:41  Transferred 'Magic Reflection' to chest.
+2026-05-09 14:03:43  Transferred 'Mind Blast' to chest.
+2026-05-09 14:03:45  Transferred 'Paralyze' to chest.
+2026-05-09 14:03:47  Transferred 'Poison Field' to chest.
+2026-05-09 14:03:49  Transferred 'Summon Creature' to chest.
+2026-05-09 14:03:51  Transferred 'Dispel' to chest.
+2026-05-09 14:03:53  Transferred 'Energy Bolt' to chest.
+2026-05-09 14:03:55  Transferred 'Explosion' to chest.
+2026-05-09 14:03:57  Transferred 'Invisibility' to chest.
+2026-05-09 14:03:59  Transferred 'Mark' to chest.
+2026-05-09 14:04:01  Transferred 'Mass Curse' to chest.
+2026-05-09 14:04:03  Transferred 'Paralyze Field' to chest.
+2026-05-09 14:04:05  Transferred 'Reveal' to chest.
+2026-05-09 14:04:07  Transferred 'Chain Lightning' to chest.
+2026-05-09 14:04:09  Transferred 'Energy Field' to chest.
+2026-05-09 14:04:11  Transferred 'Flamestrike' to chest.
+2026-05-09 14:04:13  Transferred 'Mana Vampire' to chest.
+2026-05-09 14:04:15  Transferred 'Mass Dispel' to chest.
+2026-05-09 14:04:17  Transferred 'Meteor Swarm' to chest.
+2026-05-09 14:04:19  Transferred 'Polymorph' to chest.
+2026-05-09 14:04:21  Transferred 'Earthquake' to chest.
+2026-05-09 14:04:23  Transferred 'Summon Water Elemental' to chest.
+2026-05-09 14:04:23  CRAFT done.  Crafted: 57   Failed: 7   Transferred: 57
+
+============================================================
+  RUN START  2026-05-09 14:11:51
+============================================================
+2026-05-09 14:11:55  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-05-09 14:11:55  Target your scroll chest now.
+2026-05-09 14:11:58  Scroll chest set to 0x40069209 (wooden box).
+2026-05-09 14:11:59  Target the spellbook to fill...
+2026-05-09 14:12:04  Filling spellbook 0x40058249 from chest 0x40069209...
+2026-05-09 14:12:06  Added 'Earthquake' -> spellbook.
+2026-05-09 14:12:06  'Energy Vortex' (0x1F66) not in chest.
+2026-05-09 14:12:06  'Resurrection' (0x1F67) not in chest.
+2026-05-09 14:12:07  'Summon Air Elemental' (0x1F68) not in chest.
+2026-05-09 14:12:07  'Summon Daemon' (0x1F69) not in chest.
+2026-05-09 14:12:07  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-05-09 14:12:08  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-05-09 14:12:10  Added 'Summon Water Elemental' -> spellbook.
+2026-05-09 14:12:12  Added 'Chain Lightning' -> spellbook.
+2026-05-09 14:12:14  Added 'Energy Field' -> spellbook.
+2026-05-09 14:12:16  Added 'Flamestrike' -> spellbook.
+2026-05-09 14:12:16  'Gate Travel' (0x1F60) not in chest.
+2026-05-09 14:12:18  Added 'Mana Vampire' -> spellbook.
+2026-05-09 14:12:20  Added 'Mass Dispel' -> spellbook.
+2026-05-09 14:12:22  Added 'Meteor Swarm' -> spellbook.
+2026-05-09 14:12:24  Added 'Polymorph' -> spellbook.
+2026-05-09 14:12:26  Added 'Dispel' -> spellbook.
+2026-05-09 14:12:28  Added 'Energy Bolt' -> spellbook.
+2026-05-09 14:12:30  Added 'Explosion' -> spellbook.
+2026-05-09 14:12:32  Added 'Invisibility' -> spellbook.
+2026-05-09 14:12:34  Added 'Mark' -> spellbook.
+2026-05-09 14:12:36  Added 'Mass Curse' -> spellbook.
+2026-05-09 14:12:38  Added 'Paralyze Field' -> spellbook.
+2026-05-09 14:12:40  Added 'Reveal' -> spellbook.
+2026-05-09 14:12:42  Added 'Blade Spirits' -> spellbook.
+2026-05-09 14:12:44  Added 'Dispel Field' -> spellbook.
+2026-05-09 14:12:46  Added 'Incognito' -> spellbook.
+2026-05-09 14:12:48  Added 'Magic Reflection' -> spellbook.
+2026-05-09 14:12:50  Added 'Mind Blast' -> spellbook.
+2026-05-09 14:12:52  Added 'Paralyze' -> spellbook.
+2026-05-09 14:12:54  Added 'Poison Field' -> spellbook.
+2026-05-09 14:12:56  Added 'Summon Creature' -> spellbook.
+2026-05-09 14:12:58  Added 'Arch Cure' -> spellbook.
+2026-05-09 14:13:00  Added 'Arch Protection' -> spellbook.
+2026-05-09 14:13:02  Added 'Curse' -> spellbook.
+2026-05-09 14:13:04  Added 'Fire Field' -> spellbook.
+2026-05-09 14:13:06  Added 'Greater Heal' -> spellbook.
+2026-05-09 14:13:08  Added 'Lightning' -> spellbook.
+2026-05-09 14:13:10  Added 'Mana Drain' -> spellbook.
+2026-05-09 14:13:12  Added 'Recall' -> spellbook.
+2026-05-09 14:13:14  Added 'Bless' -> spellbook.
+2026-05-09 14:13:16  Added 'Fireball' -> spellbook.
+2026-05-09 14:13:18  Added 'Magic Lock' -> spellbook.
+2026-05-09 14:13:20  Added 'Poison' -> spellbook.
+2026-05-09 14:13:22  Added 'Telekinesis' -> spellbook.
+2026-05-09 14:13:24  Added 'Teleport' -> spellbook.
+2026-05-09 14:13:26  Added 'Unlock' -> spellbook.
+2026-05-09 14:13:28  Added 'Wall of Stone' -> spellbook.
+2026-05-09 14:13:30  Added 'Agility' -> spellbook.
+2026-05-09 14:13:32  Added 'Cunning' -> spellbook.
+2026-05-09 14:13:34  Added 'Cure' -> spellbook.
+2026-05-09 14:13:36  Added 'Harm' -> spellbook.
+2026-05-09 14:13:38  Added 'Magic Trap' -> spellbook.
+2026-05-09 14:13:40  Added 'Magic Untrap' -> spellbook.
+2026-05-09 14:13:42  Added 'Protection' -> spellbook.
+2026-05-09 14:13:44  Added 'Strength' -> spellbook.
+2026-05-09 14:13:46  Added 'Reactive Armor' -> spellbook.
+2026-05-09 14:13:48  Added 'Clumsy' -> spellbook.
+2026-05-09 14:13:50  Added 'Create Food' -> spellbook.
+2026-05-09 14:13:52  Added 'Feeblemind' -> spellbook.
+2026-05-09 14:13:54  Added 'Heal' -> spellbook.
+2026-05-09 14:13:56  Added 'Magic Arrow' -> spellbook.
+2026-05-09 14:13:58  Added 'Night Sight' -> spellbook.
+2026-05-09 14:14:00  Added 'Weaken' -> spellbook.
+2026-05-09 14:14:00  FILL done.  Added: 57   Missing from chest: 7
+
+============================================================
+  RUN START  2026-05-09 14:15:00
+============================================================
+2026-05-09 14:15:08  Scroll chest (0x400F3F52) not found — prompting for target.
+2026-05-09 14:15:08  Target your scroll chest now.
+2026-05-09 14:15:11  Scroll chest set to 0x40069209 (wooden box).
+2026-05-09 14:15:13  Target the spellbook to fill...
+2026-05-09 14:15:16  Filling spellbook 0x40058249 from chest 0x40069209...
+2026-05-09 14:15:18  Added 'Earthquake' -> spellbook.
+2026-05-09 14:15:18  'Energy Vortex' (0x1F66) not in chest.
+2026-05-09 14:15:18  'Resurrection' (0x1F67) not in chest.
+2026-05-09 14:15:19  'Summon Air Elemental' (0x1F68) not in chest.
+2026-05-09 14:15:19  'Summon Daemon' (0x1F69) not in chest.
+2026-05-09 14:15:19  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-05-09 14:15:20  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-05-09 14:15:20  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-05-09 14:15:20  'Chain Lightning' (0x1F5D) not in chest.
+2026-05-09 14:15:20  'Energy Field' (0x1F5E) not in chest.
+2026-05-09 14:15:21  'Flamestrike' (0x1F5F) not in chest.
+2026-05-09 14:15:21  'Gate Travel' (0x1F60) not in chest.
+2026-05-09 14:15:21  'Mana Vampire' (0x1F61) not in chest.
+2026-05-09 14:15:22  'Mass Dispel' (0x1F62) not in chest.
+2026-05-09 14:15:22  'Meteor Swarm' (0x1F63) not in chest.
+2026-05-09 14:15:22  'Polymorph' (0x1F64) not in chest.
+2026-05-09 14:15:23  'Dispel' (0x1F55) not in chest.
+2026-05-09 14:15:23  'Energy Bolt' (0x1F56) not in chest.
+2026-05-09 14:15:23  'Explosion' (0x1F57) not in chest.
+2026-05-09 14:15:23  'Invisibility' (0x1F58) not in chest.
+2026-05-09 14:15:24  'Mark' (0x1F59) not in chest.
+2026-05-09 14:15:24  'Mass Curse' (0x1F5A) not in chest.
+2026-05-09 14:15:24  'Paralyze Field' (0x1F5B) not in chest.
+2026-05-09 14:15:25  'Reveal' (0x1F5C) not in chest.
+2026-05-09 14:15:25  'Blade Spirits' (0x1F4D) not in chest.
+2026-05-09 14:15:27  Added 'Dispel Field' -> spellbook.
+2026-05-09 14:15:29  Added 'Incognito' -> spellbook.
+2026-05-09 14:15:31  Added 'Magic Reflection' -> spellbook.
+2026-05-09 14:15:33  Added 'Mind Blast' -> spellbook.
+2026-05-09 14:15:35  Added 'Paralyze' -> spellbook.
+2026-05-09 14:15:35  'Poison Field' (0x1F53) not in chest.
+2026-05-09 14:15:36  'Summon Creature' (0x1F54) not in chest.
+2026-05-09 14:15:36  'Arch Cure' (0x1F45) not in chest.
+2026-05-09 14:15:36  'Arch Protection' (0x1F46) not in chest.
+2026-05-09 14:15:37  'Curse' (0x1F47) not in chest.
+2026-05-09 14:15:37  'Fire Field' (0x1F48) not in chest.
+2026-05-09 14:15:37  'Greater Heal' (0x1F49) not in chest.
+2026-05-09 14:15:37  'Lightning' (0x1F4A) not in chest.
+2026-05-09 14:15:38  'Mana Drain' (0x1F4B) not in chest.
+2026-05-09 14:15:38  'Recall' (0x1F4C) not in chest.
+2026-05-09 14:15:40  Added 'Bless' -> spellbook.
+2026-05-09 14:15:42  Added 'Fireball' -> spellbook.
+2026-05-09 14:15:44  Added 'Magic Lock' -> spellbook.
+2026-05-09 14:15:46  Added 'Poison' -> spellbook.
+2026-05-09 14:15:46  'Telekinesis' (0x1F41) not in chest.
+2026-05-09 14:15:47  'Teleport' (0x1F42) not in chest.
+2026-05-09 14:15:47  'Unlock' (0x1F43) not in chest.
+2026-05-09 14:15:47  'Wall of Stone' (0x1F44) not in chest.
+2026-05-09 14:15:49  Added 'Agility' -> spellbook.
+2026-05-09 14:15:51  Added 'Cunning' -> spellbook.
+2026-05-09 14:15:53  Added 'Cure' -> spellbook.
+2026-05-09 14:15:55  Added 'Harm' -> spellbook.
+2026-05-09 14:15:57  Added 'Magic Trap' -> spellbook.
+2026-05-09 14:15:59  Added 'Magic Untrap' -> spellbook.
+2026-05-09 14:16:01  Added 'Protection' -> spellbook.
+2026-05-09 14:16:03  Added 'Strength' -> spellbook.
+2026-05-09 14:16:05  Added 'Reactive Armor' -> spellbook.
+2026-05-09 14:16:07  Added 'Clumsy' -> spellbook.

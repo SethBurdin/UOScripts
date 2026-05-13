@@ -236,16 +236,69 @@ def split_logs():
 # ─────────────────────────────────────────────────────────────────────────────
 # Pack beetle — find and transfer wood
 # ─────────────────────────────────────────────────────────────────────────────
-def find_beetle():
-    # Always look up by serial — Player.Mount returns an int in IronPython,
-    # not a Mobile object, so we cannot use it to access Backpack.
-    beetle = Mobiles.FindBySerial(cfg.beetle_serial)
-    if beetle is None:
-        log("Pack beetle not found (serial=0x%X)." % cfg.beetle_serial, 0x25)
-    return beetle
+# def find_pack_animal():
+#     """
+#     Auto-detect a nearby follower with a backpack (i.e. a pack beetle).
+#     Returns the Mobile, or None if none found.
+#     """
+#     f = Mobiles.Filter()
+#     f.RangeMax = 3
+#     f.IsHuman  = False
+#     f.Friend   = True   # followers / pets only
+#     nearby = Mobiles.ApplyFilter(f)
+#     for beetle in nearby:
+#         if beetle.Serial == Player.Serial:
+#             continue
+#         if beetle.Backpack is not None:
+#             return beetle
+#     return None
+
+def discover_pet():
+    """Mount-test nearby non-human mobiles to lock in the pet serial."""
+    global _pet_serial
 
 
-def transfer_wood_to_beetle(beetle):
+    # Already mounted — dismount first so the pet appears in the mobile list,
+    # then fall through to the scan loop to capture the correct Mobile serial.
+    if Player.Mount is not None:
+        # log("Already mounted — dismounting before scan.", colors['cyan'])
+        Mobiles.UseMobile(Player.Serial)
+        Misc.Pause(2000)
+
+    # log("Scanning for mountable pet within %d tiles..." % colors['cyan'])
+    f = Mobiles.Filter()
+    f.Enabled  = True
+    f.IsHuman  = False
+    f.RangeMin = 0
+    f.RangeMax = 2
+    for mob in Mobiles.ApplyFilter(f):
+        if mob.Serial == Player.Serial or mob.IsHuman:
+            continue
+        # log("Trying %s (0x%X)..." % (mob.Name, mob.Serial), colors['yellow'])
+        Mobiles.UseMobile(mob.Serial)
+        Misc.Pause(1500)
+        # Player.Mount is an Item whose serial may differ from the Mobile serial,
+        # so just confirm something was mounted rather than comparing serials.
+        if Player.Mount is not None:
+            _pet_serial = mob.Serial
+            # log("Pet locked: %s (0x%X) — dismounting." % (mob.Name, _pet_serial), colors['cyan'])
+            Mobiles.UseMobile(Player.Serial)
+            Misc.Pause(1500)
+            return True
+
+    log("No mountable non-human pet found — target your pet manually.", colors['yellow'])
+    serial = Target.PromptTarget("Click your pet:")
+    if serial and serial != 0:
+        _pet_serial = serial
+        mob  = Mobiles.FindBySerial(serial)
+        beetle = Mobiles.FindBySerial(serial)
+        name = mob.Name if mob is not None else ('0x%X' % serial)
+        log("Pet locked via prompt: %s (0x%X)" % (name, serial), colors['cyan'])
+        return beetle
+    return False
+
+
+def transfer_wood_to_beetle(_pet_serial):
     bp = Player.Backpack
     if bp is None:
         return
@@ -254,18 +307,18 @@ def transfer_wood_to_beetle(beetle):
     Mobiles.UseMobile(Player.Serial)
     Misc.Pause(1500)
 
-    if beetle is None:
-        beetle = find_beetle()
-    if beetle is None:
+    if _pet_serial is None:
+        beetle = Mobiles.FindBySerial(_pet_serial)
+    if _pet_serial is None:
         log("Beetle not found after dismount – cannot transfer.", 0x25)
-        Mobiles.UseMobile(cfg.beetle_serial)
+        Mobiles.UseMobile(_pet_serial)
         Misc.Pause(1200)
         return
 
-    beetle_pack = beetle.Backpack
+    beetle_pack = _pet_serial.Backpack
     if beetle_pack is None:
         log("Beetle backpack not accessible (out of range?).", 0x25)
-        Mobiles.UseMobile(cfg.beetle_serial)
+        Mobiles.UseMobile(_pet_serial)
         Misc.Pause(1200)
         return
 
@@ -651,7 +704,7 @@ def deposit_wood_to_container():
         Mobiles.UseMobile(Player.Serial)
         Misc.Pause(1500)
 
-    beetle = find_beetle()
+    beetle = find_pack_animal()
     moved  = 0
 
     sources = []
@@ -712,7 +765,7 @@ def ensure_mounted():
     if Player.Mount is not None:
         return True
     log("Mounting beetle before recall...", 0x3B)
-    Mobiles.UseMobile(cfg.beetle_serial)
+    Mobiles.UseMobile(beetle.serial)
     Misc.Pause(1500)
     return True
 

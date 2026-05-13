@@ -164,15 +164,22 @@ def main():
     candidates = [item for item in contents if not item.IsContainer and item.ItemID not in SKIP_IDS]
     targets = filter_items_by_skill(candidates, skill)
     log("Found %i eligible item(s) to unravel (%i skipped)." % (len(targets), len(contents) - len(targets)))
-    success = 0
+    success  = 0
+    returned = 0
     for i, item in enumerate(targets):
         log("  [%i/%i] %s (0x%04X)" % (i + 1, len(targets), item.Name, item.ItemID))
         Items.Move(item, Player.Backpack, item.Amount)
         Misc.Pause(1200)
-        if unravel_item(item):
-            success += 1
+        unravel_item(item)
         Misc.Pause(PAUSE_BETWEEN_ITEMS)
-    log("Done – attempted %i item(s)." % success)
+        still_here = Items.FindBySerial(item.Serial)
+        if still_here is not None:
+            Items.Move(still_here, box, still_here.Amount)
+            Misc.Pause(1200)
+            returned += 1
+        else:
+            success += 1
+    log("Done – unravelled %i, returned %i to box." % (success, returned))
 
 
 main()
