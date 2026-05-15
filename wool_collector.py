@@ -355,7 +355,7 @@ def UseLoom():
         Misc.Pause( 500 )
 
         # Wait for the loom to finish weaving before the next use
-        Timer.Create( 'loom_timeout', 1200 )
+        # Timer.Create( 'loom_timeout', 1200 )
         while Timer.Check( 'loom_timeout' ):
             if ( Journal.SearchByType( 'You weave', 'Regular' ) or
                  Journal.SearchByType( 'cloth',     'Regular' ) or

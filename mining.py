@@ -500,7 +500,7 @@ def try_craft_pickaxe():
             log("Tool crafted: %s (0x%X)." % (item.Name, item.Serial))
             return True
 
-    log("Tool craft failed – check PICKAXE_ITEM_BTN (%d) and HATCHET_ID (0x%X) for this shard." % (PICKAXE_ITEM_BTN, HATCHET_ID), 0x25)
+    log("Tool craft failed – check PICKAXE_ITEM_BTN (%d) for this shard." % PICKAXE_ITEM_BTN, 0x25)
     return False
 
 
@@ -1333,6 +1333,8 @@ def grab_pickaxe_from_box():
     if box is None:
         log("Pickaxe box (0x%X) not found at home." % cfg.pickaxe_box_serial, 0x25)
         return False
+    if Gumps.HasGump():
+        Misc.Pause(1200)
     Items.UseItem(box)
     Items.WaitForContents(box, 3000)
     Misc.Pause(600)

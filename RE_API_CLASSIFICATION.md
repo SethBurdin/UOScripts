@@ -73,7 +73,9 @@ Player.Hits, Player.HitsMax   # current / max HP
 Player.Mana, Player.ManaMax   # current / max mana
 Player.Stam, Player.StamMax   # current / max stamina
 Player.Weight, Player.MaxWeight
-Player.SkillValue("Inscription")  # returns float (0.0–120.0)
+Player.GetSkillValue("Inscription")     # current effective value (0.0–120.0)
+Player.GetRealSkillValue("Inscription") # base value without temporary buffs
+Player.GetSkillCap("Inscription")       # per-skill cap; 100 default, up to 120 with power scrolls
 
 # ── Actions ────────────────────────────────────────────────────────────────
 Player.UseSkill("Meditation")   # trigger a skill use (meditation, etc.)
@@ -493,7 +495,9 @@ Used in: `mining.py` (mana-free), `inscription_fill_spellbook.py`, `HEAL SELF ME
 | Max weight | `Player.MaxWeight` |
 | Over-weight check | `Player.Weight >= Player.MaxWeight - buffer` |
 | Trigger meditation | `Player.UseSkill("Meditation")` |
-| Skill value | `Player.SkillValue("Inscription")` |
+| Current skill value | `Player.GetSkillValue("Inscription")` |
+| Base value (no buffs) | `Player.GetRealSkillValue("Inscription")` |
+| Per-skill cap | `Player.GetSkillCap("Inscription")` |
 
 **Meditate-to-full pattern**:
 ```python

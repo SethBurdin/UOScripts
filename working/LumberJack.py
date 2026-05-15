@@ -298,7 +298,7 @@ def discover_pet():
     return False
 
 
-def transfer_wood_to_beetle(_pet_serial):
+def transfer_wood_to_beetle(beetle):
     bp = Player.Backpack
     if bp is None:
         return
@@ -311,7 +311,7 @@ def transfer_wood_to_beetle(_pet_serial):
         beetle = Mobiles.FindBySerial(_pet_serial)
     if _pet_serial is None:
         log("Beetle not found after dismount – cannot transfer.", 0x25)
-        Mobiles.UseMobile(_pet_serial)
+        Mobiles.UseMobile(beetle)
         Misc.Pause(1200)
         return
 

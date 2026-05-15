@@ -39,7 +39,7 @@ class TailoringCraftable:
 
 
 tailoringCraftables = {
-    ### Hats: Gump Button 1 ###
+    ### Hats: Gump Button 8 ###
     'skullcap': TailoringCraftable(
         name = 'skullcap',
         itemID = 0x1544,
@@ -47,7 +47,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 0.0,
         resourcesNeeded = { 'cloth': 2 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 2 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 2 ) )
     ),
     'bandana': TailoringCraftable(
         name = 'bandana',
@@ -56,7 +56,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 0.0,
         resourcesNeeded = { 'cloth': 2 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 9 ) )
     ),
     'floppy hat': TailoringCraftable(
         name = 'floppy hat',
@@ -65,7 +65,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 6.2,
         resourcesNeeded = { 'cloth': 11 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 16 ) )
     ),
     'cap': TailoringCraftable(
         name = 'cap',
@@ -74,7 +74,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 6.2,
         resourcesNeeded = { 'cloth': 11 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 23 ) )
     ),
     'wide-brim hat': TailoringCraftable(
         name = 'wide-brim hat',
@@ -83,7 +83,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 6.2,
         resourcesNeeded = { 'cloth': 12 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 30 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 30 ) )
     ),
     'straw hat': TailoringCraftable(
         name = 'straw hat',
@@ -92,7 +92,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 6.2,
         resourcesNeeded = { 'cloth': 10 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 37 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 37 ) )
     ),
     'tall straw hat': TailoringCraftable(
         name = 'tall straw hat',
@@ -101,7 +101,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 6.7,
         resourcesNeeded = { 'cloth': 13 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 44 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 44 ) )
     ),
     'wizard''s hat': TailoringCraftable(
         name = 'wizard''s hat',
@@ -110,7 +110,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 7.2,
         resourcesNeeded = { 'cloth': 15 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 51 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 51 ) )
     ),
     'bonnet': TailoringCraftable(
         name = 'bonnet',
@@ -119,7 +119,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 6.2,
         resourcesNeeded = { 'cloth': 11 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 58 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 58 ) )
     ),
     'feathered hat': TailoringCraftable(
         name = 'feathered hat',
@@ -128,7 +128,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 6.2,
         resourcesNeeded = { 'cloth': 12 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 65 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 65 ) )
     ),
     'tricorne hat': TailoringCraftable(
         name = 'tricorne hat',
@@ -137,7 +137,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 6.2,
         resourcesNeeded = { 'cloth': 12 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 72 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 72 ) )
     ),
     'jester hat': TailoringCraftable(
         name = 'jester hat',
@@ -146,7 +146,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 7.2,
         resourcesNeeded = { 'cloth': 15 },
-        gumpPath = ( GumpSelection( 949095101, 1 ), GumpSelection( 949095101, 79 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 79 ) )
     ),
 
 
@@ -158,7 +158,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 0.0,
         resourcesNeeded = { 'cloth': 8 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 2 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 2 ) )
     ),
     'shirt': TailoringCraftable(
         name = 'shirt',
@@ -167,7 +167,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 20.7,
         resourcesNeeded = { 'cloth': 8 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 9 ) )
     ),
     'fancy shirt': TailoringCraftable(
         name = 'fancy shirt',
@@ -176,7 +176,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 24.8,
         resourcesNeeded = { 'cloth': 8 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 16 ) )
     ),
     'tunic': TailoringCraftable(
         name = 'tunic',
@@ -185,7 +185,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 0.0,
         resourcesNeeded = { 'cloth': 12 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 23 ) )
     ),
     'surcoat': TailoringCraftable(
         name = 'surcoat',
@@ -194,7 +194,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 8.2,
         resourcesNeeded = { 'cloth': 14 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 30 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 30 ) )
     ),
     'plain dress': TailoringCraftable(
         name = 'plain dress',
@@ -203,7 +203,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 12.4,
         resourcesNeeded = { 'cloth': 10 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 37 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 37 ) )
     ),
     'fancy dress': TailoringCraftable(
         name = 'fancy dress',
@@ -212,7 +212,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 33.1,
         resourcesNeeded = { 'cloth': 12 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 44 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 44 ) )
     ),
     'cloak': TailoringCraftable(
         name = 'cloak',
@@ -221,7 +221,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 41.4,
         resourcesNeeded = { 'cloth': 14 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 51 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 51 ) )
     ),
     'robe': TailoringCraftable(
         name = 'robe',
@@ -230,7 +230,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 53.9,
         resourcesNeeded = { 'cloth': 16 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 58 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 58 ) )
     ),
     'jester suit': TailoringCraftable(
         name = 'jester suit',
@@ -239,7 +239,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 8.2,
         resourcesNeeded = { 'cloth': 24 },
-        gumpPath = ( GumpSelection( 949095101, 8 ), GumpSelection( 949095101, 65 ) )
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 65 ) )
     ),
 
 
@@ -251,7 +251,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 24.8,
         resourcesNeeded = { 'cloth': 6 },
-        gumpPath = ( GumpSelection( 949095101, 15 ), GumpSelection( 949095101, 2 ) )
+        gumpPath = ( GumpSelection( 2653346093, 15 ), GumpSelection( 2653346093, 2 ) )
     ),
     'long pants': TailoringCraftable(
         name = 'long pants',
@@ -260,7 +260,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 24.8,
         resourcesNeeded = { 'cloth': 8 },
-        gumpPath = ( GumpSelection( 949095101, 15 ), GumpSelection( 949095101, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 15 ), GumpSelection( 2653346093, 9 ) )
     ),
     'kilt': TailoringCraftable(
         name = 'kilt',
@@ -269,7 +269,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 20.7,
         resourcesNeeded = { 'cloth': 8 },
-        gumpPath = ( GumpSelection( 949095101, 15 ), GumpSelection( 949095101, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 15 ), GumpSelection( 2653346093, 16 ) )
     ),
     'skirt': TailoringCraftable(
         name = 'skirt',
@@ -278,7 +278,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 29.0,
         resourcesNeeded = { 'cloth': 10 },
-        gumpPath = ( GumpSelection( 949095101, 15 ), GumpSelection( 949095101, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 15 ), GumpSelection( 2653346093, 23 ) )
     ),
 
 
@@ -290,7 +290,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 4.1,
         resourcesNeeded = { 'cloth': 4 },
-        gumpPath = ( GumpSelection( 949095101, 22 ), GumpSelection( 949095101, 2 ) )
+        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 2 ) )
     ),
     'half apron': TailoringCraftable(
         name = 'half apron',
@@ -299,7 +299,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 20.7,
         resourcesNeeded = { 'cloth': 6 },
-        gumpPath = ( GumpSelection( 949095101, 22 ), GumpSelection( 949095101, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 9 ) )
     ),
     'full apron': TailoringCraftable(
         name = 'full apron',
@@ -308,7 +308,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 29.0,
         resourcesNeeded = { 'cloth': 10 },
-        gumpPath = ( GumpSelection( 949095101, 22 ), GumpSelection( 949095101, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 16 ) )
     ),
     'oil cloth': TailoringCraftable(
         name = 'oil cloth',
@@ -317,7 +317,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 74.6,
         resourcesNeeded = { 'cloth': 1 },
-        gumpPath = ( GumpSelection( 949095101, 22 ), GumpSelection( 949095101, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 23 ) )
     ),
 
 
@@ -329,7 +329,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 12.4,
         resourcesNeeded = { 'leather': 4 },
-        gumpPath = ( GumpSelection( 949095101, 29 ), GumpSelection( 949095101, 2 ) )
+        gumpPath = ( GumpSelection( 2653346093, 29 ), GumpSelection( 2653346093, 2 ) )
     ),
     'shoes': TailoringCraftable(
         name = 'shoes',
@@ -338,7 +338,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 16.5,
         resourcesNeeded = { 'leather': 6 },
-        gumpPath = ( GumpSelection( 949095101, 29 ), GumpSelection( 949095101, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 29 ), GumpSelection( 2653346093, 9 ) )
     ),
     'boots': TailoringCraftable(
         name = 'boots',
@@ -347,7 +347,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 33.1,
         resourcesNeeded = { 'leather': 8 },
-        gumpPath = ( GumpSelection( 949095101, 29 ), GumpSelection( 949095101, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 29 ), GumpSelection( 2653346093, 16 ) )
     ),
     'thigh boots': TailoringCraftable(
         name = 'thigh boots',
@@ -356,7 +356,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 41.4,
         resourcesNeeded = { 'leather': 10 },
-        gumpPath = ( GumpSelection( 949095101, 29 ), GumpSelection( 949095101, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 29 ), GumpSelection( 2653346093, 23 ) )
     ),
 
 
@@ -368,7 +368,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 53.9,
         resourcesNeeded = { 'leather': 4 },
-        gumpPath = ( GumpSelection( 949095101, 36 ), GumpSelection( 949095101, 2 ) )
+        gumpPath = ( GumpSelection( 2653346093, 36 ), GumpSelection( 2653346093, 2 ) )
     ),
     'leather cap': TailoringCraftable(
         name = 'leather cap',
@@ -377,7 +377,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 6.2,
         resourcesNeeded = { 'leather': 2 },
-        gumpPath = ( GumpSelection( 949095101, 36 ), GumpSelection( 949095101, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 36 ), GumpSelection( 2653346093, 9 ) )
     ),
     'leather gloves': TailoringCraftable(
         name = 'leather gloves',
@@ -386,7 +386,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 51.8,
         resourcesNeeded = { 'leather': 3 },
-        gumpPath = ( GumpSelection( 949095101, 36 ), GumpSelection( 949095101, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 36 ), GumpSelection( 2653346093, 16 ) )
     ),
     'leather sleeves': TailoringCraftable(
         name = 'leather sleeves',
@@ -395,7 +395,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 53.9,
         resourcesNeeded = { 'leather': 8 },
-        gumpPath = ( GumpSelection( 949095101, 36 ), GumpSelection( 949095101, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 36 ), GumpSelection( 2653346093, 23 ) )
     ),
     'leather leggings': TailoringCraftable(
         name = 'leather leggings',
@@ -404,7 +404,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 66.3,
         resourcesNeeded = { 'leather': 10 },
-        gumpPath = ( GumpSelection( 949095101, 36 ), GumpSelection( 949095101, 30 ) )
+        gumpPath = ( GumpSelection( 2653346093, 36 ), GumpSelection( 2653346093, 30 ) )
     ),
     'leather tunic': TailoringCraftable(
         name = 'leather tunic',
@@ -413,7 +413,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 70.5,
         resourcesNeeded = { 'leather': 12 },
-        gumpPath = ( GumpSelection( 949095101, 36 ), GumpSelection( 949095101, 37 ) )
+        gumpPath = ( GumpSelection( 2653346093, 36 ), GumpSelection( 2653346093, 37 ) )
     ),
 
 
@@ -425,7 +425,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 78.8,
         resourcesNeeded = { 'leather': 6 },
-        gumpPath = ( GumpSelection( 949095101, 43 ), GumpSelection( 949095101, 2 ) )
+        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 2 ) )
     ),
     'studded cap': TailoringCraftable(
         name = 'studded cap',
@@ -434,7 +434,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 80.9,
         resourcesNeeded = { 'leather': 4 },
-        gumpPath = ( GumpSelection( 949095101, 43 ), GumpSelection( 949095101, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 9 ) )
     ),
     'studded gloves': TailoringCraftable(
         name = 'studded gloves',
@@ -443,7 +443,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 82.9,
         resourcesNeeded = { 'leather': 8 },
-        gumpPath = ( GumpSelection( 949095101, 43 ), GumpSelection( 949095101, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 16 ) )
     ),
     'studded sleeves': TailoringCraftable(
         name = 'studded sleeves',
@@ -452,7 +452,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 87.1,
         resourcesNeeded = { 'leather': 10 },
-        gumpPath = ( GumpSelection( 949095101, 43 ), GumpSelection( 949095101, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 23 ) )
     ),
     'studded leggings': TailoringCraftable(
         name = 'studded leggings',
@@ -461,7 +461,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 91.2,
         resourcesNeeded = { 'leather': 12 },
-        gumpPath = ( GumpSelection( 949095101, 43 ), GumpSelection( 949095101, 30 ) )
+        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 30 ) )
     ),
     'studded tunic': TailoringCraftable(
         name = 'studded tunic',
@@ -470,7 +470,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 94.0,
         resourcesNeeded = { 'leather': 14 },
-        gumpPath = ( GumpSelection( 949095101, 43 ), GumpSelection( 949095101, 37 ) )
+        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 37 ) )
     ),
 
 
@@ -482,7 +482,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 62.2,
         resourcesNeeded = { 'leather': 8 },
-        gumpPath = ( GumpSelection( 949095101, 50 ), GumpSelection( 949095101, 2 ) )
+        gumpPath = ( GumpSelection( 2653346093, 50 ), GumpSelection( 2653346093, 2 ) )
     ),
     'leather skirt': TailoringCraftable(
         name = 'leather skirt',
@@ -491,7 +491,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 58.0,
         resourcesNeeded = { 'leather': 6 },
-        gumpPath = ( GumpSelection( 949095101, 50 ), GumpSelection( 949095101, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 50 ), GumpSelection( 2653346093, 9 ) )
     ),
     'leather bustier': TailoringCraftable(
         name = 'leather bustier',
@@ -500,7 +500,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 58.0,
         resourcesNeeded = { 'leather': 6 },
-        gumpPath = ( GumpSelection( 949095101, 50 ), GumpSelection( 949095101, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 50 ), GumpSelection( 2653346093, 16 ) )
     ),
     'studded bustier': TailoringCraftable(
         name = 'studded bustier',
@@ -509,7 +509,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 82.9,
         resourcesNeeded = { 'leather': 8 },
-        gumpPath = ( GumpSelection( 949095101, 50 ), GumpSelection( 949095101, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 50 ), GumpSelection( 2653346093, 23 ) )
     ),
     'female leather armor': TailoringCraftable(
         name = 'female leather armor',
@@ -518,7 +518,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 62.2,
         resourcesNeeded = { 'leather': 8 },
-        gumpPath = ( GumpSelection( 949095101, 50 ), GumpSelection( 949095101, 30 ) )
+        gumpPath = ( GumpSelection( 2653346093, 50 ), GumpSelection( 2653346093, 30 ) )
     ),
     'studded armor': TailoringCraftable(
         name = 'studded armor',
@@ -527,7 +527,16 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 87.1,
         resourcesNeeded = { 'leather': 10 },
-        gumpPath = ( GumpSelection( 949095101, 50 ), GumpSelection( 949095101, 37 ) )
+        gumpPath = ( GumpSelection( 2653346093, 50 ), GumpSelection( 2653346093, 37 ) )
+    ),
+    'studded hiro sode': TailoringCraftable(
+        name = 'studded hiro sode',
+        itemID = 0x277F,
+        retainsMark = True,
+        retainsColor = True,
+        minSkill = 107.5,
+        resourcesNeeded = { 'leather': 8 },
+        gumpPath = ( GumpSelection( 2653346093, 50 ), GumpSelection( 2653346093, 51 ) )
     ),
 
 
@@ -539,7 +548,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 85.0,
         resourcesNeeded = { 'leather': 4, 'bones': 2 },
-        gumpPath = ( GumpSelection( 949095101, 57 ), GumpSelection( 949095101, 2 ) )
+        gumpPath = ( GumpSelection( 2653346093, 57 ), GumpSelection( 2653346093, 2 ) )
     ),
     'bone gloves': TailoringCraftable(
         name = 'bone gloves',
@@ -548,7 +557,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 89.0,
         resourcesNeeded = { 'leather': 6, 'bones': 2 },
-        gumpPath = ( GumpSelection( 949095101, 57 ), GumpSelection( 949095101, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 57 ), GumpSelection( 2653346093, 9 ) )
     ),
     'bone arms': TailoringCraftable(
         name = 'bone arms',
@@ -557,7 +566,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 92.0,
         resourcesNeeded = { 'leather': 8, 'bones': 4 },
-        gumpPath = ( GumpSelection( 949095101, 57 ), GumpSelection( 949095101, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 57 ), GumpSelection( 2653346093, 16 ) )
     ),
     'bone leggings': TailoringCraftable(
         name = 'bone leggings',
@@ -566,7 +575,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 95.0,
         resourcesNeeded = { 'leather': 10, 'bones': 6 },
-        gumpPath = ( GumpSelection( 949095101, 57 ), GumpSelection( 949095101, 23 ) )
+        gumpPath = ( GumpSelection( 2653346093, 57 ), GumpSelection( 2653346093, 23 ) )
     ),
     'bone armor': TailoringCraftable(
         name = 'bone armor',
@@ -575,7 +584,7 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 96.0,
         resourcesNeeded = { 'leather': 12, 'bones': 10 },
-        gumpPath = ( GumpSelection( 949095101, 57 ), GumpSelection( 949095101, 30 ) )
+        gumpPath = ( GumpSelection( 2653346093, 57 ), GumpSelection( 2653346093, 30 ) )
     ),
     'orc helm': TailoringCraftable(
         name = 'orc helm',
@@ -584,6 +593,30 @@ tailoringCraftables = {
         retainsColor = True,
         minSkill = 90.0,
         resourcesNeeded = { 'leather': 6, 'bones': 4 },
-        gumpPath = ( GumpSelection( 949095101, 57 ), GumpSelection( 949095101, 37 ) )
+        gumpPath = ( GumpSelection( 2653346093, 57 ), GumpSelection( 2653346093, 37 ) )
+    ),
+
+
+    ### Tribal Mask: Hats (button 8) → item button 128 ###
+    'tribal mask': TailoringCraftable(
+        name = 'tribal mask',
+        itemID = 0x1549,
+        retainsMark = True,
+        retainsColor = True,
+        minSkill = 100.0,
+        resourcesNeeded = { 'cloth': 4 },  # TODO: verify — likely 'combined cloth' once item ID known
+        gumpPath = ( GumpSelection( 2653346093, 8 ), GumpSelection( 2653346093, 128 ) )
+    ),
+
+
+    ### Materials category: Gump Button 1 ###
+    'combined cloth': TailoringCraftable(
+        name = 'combined cloth',
+        itemID = 0x1767,
+        retainsMark = False,
+        retainsColor = False,
+        minSkill = 0.0,
+        resourcesNeeded = { 'cloth': 4 },  # TODO: verify how many cut cloth per combined cloth
+        gumpPath = ( GumpSelection( 2653346093, 1 ), GumpSelection( 2653346093, 9 ) )
     ),
 }

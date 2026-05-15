@@ -20,7 +20,7 @@ GUARD_HEALTH_THRESHOLD = 0.90 # say "all guard me" when pet HP ratio drops below
 CHECK_INTERVAL        = 1500  # ms between main loop ticks
 FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting for pet
 FOLLOW_MAX_CHECKS     = 3     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
-PET_SCAN_RANGE        = 30    # tile radius to search for a friendly mobile
+PET_SCAN_RANGE        = 30     # tile radius to search for a friendly mobile
 GUARD_BREAK_DISTANCE  = 1    # tiles player must move from guard origin before pet is immediately recalled
 
 # Pet context menu entry indices (right-click the pet)
@@ -55,8 +55,21 @@ TRANSFER_ITEMS = [
 WEIGHT_BANK_THRESHOLD = 0.90        # recall home when weight ratio >= this
 GOLD_DEST_SERIAL      = config.quick_dropbox
 HOME_RUNEBOOK_NAME    = "home"      # label on the runebook item (case-insensitive)
-FARM_RUNE_NAME        = "ww"        # label of the rune to return to after banking (case-insensitive)
+FARM_RUNE_NAME        = None        # set at runtime via prompt
 RECALL_SETTLE_DELAY   = 2000        # ms to wait after recall lands
+
+# Known farm locations — shown as suggestions in the startup prompt.
+# The rune name must match the label on the rune in the runebook (case-insensitive).
+FARM_LOCATIONS = [
+    'ww',        # Wind Wyrms
+    'iceogre',   # Ice Ogre Lords
+    'demons',    # Demons
+    'ogrelords', # Ogre Lords
+    'liches',    # Liches
+    'balron',    # Balrons
+    'ancient',   # Ancient Wyrms
+    'titans',    # Titans
+]
 
 GOLD_ITEM_ID = 0x0EED
 
@@ -172,6 +185,7 @@ def bank_gold_if_heavy():
 
     if do_banking(rb):
         travel_to_named_rune(rb, FARM_RUNE_NAME, RECALL_SETTLE_DELAY)
+        Player.ChatSay("all guard me")
 
 
 def discover_pet():
@@ -270,8 +284,6 @@ def check_pet_health(pet):
     if pet.HitsMax == 0:
         return
     hp_ratio = float(pet.Hits) / pet.HitsMax
-    if Player.Name.lower() == 'kspot':
-        return
     if pet.Poisoned and hp_ratio < HEALTH_THRESHOLD:
         cure_pet(pet)
     elif hp_ratio < HEALTH_THRESHOLD:
@@ -297,14 +309,51 @@ def recall_pet(pet):
 # ─── Main loop ────────────────────────────────────────────────────────────────
 
 def main():
-    global _session_start, _session_gold
+    global _session_start, _session_gold, FARM_RUNE_NAME
     _session_start = time.time()
     _session_gold  = 0
-    log("Guardian started.", colors['cyan'])
 
+    # ── Location prompt ───────────────────────────────────────────────────────
+    Misc.SendMessage('[guardian] Farm location — say the number:', colors['cyan'])
+    for i, loc in enumerate(FARM_LOCATIONS):
+        Misc.SendMessage('[guardian]   %d) %s' % (i + 1, loc), colors['cyan'])
+    Misc.Pause(600)
+    Journal.Clear()
+    Misc.Pause(200)
+    Journal.Clear()
+
+    chosen = None
+    deadline = time.time() + 30
+    while time.time() < deadline and chosen is None:
+        for i, loc in enumerate(FARM_LOCATIONS):
+            if Journal.SearchByName(str(i + 1), Player.Name):
+                chosen = loc
+                break
+        Misc.Pause(200)
+
+    if chosen is None:
+        log("No location selected (30s timeout) — stopping.", colors['red'])
+        return
+    Journal.Clear()
+    FARM_RUNE_NAME = chosen
+    log("Target: %s" % FARM_RUNE_NAME, colors['cyan'])
+
+    # ── Pet discovery (before recall so mount is confirmed at the house) ─────
     if not discover_pet():
         log("Pet discovery failed — stopping.", colors['red'])
         return
+
+    # ── Recall from house to farm location ────────────────────────────────────
+    rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
+    if rb is None:
+        log("Runebook '%s' not found in backpack — stopping." % HOME_RUNEBOOK_NAME, colors['red'])
+        return
+    log("Recalling to '%s'..." % FARM_RUNE_NAME, colors['cyan'])
+    if not travel_to_named_rune(rb, FARM_RUNE_NAME, RECALL_SETTLE_DELAY):
+        log("Failed to recall to '%s' — stopping." % FARM_RUNE_NAME, colors['red'])
+        return
+
+    log("Guardian started.", colors['cyan'])
 
     is_guarding = False
     guard_pos   = None  # player tile when "all guard me" was last issued

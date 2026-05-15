@@ -28,11 +28,11 @@ from utilities.items import FindItem
 # Configuration
 # ---------------------------------------------------------------------------
 
-SCAN_RANGE        = 3     # tiles from player to check for corpses
+SCAN_RANGE        = 2     # tiles from player to check for corpses
 SCAN_INTERVAL_MS  = 500   # ms between scan passes (used in future loop)
-ACTION_DELAY_MS   = 2000   # ms delay between all actions
-SKIN_WAIT_MS      = 800  # ms to wait after using the skinning tool
-MOVE_PAUSE_MS     = ACTION_DELAY_MS  # ms between each item move to the beetle
+ACTION_DELAY_MS   = 1200  # ms delay between all actions
+SKIN_WAIT_MS      = 600   # ms to wait after using the skinning tool
+MOVE_PAUSE_MS     = 800   # ms between each item move to the beetle
 
 DEBUG = True
 
@@ -45,6 +45,8 @@ HIDE_ITEM_IDS = [
     cloth['piles of hides'].itemID,    # 0x1079  raw hides on corpse
     cloth['pieces of leather'].itemID, # 0x1081  cut leather after skinning
 ]
+
+SCISSORS_ID = 0x0F9F   # scissors — needed to cut raw hides into leather
 
 # Dragon scale IDs — confirm against in-game SingleClick if wrong on this shard
 SCALE_ITEM_IDS = [0x26B4, 0x26B5, 0x26B6, 0x26B7, 0x26B8, 0x26B9]
@@ -208,6 +210,8 @@ def transfer_resources(corpse, beetle):
         Mobiles.UseMobile(Player.Serial)
         Misc.Pause(ACTION_DELAY_MS)
 
+    # Wait for the server action cooldown from skinning to clear
+    Misc.Pause(ACTION_DELAY_MS)
     Items.UseItem(corpse.Serial)
     Items.WaitForContents(corpse.Serial, 2500)
     Misc.Pause(ACTION_DELAY_MS)
@@ -215,21 +219,77 @@ def transfer_resources(corpse, beetle):
     moved = 0
     for item in list(corpse.Contains):
         if item.ItemID in RESOURCE_ITEM_IDS:
-            log('Moving %ix %s (0x%04X) to beetle.' % (item.Amount, item.Name, item.ItemID))
-            Items.Move(item, beetle.Serial, 0)
+            if item.ItemID in HIDE_ITEM_IDS:
+                # Hides go to backpack so they can be cut before going to beetle
+                log('Moving %ix %s (0x%04X) to backpack for cutting.' % (item.Amount, item.Name, item.ItemID))
+                Items.Move(item, Player.Backpack, item.Amount)
+            else:
+                # Scales and other resources go straight to beetle
+                log('Moving %ix %s (0x%04X) to beetle.' % (item.Amount, item.Name, item.ItemID))
+                Items.Move(item, beetle.Serial, 0)
             Misc.Pause(MOVE_PAUSE_MS)
             moved += 1
 
     if moved == 0:
         log('No hides or scales on corpse 0x%X after skinning.' % corpse.Serial, 'warn')
     else:
-        log('%i stack(s) transferred to beetle.' % moved, 'ok')
+        log('%i stack(s) transferred.' % moved, 'ok')
 
     if mounted:
         Mobiles.UseMobile(beetle.Serial)
         Misc.Pause(ACTION_DELAY_MS)
 
     return moved
+
+
+# ---------------------------------------------------------------------------
+# Step 5 - Pull hides from beetle, cut, return leather
+# ---------------------------------------------------------------------------
+
+def _cut_hides_in_backpack(scissors):
+    '''Use scissors on every raw hide stack in the backpack.'''
+    raw_hide_id = cloth['piles of hides'].itemID
+    hide = Items.FindByID(raw_hide_id, -1, Player.Backpack.Serial)
+    while hide is not None:
+        Items.UseItem(scissors)
+        if not Target.WaitForTarget(3000, False):
+            log('_cut_hides: target cursor never appeared.', 'warn')
+            return
+        Target.TargetExecute(hide.Serial)
+        Misc.Pause(ACTION_DELAY_MS)
+        hide = Items.FindByID(raw_hide_id, -1, Player.Backpack.Serial)
+
+
+def process_beetle_hides(beetle):
+    '''
+    Cuts hides that landed in the backpack from skinning, then moves
+    the cut leather to the beetle.
+    '''
+    scissors = Items.FindByID(SCISSORS_ID, -1, Player.Backpack.Serial)
+    if scissors is None:
+        log('No scissors in backpack — cannot cut hides.', 'error')
+        return
+
+    leather_id = cloth['pieces of leather'].itemID
+
+    _cut_hides_in_backpack(scissors)
+
+    was_mounted = Player.Mount is not None
+    if was_mounted:
+        Mobiles.UseMobile(Player.Serial)
+        Misc.Pause(ACTION_DELAY_MS)
+
+    leather = Items.FindByID(leather_id, -1, Player.Backpack.Serial)
+    while leather is not None:
+        Items.Move(leather, beetle.Serial, leather.Amount)
+        Misc.Pause(MOVE_PAUSE_MS)
+        leather = Items.FindByID(leather_id, -1, Player.Backpack.Serial)
+
+    if was_mounted:
+        Mobiles.UseMobile(beetle.Serial)
+        Misc.Pause(ACTION_DELAY_MS)
+
+    log('Hide processing complete.', 'ok')
 
 
 # ---------------------------------------------------------------------------
@@ -264,3 +324,5 @@ else:
             for corpse in skinnable:
                 if skin_corpse(tool, corpse):
                     transfer_resources(corpse, beetle)
+
+        process_beetle_hides(beetle)
