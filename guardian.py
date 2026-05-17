@@ -15,13 +15,18 @@ from glossary.runebook_handler import find_runebook_by_label, travel_to_runebook
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 PET_FOLLOW_RANGE     = 1      # tiles — beyond this the pet is recalled
-HEALTH_THRESHOLD     = 0.85   # heal/cure when pet HP ratio drops below this
-GUARD_HEALTH_THRESHOLD = 0.90 # say "all guard me" when pet HP ratio drops below this
+HEALTH_THRESHOLD          = 0.85   # heal/cure when pet HP ratio drops below this
+CRITICAL_HEALTH_THRESHOLD = 0.40   # cast heals back-to-back when below this
+GUARD_HEALTH_THRESHOLD    = 0.90   # say "all guard me" when pet HP ratio drops below this
 CHECK_INTERVAL        = 1500  # ms between main loop ticks
 FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting for pet
 FOLLOW_MAX_CHECKS     = 3     # max polls waiting for pet to arrive (total wait = FOLLOW_CHECK_INTERVAL * FOLLOW_MAX_CHECKS)
 PET_SCAN_RANGE        = 30     # tile radius to search for a friendly mobile
 GUARD_BREAK_DISTANCE  = 1    # tiles player must move from guard origin before pet is immediately recalled
+
+# Animal Whispering mastery spell
+WHISPER_ENABLED      = True
+WHISPER_INTERVAL_SEC = 1800  # seconds between casts (30 min)
 
 # Pet context menu entry indices (right-click the pet)
 PET_CMD_FOLLOW = 2   # "Command: Follow"
@@ -78,9 +83,10 @@ os.makedirs(os.path.dirname(STATS_FILE), exist_ok=True)
 
 # ─── Session gold tracking ────────────────────────────────────────────────────
 
-_pet_serial    = None
-_session_start = None
-_session_gold  = 0
+_pet_serial      = None
+_session_start   = None
+_session_gold    = 0
+_last_whisper    = 0.0
 
 
 def _append_gold_stat(gold_this_trip):
@@ -157,11 +163,19 @@ def transfer_gold():
     return total
 
 
+def _walk_to_drop():
+    """Step east → north → west to reach the drop-off container."""
+    for direction in ('East', 'North', 'West'):
+        Player.Walk(direction)
+        Misc.Pause(600)
+
+
 def do_banking(rb):
     """Travel home, deposit everything, then return to the farm rune."""
     if not travel_to_runebook(rb, RECALL_SETTLE_DELAY):
         log("Failed to travel home — banking aborted.", colors['red'])
         return False
+    _walk_to_drop()
     gold = transfer_gold()
     transfer_loot_to_chest()
     if gold and _session_start is not None:
@@ -261,12 +275,35 @@ def heal_pet(pet):
     Misc.Pause(1200)
 
 
+def heal_pet_critical(pet):
+    log("HP critical (%.0f%%) — rapid healing %s" % (
+        float(pet.Hits) / pet.HitsMax * 100, pet.Name), colors['red'])
+    for _ in range(3):
+        Spells.CastMagery('Greater Heal')
+        Target.WaitForTarget(3000, False)
+        Target.TargetExecute(pet.Serial)
+        Misc.Pause(800)
+
+
 def cure_pet(pet):
     log("Poisoned — curing %s" % pet.Name, colors['cyan'])
     Spells.CastMagery('Arch Cure')
     Target.WaitForTarget(3000, False)
     Target.TargetExecute(pet.Serial)
     Misc.Pause(1200)
+
+
+def cast_animal_whispering(pet):
+    global _last_whisper
+    if not WHISPER_ENABLED:
+        return
+    if time.time() - _last_whisper < WHISPER_INTERVAL_SEC:
+        return
+    log("Casting Animal Whispering on %s." % pet.Name, colors['cyan'])
+    Spells.Cast("Whispering")
+    if Target.WaitForTarget(4000, False):
+        Target.TargetExecute(pet.Serial)
+    _last_whisper = time.time()
 
 
 def guard_pet_if_low(pet):
@@ -286,6 +323,8 @@ def check_pet_health(pet):
     hp_ratio = float(pet.Hits) / pet.HitsMax
     if pet.Poisoned and hp_ratio < HEALTH_THRESHOLD:
         cure_pet(pet)
+    if hp_ratio < CRITICAL_HEALTH_THRESHOLD:
+        heal_pet_critical(pet)
     elif hp_ratio < HEALTH_THRESHOLD:
         heal_pet(pet)
 
@@ -392,6 +431,7 @@ def main():
 
         guard_pet_if_low(pet)
         check_pet_health(pet)
+        cast_animal_whispering(pet)
 
         if Player.DistanceTo(pet) > PET_FOLLOW_RANGE:
             is_guarding = False

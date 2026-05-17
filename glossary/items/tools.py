@@ -15,7 +15,7 @@ tools = {
     'smith\'s hammer': myItem(
         name = 'smith\'s hammer',
         itemID = 0x13E3,
-        color = 0x0000,
+        color = -1,       # -1 = any hue — matches plain iron through valorite runic hammers
         category = 'tool',
         weight = 8
     ),

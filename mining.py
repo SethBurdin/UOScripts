@@ -258,12 +258,14 @@ def _try_discard_ore(serial):
     return Items.FindBySerial(serial) is None
 
 
-def smelt_from_backpack():
-    """Smelt every ore stack currently in the player's backpack. Returns count."""
+def smelt_from_backpack(container_serial=None):
+    """Smelt every ore stack in container_serial (defaults to player backpack). Returns count."""
+    if container_serial is None:
+        container_serial = Player.Backpack.Serial
     count = 0
     Journal.Clear()
     for oid in ORE_IDS:
-        ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
+        ore = Items.FindByID(oid, -1, container_serial)
         while ore is not None:
             prev_serial = ore.Serial
             Items.UseItem(ore)
@@ -280,20 +282,20 @@ def smelt_from_backpack():
             Journal.Clear()
 
             if failed:
-                if not _try_discard_ore(prev_serial):
-                    log("Cannot discard stack 0x%08X (indoors?) – skipping ore type." % prev_serial, 0x3B)
-                    break  # can't drop here; move on to next ore ID
-                ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
+                if container_serial == Player.Backpack.Serial:
+                    if not _try_discard_ore(prev_serial):
+                        log("Cannot discard stack 0x%08X – skipping ore type." % prev_serial, 0x3B)
+                        break
+                    ore = Items.FindByID(oid, -1, container_serial)
+                else:
+                    break  # can't drop from a remote container; skip this ore type
                 continue
 
             count += 1
-            ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
+            ore = Items.FindByID(oid, -1, container_serial)
             if ore is not None and ore.Serial == prev_serial:
-                log("Ore unchanged after smelt – discarding.", 0x3B)
-                if not _try_discard_ore(prev_serial):
-                    log("Cannot discard stack 0x%08X – skipping ore type." % prev_serial, 0x3B)
-                    break
-                ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
+                log("Ore unchanged after smelt – skipping ore type.", 0x3B)
+                break
     return count
 
 
@@ -1198,9 +1200,11 @@ def auto_mine_spot(home_rb):
         if result == 'no_tool':
             if try_craft_pickaxe():
                 continue
-            log("Craft failed – trying pickaxe box at home.", 0x25)
-            grab_pickaxe_from_box()  # goes home, deposits, grabs pickaxe if available
-            return False  # run_auto_mode will re-navigate to a mining spot
+            log("Craft failed – going home for pickaxes.", 0x25)
+            if not grab_pickaxe_from_box():
+                log("No pickaxes available — stopping.", 0x25)
+                return None   # sentinel: stop run_auto_mode entirely
+            return False  # got pickaxes — run_auto_mode will re-navigate
 
         status = read_journal_status()
         log("Journal status: %s" % status, 0x3B)
@@ -1252,12 +1256,23 @@ def run_auto_mode():
 
         for slot, name in spots:
             _remount_if_needed()
+            if _count_tools() < 4 and cfg.pickaxe_box_serial is not None:
+                need = 4 - _count_tools()
+                log("Only %d pickaxe(s) — topping up before traveling." % _count_tools(), 0x3B)
+                _grab_pickaxes_from_box(need)
+                Misc.Pause(cfg.pause_after_transfer)
+            if _count_tools() == 0:
+                log("No pickaxes — stopping.", 0x25)
+                return
             log("Traveling to %s (slot %d)..." % (name, slot))
             if not travel_to_slot(mining_rb, slot, 2000):
                 log("Travel failed — skipping %s." % name, 0x25)
                 continue
 
-            if not auto_mine_spot(home_rb):
+            result = auto_mine_spot(home_rb)
+            if result is None:
+                return   # no pickaxes — stop entirely
+            if not result:
                 # Went home mid-cycle — re-acquire runebooks from new location
                 mining_rb, spots = _find_mining_runebook()
                 home_rb = find_runebook_by_label(cfg.auto_home_runebook)
@@ -1279,6 +1294,7 @@ def _home_deposit():
     Shared by finish(), grab_pickaxe_from_box(), and the tinkering fallback.
     Returns True if home was reached (deposit attempted regardless of container availability).
     """
+    global forge_serial
     home_rb = find_runebook_by_label(cfg.auto_home_runebook)
     if home_rb is None:
         log("No home runebook – cannot go home.", 0x25)
@@ -1294,7 +1310,11 @@ def _home_deposit():
     for _ in range(2):
         Player.Walk('Up')
         Misc.Pause(400)
+    if Player.Mount is not None:
+        Mobiles.UseMobile(Player.Serial)
+        Misc.Pause(1500)
     pack, fire = find_beetles()
+
     if fire is not None:
         log("Smelting backpack ore with fire beetle...")
         smelt_with_fire_beetle(fire)
@@ -1310,44 +1330,104 @@ def _home_deposit():
                     Misc.Pause(cfg.pause_after_transfer)
                     smelt_with_fire_beetle(fire)
                     ore = Items.FindByID(oid, -1, pack.Backpack.Serial)
+
     dest = Items.FindBySerial(_config.quick_dropbox)
     if dest is None:
         log("Drop container (0x%X) not found." % _config.quick_dropbox, 0x25)
     else:
+        # Always transfer whatever remains in the pack beetle to the drop box.
+        # If a fire beetle already smelted everything above, these calls are no-ops.
+        if pack is not None and pack.Backpack is not None:
+            Items.UseItem(pack.Backpack)
+            Items.WaitForContents(pack.Backpack, 3000)
+            Misc.Pause(600)
+            _deposit_stacks(pack.Backpack.Serial, ORE_IDS,   dest, "ore from beetle")
+            _deposit_stacks(pack.Backpack.Serial, INGOT_IDS, dest, "ingots from beetle")
+
         _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
         _deposit_stacks(Player.Backpack.Serial, ORE_IDS,   dest, "remaining ore")
+
+        # Smelt ore sitting in the drop box
+        smelt_forge = fire.Serial if fire is not None else forge_serial
+        if smelt_forge is None:
+            smelt_forge = find_forge_nearby()
+        if smelt_forge is not None:
+            prev_forge   = forge_serial
+            forge_serial = smelt_forge
+            Items.UseItem(dest.Serial)
+            Items.WaitForContents(dest, 3000)
+            Misc.Pause(600)
+            n = smelt_from_backpack(dest.Serial)
+            forge_serial = prev_forge
+            if n:
+                log("Smelted %d stack(s) from drop box." % n)
+                _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots (post-smelt)")
+        else:
+            log("No forge available — ore left in drop box for manual smelt.", 0x3B)
     return True
+
+
+def _count_tools():
+    """Count total mining tools in the player's backpack."""
+    count = 0
+    for tid in MINING_TOOL_IDS:
+        stack = Items.FindByID(tid, -1, Player.Backpack.Serial)
+        if stack is not None:
+            count += stack.Amount
+    return count
+
+
+def _grab_pickaxes_from_box(needed):
+    """
+    Open cfg.pickaxe_box_serial and pull up to `needed` pickaxes into the backpack.
+    Assumes the player is already at home and the box is in range.
+    Returns the number grabbed, or -1 if the box could not be found.
+    """
+    if cfg.pickaxe_box_serial is None:
+        log("No pickaxe box serial configured (cfg.pickaxe_box_serial).", 0x25)
+        return -1
+    if Gumps.HasGump():
+        Misc.Pause(1200)
+    box = Items.FindBySerial(cfg.pickaxe_box_serial)
+    if box is None:
+        Misc.Pause(1000)
+        box = Items.FindBySerial(cfg.pickaxe_box_serial)
+    if box is None:
+        log("Pickaxe box (0x%X) not found." % cfg.pickaxe_box_serial, 0x25)
+        return -1
+    Items.UseItem(box.Serial)
+    Items.WaitForContents(box, 3000)
+    Misc.Pause(600)
+    grabbed = 0
+    for tid in MINING_TOOL_IDS:
+        if grabbed >= needed:
+            break
+        tool = Items.FindByID(tid, -1, box.Serial)
+        while tool is not None and grabbed < needed:
+            take = min(tool.Amount, needed - grabbed)
+            Items.Move(tool, Player.Backpack, take)
+            Misc.Pause(cfg.pause_after_transfer)
+            grabbed += take
+            tool = Items.FindByID(tid, -1, box.Serial)
+    if grabbed:
+        log("Grabbed %d pickaxe(s) from box." % grabbed)
+    else:
+        log("No pickaxes in box (0x%X)." % cfg.pickaxe_box_serial, 0x25)
+    return grabbed
 
 
 def grab_pickaxe_from_box():
     """
-    Travel home, deposit ore/ingots, then grab one pickaxe from cfg.pickaxe_box_serial.
-    Returns True if a pickaxe is now in the backpack.
+    Travel home, deposit ore/ingots, then grab 4 pickaxes from cfg.pickaxe_box_serial.
+    Returns True if the player now has at least one pickaxe.
     """
     if cfg.pickaxe_box_serial is None:
         log("No pickaxe box serial configured (cfg.pickaxe_box_serial).", 0x25)
         return False
     if not _home_deposit():
         return False
-    box = Items.FindBySerial(cfg.pickaxe_box_serial)
-    if box is None:
-        log("Pickaxe box (0x%X) not found at home." % cfg.pickaxe_box_serial, 0x25)
-        return False
-    if Gumps.HasGump():
-        Misc.Pause(1200)
-    Items.UseItem(box)
-    Items.WaitForContents(box, 3000)
-    Misc.Pause(600)
-    for tid in MINING_TOOL_IDS:
-        tool = Items.FindByID(tid, -1, cfg.pickaxe_box_serial)
-        if tool is not None:
-            Items.Move(tool, Player.Backpack, 1)
-            Misc.Pause(cfg.pause_after_transfer)
-            if get_tool() is not None:
-                log("Grabbed pickaxe from box.")
-                return True
-    log("No pickaxes in box (0x%X)." % cfg.pickaxe_box_serial, 0x25)
-    return False
+    _grab_pickaxes_from_box(4)
+    return _count_tools() > 0
 
 
 def finish():

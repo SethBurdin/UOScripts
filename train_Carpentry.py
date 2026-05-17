@@ -14,6 +14,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from glossary.colors import colors
 from glossary.crafting.carpentry import FindCarpentryTool, carpentryCraftables
+from glossary.crafting.tinkering import FindTinkeringTool
+from utilities.gumps import GumpSelection
 from utilities.items import FindNumberOfItems
 from crate_manager import make_new_output
 
@@ -25,7 +27,18 @@ WEIGHT_BUFFER = 50     # stones below MaxWeight to trigger offload
 
 BOARD_IDS     = [0x1BD7, 0x1BDD]   # plain boards, hue 0 only
 MAKE_LAST_BTN = None               # set once known (record a macro pressing Make Last)
-TOOLS_BOX_SERIAL = 0x400EC30D            # serial of the container holding spare carpentry tools
+
+# Smith's hammer via tinkering — confirmed from macro recording
+# Gump 2653346093, button 15 = Tools category, button 93 = smith's hammer
+HAMMER_ITEM_ID        = 0x13E3
+HAMMER_CRAFT_GUMP_ID  = 2653346093
+HAMMER_CRAFT_PATH     = (
+    GumpSelection(2653346093, 15),  # Tools category
+    GumpSelection(2653346093, 93),  # smith's hammer
+)
+
+# Resolved at runtime via prompt
+_tools_box = None
 
 # Known item IDs per craft tier.  None = unknown, discovered after first craft.
 # Verify with Object Inspector and fill in any that are still None.
@@ -128,35 +141,75 @@ def dump_to_output(output_box, item_id):
 
 # ── Main training loop ────────────────────────────────────────────────────────
 
+def craft_hammer():
+    """
+    Craft a new hammer using HAMMER_CRAFT_PATH.
+    HAMMER_CRAFT_GUMP_ID and HAMMER_CRAFT_PATH must be configured — record a macro
+    of crafting a hammer to discover the gump ID and button IDs.
+    Returns the crafted Item, or None.
+    """
+    if HAMMER_CRAFT_PATH is None or HAMMER_CRAFT_GUMP_ID is None:
+        log('HAMMER_CRAFT_PATH not configured — cannot craft hammer.', colors['red'])
+        return None
+
+    # Need tinker's tools to open the tinkering gump — pull from box if backpack is empty
+    tinkering_tool = FindTinkeringTool(Player.Backpack)
+    if tinkering_tool is None and _tools_box is not None:
+        Items.UseItem(_tools_box)
+        Items.WaitForContents(_tools_box, 3000)
+        Misc.Pause(600)
+        tinkering_tool = FindTinkeringTool(_tools_box)
+        if tinkering_tool is not None:
+            Items.Move(tinkering_tool, Player.Backpack, 1)
+            Misc.Pause(PAUSE_MOVE)
+            tinkering_tool = FindTinkeringTool(Player.Backpack)
+    if tinkering_tool is None:
+        log('No tinker\'s tools found — cannot craft hammer.', colors['red'])
+        return None
+
+    log('Crafting a new hammer...', colors['cyan'])
+    before = {item.Serial for item in (Player.Backpack.Contains or [])}
+    Items.UseItem(tinkering_tool)
+    Misc.Pause(2000)
+    for i, step in enumerate(HAMMER_CRAFT_PATH):
+        Gumps.SendAction(step.gumpID, step.buttonID)
+        if i < len(HAMMER_CRAFT_PATH) - 1:
+            Misc.Pause(500)
+    Misc.Pause(1000)
+
+    for item in (Player.Backpack.Contains or []):
+        if item.Serial not in before and item.ItemID == HAMMER_ITEM_ID:
+            log('Crafted hammer: %s (0x%X).' % (item.Name, item.Serial), colors['green'])
+            return item
+
+    log('Hammer craft did not produce the expected item.', colors['red'])
+    return None
+
+
 def get_tool():
-    """Return a carpentry tool from the backpack, pulling one from TOOLS_BOX_SERIAL if needed."""
+    """Return a carpentry tool from the backpack, pulling one from _tools_box if needed.
+    If the tools box is empty, attempts to craft a new hammer."""
     tool = FindCarpentryTool(Player.Backpack)
     if tool is not None:
         return tool
-    if TOOLS_BOX_SERIAL is None:
+    if _tools_box is None:
         return None
-    spare_box = Items.FindBySerial(TOOLS_BOX_SERIAL)
-    if spare_box is None:
-        log('Tools box (0x%X) not found.' % TOOLS_BOX_SERIAL, colors['red'])
-        return None
-    # Wait for any open gump (e.g. the carpentry gump left open after the last craft)
-    # to settle before using the container — otherwise Razor routes the UseItem
-    # through the active gump and the open/contents load fails.
+    # Wait for any open gump to settle before opening the container.
     if Gumps.HasGump():
         Misc.Pause(1200)
-    for attempt in range(3):
+    for attempt in range(1, 4):
         Journal.Clear()
-        Items.UseItem(spare_box)
-        Items.WaitForContents(spare_box, 3000)
+        Items.UseItem(_tools_box)
+        Items.WaitForContents(_tools_box, 3000)
         Misc.Pause(600)
         if not Journal.Search('You must wait'):
             break
-        log('Server busy – retrying tools box open (%d/3).' % (attempt + 1), colors['yellow'])
+        log('Server busy – retrying tools box open (%d/3).' % attempt, colors['yellow'])
         Misc.Pause(1500)
-    spare = FindCarpentryTool(spare_box)
+    spare = FindCarpentryTool(_tools_box)
     if spare is None:
-        log('Tools box is empty.', colors['red'])
-        return None
+        log('Tools box is empty — attempting to craft a hammer.', colors['yellow'])
+        return craft_hammer()
     Items.Move(spare, Player.Backpack, 1)
     Misc.Pause(PAUSE_MOVE)
     tool = FindCarpentryTool(Player.Backpack)
@@ -327,4 +380,7 @@ boards_box = prompt_container('Target the BOARDS supply container:')
 if boards_box is not None:
     output_box = prompt_container('Target the OUTPUT container (for crafted items):')
     if output_box is not None:
-        TrainCarpentry(boards_box, output_box)
+        tools_box = prompt_container('Target the TOOLS container (carpentry tools / hammers):')
+        if tools_box is not None:
+            _tools_box = tools_box
+            TrainCarpentry(boards_box, output_box)

@@ -45,7 +45,7 @@ def GetEnemyNotorieties( minRange = 0, maxRange = 12 ):
     ] )
 
 
-def GetEnemies( Mobiles, minRange = 0, maxRange = 12, notorieties = GetEnemyNotorieties(), IgnorePartyMembers = False ):
+def GetEnemies( Mobiles, minRange = 0, maxRange = 12, notorieties = GetEnemyNotorieties(), IgnorePartyMembers = True ):
     '''
     Returns a list of the nearby enemies with the specified notorieties
     '''

@@ -1,0 +1,42 @@
+[
+  {
+    "Description": "1",
+    "Delay": 0,
+    "Range": 0,
+    "Bag": 1076355802,
+    "Selected": false,
+    "NoOpenCorpse": false
+  },
+  {
+    "Description": "all",
+    "Delay": 900,
+    "Range": 2,
+    "Bag": 1074357171,
+    "Selected": true,
+    "NoOpenCorpse": false
+  },
+  {
+    "Description": "gold",
+    "Delay": 900,
+    "Range": 2,
+    "Bag": 0,
+    "Selected": false,
+    "NoOpenCorpse": false
+  },
+  {
+    "Description": "dexxer",
+    "Delay": 800,
+    "Range": 2,
+    "Bag": 0,
+    "Selected": false,
+    "NoOpenCorpse": false
+  },
+  {
+    "Description": "asdf",
+    "Delay": 900,
+    "Range": 2,
+    "Bag": 0,
+    "Selected": false,
+    "NoOpenCorpse": false
+  }
+]

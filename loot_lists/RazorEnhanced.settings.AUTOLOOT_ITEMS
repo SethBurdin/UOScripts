@@ -1,0 +1,2189 @@
+[
+  {
+    "Name": "gold coin (0EED)",
+    "Graphics": 3821,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "1"
+  },
+  {
+    "Name": "zoogi fungus (26B7)",
+    "Graphics": 9911,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "1"
+  },
+  {
+    "Name": "Dragon's Blood (4077)",
+    "Graphics": 16503,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "1"
+  },
+  {
+    "Name": "Daemon Bone%s% (0F80)",
+    "Graphics": 3968,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "1"
+  },
+  {
+    "Name": "Daemon Bone%s% (0F80)",
+    "Graphics": 3968,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "dexxer"
+  },
+  {
+    "Name": "gold coin (0EED)",
+    "Graphics": 3821,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "dexxer"
+  },
+  {
+    "Name": "Crystal of Shame",
+    "Graphics": 16395,
+    "Color": 2611,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "dexxer"
+  },
+  {
+    "Name": "3 zoogi fungus",
+    "Graphics": 9911,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "dexxer"
+  },
+  {
+    "Name": "10 clean bandage",
+    "Graphics": 3617,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "dexxer"
+  },
+  {
+    "Name": "Dragon Easter Egg",
+    "Graphics": 45773,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "dexxer"
+  },
+  {
+    "Name": "gold coin (0EED)",
+    "Graphics": 3821,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "gold"
+  },
+  {
+    "Name": "arrow (0F3F)",
+    "Graphics": 3903,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": false,
+    "Properties": [],
+    "List": "gold"
+  },
+  {
+    "Name": "7 ore",
+    "Graphics": 6583,
+    "Color": 2413,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "asdf"
+  },
+  {
+    "Name": "5 ore",
+    "Graphics": 6583,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "asdf"
+  },
+  {
+    "Name": "299 ingots",
+    "Graphics": 7154,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "asdf"
+  },
+  {
+    "Name": "200 gold coin",
+    "Graphics": 3821,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "asdf"
+  },
+  {
+    "Name": "2 Fertile Dirt",
+    "Graphics": 3969,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "asdf"
+  },
+  {
+    "Name": "A Tattered Treasure Map Leading to a Mage's Supply",
+    "Graphics": 5356,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [],
+    "List": "asdf"
+  },
+  {
+    "Name": "studded leggings (13DA)",
+    "Graphics": 5082,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "norse helm (140C)",
+    "Graphics": 5132,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "platemail (1415)",
+    "Graphics": 5141,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gold coin (0EED)",
+    "Graphics": 3821,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gold coin (0EED)",
+    "Graphics": 3821,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Cyclone (0901)",
+    "Graphics": 2305,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "platemail legs (1411)",
+    "Graphics": 5137,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "feathered hat (171A)",
+    "Graphics": 5914,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bracelet (1086)",
+    "Graphics": 4230,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "studded tunic (13DB)",
+    "Graphics": 5083,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "orc mask (141B)",
+    "Graphics": 5147,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "plate helm (1412)",
+    "Graphics": 5138,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "flower garland (2306)",
+    "Graphics": 8966,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "short spear (1403)",
+    "Graphics": 5123,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gargoyle_leather_arm (0302)",
+    "Graphics": 770,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Gargish Ring (4212)",
+    "Graphics": 16914,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "mace (0F5C)",
+    "Graphics": 3932,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "heavy crossbow (13FD)",
+    "Graphics": 5117,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "war fork (1405)",
+    "Graphics": 5125,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "crossbow (0F50)",
+    "Graphics": 3920,
+    "Color": 1276,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "crossbow (0F50)",
+    "Graphics": 3920,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "hatchet (0F43)",
+    "Graphics": 3907,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bow (13B2)",
+    "Graphics": 5042,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bow (13B2)",
+    "Graphics": 5042,
+    "Color": 1270,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Gargish Bracelet (4211)",
+    "Graphics": 16913,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "longsword (0F61)",
+    "Graphics": 3937,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "longsword (0F61)",
+    "Graphics": 3937,
+    "Color": 1261,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "halberd (143E)",
+    "Graphics": 5182,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "ring (108A)",
+    "Graphics": 4234,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "pike (26BE)",
+    "Graphics": 9918,
+    "Color": 1276,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "chainmail leggings (13BE)",
+    "Graphics": 5054,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "leather tunic (13CC)",
+    "Graphics": 5068,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "large battle axe (13FB)",
+    "Graphics": 5115,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "maul (143B)",
+    "Graphics": 5179,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Order shield (1BC4)",
+    "Graphics": 7108,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Large Stone Shield (4205)",
+    "Graphics": 16901,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "platemail gorget (1413)",
+    "Graphics": 5139,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "chainmail tunic (13BF)",
+    "Graphics": 5055,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "viking sword (13B9)",
+    "Graphics": 5049,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "jester hat (171C)",
+    "Graphics": 5916,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "corpse (2006)",
+    "Graphics": 8198,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "wooden shield (1B7A)",
+    "Graphics": 7034,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gnarled staff (13F8)",
+    "Graphics": 5112,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "two handed axe (1443)",
+    "Graphics": 5187,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "skullcap (1544)",
+    "Graphics": 5444,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bone leggings (1452)",
+    "Graphics": 5202,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "kite shield (1B74)",
+    "Graphics": 7028,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "floppy hat (1713)",
+    "Graphics": 5907,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Dual Short Axes (08FD)",
+    "Graphics": 2301,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Stone War Sword (0900)",
+    "Graphics": 2304,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bone harvester (26BB)",
+    "Graphics": 9915,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "buckler  (1B73)",
+    "Graphics": 7027,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "leather bustier (1C0A)",
+    "Graphics": 7178,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "close helmet (1408)",
+    "Graphics": 5128,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bladed staff (26BD)",
+    "Graphics": 9917,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "butcher knife (13F6)",
+    "Graphics": 5110,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "leather cap (1DB9)",
+    "Graphics": 7609,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bone helmet (1451)",
+    "Graphics": 5201,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "pitchfork (0E87)",
+    "Graphics": 3719,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "scimitar (13B6)",
+    "Graphics": 5046,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "map (14EC)",
+    "Graphics": 5356,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "black staff (0DF0)",
+    "Graphics": 3568,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bone gloves (1450)",
+    "Graphics": 5200,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "composite bow (26C2)",
+    "Graphics": 9922,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "composite bow (26C2)",
+    "Graphics": 9922,
+    "Color": 1272,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "double bladed staff (26BF)",
+    "Graphics": 9919,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bear mask (1545)",
+    "Graphics": 5445,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Gargish Kite Shield (4201)",
+    "Graphics": 16897,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "helmet (140A)",
+    "Graphics": 5130,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bardiche (0F4D)",
+    "Graphics": 3917,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "kryss (1401)",
+    "Graphics": 5121,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bracelet (1F06)",
+    "Graphics": 7942,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "battle axe (0F47)",
+    "Graphics": 3911,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "repeating crossbow (26C3)",
+    "Graphics": 9923,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "ringmail tunic (13EC)",
+    "Graphics": 5100,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bronze shield (1B72)",
+    "Graphics": 7026,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "leather sleeves (13CD)",
+    "Graphics": 5069,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "axe (0F49)",
+    "Graphics": 3913,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "tricorne hat (171B)",
+    "Graphics": 5915,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "kite shield (1B78)",
+    "Graphics": 7032,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "ringmail gloves (13EB)",
+    "Graphics": 5099,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bascinet (140E)",
+    "Graphics": 5134,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bone armor (144F)",
+    "Graphics": 5199,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "scepter (26BC)",
+    "Graphics": 9916,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Chaos shield (1BC3)",
+    "Graphics": 7107,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gargoyle_plate_chest (030A)",
+    "Graphics": 778,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "studded sleeves (13DC)",
+    "Graphics": 5084,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "plate armor (1C04)",
+    "Graphics": 7172,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "lance (26C0)",
+    "Graphics": 9920,
+    "Color": 1273,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Gargish Talwar (0908)",
+    "Graphics": 2312,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "pickaxe (0E86)",
+    "Graphics": 3718,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "ringmail leggings (13F0)",
+    "Graphics": 5104,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bone arms (144E)",
+    "Graphics": 5198,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "ring (1F09)",
+    "Graphics": 7945,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "studded gorget (13D6)",
+    "Graphics": 5078,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gargoyle_stone_kilt_ (0288)",
+    "Graphics": 648,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Dual Pointed Spear (0904)",
+    "Graphics": 2308,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "katana (13FF)",
+    "Graphics": 5119,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "deer mask (1547)",
+    "Graphics": 5447,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gargoyle_leather_leg (0305)",
+    "Graphics": 773,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "wide-brim hat (1714)",
+    "Graphics": 5908,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "double axe (0F4B)",
+    "Graphics": 3915,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gargoyle_plate_legs_ (030E)",
+    "Graphics": 782,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "metal shield (1B7B)",
+    "Graphics": 7035,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "hammer pick (143D)",
+    "Graphics": 5181,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "dagger (0F52)",
+    "Graphics": 3922,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gargoyle_plate_arms_ (0308)",
+    "Graphics": 776,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "broadsword (0F5E)",
+    "Graphics": 3934,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "straw hat (1717)",
+    "Graphics": 5911,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Disc Mace (0903)",
+    "Graphics": 2307,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Glass Sword (090C)",
+    "Graphics": 2316,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Glass Staff (0905)",
+    "Graphics": 2309,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Boomerang (08FF)",
+    "Graphics": 2303,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "studded bustier (1C0C)",
+    "Graphics": 7180,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "heater shield (1B76)",
+    "Graphics": 7030,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Gargish Earrings (4213)",
+    "Graphics": 16915,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "shepherd's crook (0E81)",
+    "Graphics": 3713,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "platemail arms (1410)",
+    "Graphics": 5136,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bandana (1540)",
+    "Graphics": 5440,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "cutlass (1441)",
+    "Graphics": 5185,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "cutlass (1441)",
+    "Graphics": 5185,
+    "Color": 1267,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "leather gorget (13C7)",
+    "Graphics": 5063,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "war mace (1407)",
+    "Graphics": 5127,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "gargoyle_stone_arms_ (0284)",
+    "Graphics": 644,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "studded gloves (13D5)",
+    "Graphics": 5077,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "cap (1715)",
+    "Graphics": 5909,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "tall straw hat (1716)",
+    "Graphics": 5910,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "bonnet (1719)",
+    "Graphics": 5913,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "crescent blade (26C1)",
+    "Graphics": 9921,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "war axe (13B0)",
+    "Graphics": 5040,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "leather leggings (13CB)",
+    "Graphics": 5067,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Samurai Armor Arms (277F)",
+    "Graphics": 10111,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Plate Jingasa (2784)",
+    "Graphics": 10116,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Tekagi (27AB)",
+    "Graphics": 10155,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  },
+  {
+    "Name": "Leather Gloves (13C6)",
+    "Graphics": 5062,
+    "Color": 0,
+    "LootBagOverride": 0,
+    "Selected": true,
+    "Properties": [
+      {
+        "Name": "Luck",
+        "Minimum": 100,
+        "Maximum": 0
+      }
+    ],
+    "List": "all"
+  }
+]

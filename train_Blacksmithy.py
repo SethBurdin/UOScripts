@@ -6,77 +6,220 @@ Last Contribution By: TheWarDoctor95 - April 26, 2019
 Description: Trains Blacksmithy to its cap
 '''
 
-import config
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from glossary.items.ores import ores
-from glossary.crafting.blacksmithing import blacksmithTools, FindBlacksmithTool, blacksmithCraftables
+from glossary.crafting.blacksmithing import FindBlacksmithTool, blacksmithCraftables
+from glossary.crafting.tinkering import FindTinkeringTool
 from glossary.colors import colors
-from utilities.items import FindItem, FindNumberOfItems, MoveItem
+from utilities.items import FindItem, FindNumberOfItems
+from utilities.gumps import GumpSelection
 
-# Set to serial of bag or 'pet' for the mount that you are on
-# Set to None if you don't want to keep slayers
-slayerBag = 'pet'
-petName = 'Beetlejuice'
+BLACKSMITH_GUMP_ID   = 2653346093   # confirmed from gump log (0x9e26d92d)
 
-def FindPet():
+# Smith's hammer via tinkering — confirmed from macro recording
+HAMMER_ITEM_ID       = 0x13E3
+HAMMER_CRAFT_GUMP_ID = 2653346093
+HAMMER_CRAFT_PATH    = (
+    GumpSelection(2653346093, 15),  # Tools category
+    GumpSelection(2653346093, 93),  # smith's hammer
+)
+
+INGOT_ID      = 0x1BF2
+PAUSE_MOVE    = 1200
+LOW_INGOTS    = 30    # pull from materials box when backpack drops below this
+REFILL_INGOTS = 150   # how many ingots to pull each refill
+
+RESOURCE_FAIL_PHRASES = [
+    'You do not have sufficient',
+    'not enough',
+    'insufficient',
+    'You do not have the',
+]
+
+_tools_box     = None  # set at runtime via prompt
+_materials_box = None  # set at runtime via prompt
+
+
+def _prompt_container(label):
+    Misc.SendMessage('[smith] Target the %s:' % label, colors['cyan'])
+    serial = Target.PromptTarget('Target the %s:' % label)
+    if not serial or serial == 0:
+        return None
+    box = Items.FindBySerial(int(serial))
+    if box is None:
+        Misc.SendMessage('[smith] Could not find that container.', colors['red'])
+    return box
+
+
+def prompt_tools_box():
+    global _tools_box
+    _tools_box = _prompt_container('TOOLS container (smith\'s hammers)')
+    return _tools_box
+
+
+def prompt_materials_box():
+    global _materials_box
+    _materials_box = _prompt_container('MATERIALS container (ingots)')
+    return _materials_box
+
+
+def transfer_colored_ingots_to_box():
+    """Move any non-plain-iron ingots (hue != 0) from backpack to _materials_box."""
+    if _materials_box is None:
+        return
+    moved = 0
+    stack = Items.FindByID(INGOT_ID, -1, Player.Backpack.Serial)
+    while stack is not None:
+        if stack.Hue != 0:
+            Items.Move(stack, _materials_box, stack.Amount)
+            Misc.Pause(PAUSE_MOVE)
+            moved += stack.Amount
+        stack = Items.FindByID(INGOT_ID, -1, Player.Backpack.Serial)
+        if stack is not None and stack.Hue == 0:
+            break
+    if moved:
+        Misc.SendMessage('[smith] Moved %d colored ingot(s) to materials box.' % moved, colors['cyan'])
+
+
+def pull_ingots(amount_needed):
+    """Pull ingots from _materials_box into backpack until we have enough."""
+    if _materials_box is None:
+        Misc.SendMessage('[smith] pull_ingots: no materials box set.', colors['red'])
+        return
+    Items.UseItem(_materials_box.Serial)
+    Items.WaitForContents(_materials_box, 3000)
+    Misc.Pause(600)
+    have = FindNumberOfItems(INGOT_ID, Player.Backpack)[INGOT_ID]
+    stack = Items.FindByID(INGOT_ID, 0x0000, _materials_box.Serial)
+    while stack is not None and have < amount_needed:
+        pull = min(stack.Amount, amount_needed - have)
+        Items.Move(stack, Player.Backpack, pull)
+        Misc.Pause(PAUSE_MOVE)
+        have = FindNumberOfItems(INGOT_ID, Player.Backpack)[INGOT_ID]
+        stack = Items.FindByID(INGOT_ID, 0x0000, _materials_box.Serial)
+    Misc.SendMessage('[smith] Backpack: %d iron ingots.' % have, colors['cyan'])
+
+
+def get_smith_tool():
+    """Return a blacksmithing tool from backpack, pulling from _tools_box or crafting if needed."""
+    tool = FindBlacksmithTool(Player.Backpack)
+    if tool is not None:
+        return tool
+
+    if _tools_box is not None:
+        for attempt in range(1, 4):
+            Journal.Clear()
+            Items.UseItem(_tools_box)
+            Items.WaitForContents(_tools_box, 3000)
+            Misc.Pause(600)
+            if not Journal.Search('You must wait'):
+                break
+            Misc.SendMessage('[smith] Server busy – retry %d/3.' % attempt, colors['yellow'])
+            Misc.Pause(1500)
+        spare = FindBlacksmithTool(_tools_box)
+        if spare is not None:
+            Items.Move(spare, Player.Backpack, 1)
+            Misc.Pause(PAUSE_MOVE)
+            return FindBlacksmithTool(Player.Backpack)
+        Misc.SendMessage('[smith] Tools box empty — crafting a hammer.', colors['yellow'])
+
+    return craft_smith_hammer()
+
+
+def craft_smith_hammer():
+    """Craft a smith's hammer using tinker's tools via the tinkering gump."""
+    tinkering_tool = FindTinkeringTool(Player.Backpack)
+    if tinkering_tool is None and _tools_box is not None:
+        Items.UseItem(_tools_box)
+        Items.WaitForContents(_tools_box, 3000)
+        Misc.Pause(600)
+        tinkering_tool = FindTinkeringTool(_tools_box)
+        if tinkering_tool is not None:
+            Items.Move(tinkering_tool, Player.Backpack, 1)
+            Misc.Pause(PAUSE_MOVE)
+            tinkering_tool = FindTinkeringTool(Player.Backpack)
+    if tinkering_tool is None:
+        Misc.SendMessage('[smith] No tinker\'s tools found — cannot craft hammer.', colors['red'])
+        return None
+
+    # Close any open gump (e.g. blacksmithing gump still open) before switching to tinkering
+    if Gumps.HasGump():
+        Gumps.SendAction(int(Gumps.CurrentGump()), 0)
+        Misc.Pause(600)
+
+    Misc.SendMessage('[smith] Crafting smith\'s hammer...', colors['cyan'])
+    before = {item.Serial for item in (Player.Backpack.Contains or [])}
+    Items.UseItem(tinkering_tool.Serial)
+    Misc.Pause(2000)
+    for i, step in enumerate(HAMMER_CRAFT_PATH):
+        Gumps.SendAction(step.gumpID, step.buttonID)
+        if i < len(HAMMER_CRAFT_PATH) - 1:
+            Misc.Pause(500)
+    Misc.Pause(1000)
+
+    for item in (Player.Backpack.Contains or []):
+        if item.Serial not in before and item.ItemID == HAMMER_ITEM_ID:
+            Misc.SendMessage('[smith] Crafted hammer: %s.' % item.Name, colors['green'])
+            return item
+
+    Misc.SendMessage('[smith] Hammer craft did not produce expected item.', colors['red'])
+    return None
+
+
+def _open_smelt_gump(tool):
+    """Open the blacksmithing gump with retry for tool recharge. Returns True on success."""
+    for _ in range(5):
+        Journal.Clear()
+        Items.UseItem(tool.Serial)
+        if Gumps.WaitForGump(BLACKSMITH_GUMP_ID, 3000):
+            return True
+        if Journal.Search('You must wait'):
+            Misc.Pause(2000)
+        else:
+            break
+    Misc.SendMessage('[smith] Smelt gump did not open.', colors['red'])
+    return False
+
+
+def SmeltItems(itemID):
     '''
-    Dismounts and finds the pet you were mounted on
+    Smelts all items in the player's backpack that match the item ID.
+    Opens the gump once and reuses it across all items — avoids stacking
+    target cursors from repeated UseItem calls while the gump is already open.
     '''
-
-    global petName
-
-    if Player.Mount != None:
-        Mobiles.UseMobile( Player.Serial )
-        Misc.Pause( 700 )
-
-    petFilter = Mobiles.Filter()
-    petFilter.Enabled = True
-    petFilter.RangeMin = 0
-    petFilter.RangeMax = 1
-    petFilter.Name = petName
-
-    pet = Mobiles.ApplyFilter( petFilter )[ 0 ]
-    return pet
-
-
-def SmeltItems( itemID ):
-    '''
-    Smelts all items in the player's backpack that match the item ID given
-    Returns True if all items were smelted successfully, False if not all the items were smelted
-    '''
-
-    tool = FindBlacksmithTool( Player.Backpack )
-    if tool == None:
-        Player.HeadMessage( colors[ 'red' ], 'Ran out of tools!' )
+    tool = get_smith_tool()
+    if tool is None:
+        Misc.SendMessage('[smith] Ran out of tools!', colors['red'])
         return False
 
-    itemToSmelt = FindItem( itemID, Player.Backpack )
-    while itemToSmelt != None and tool != None:
-        # Make sure the tool isn't broken. If it is broken, this will return None
-        tool = Items.FindBySerial( tool.Serial )
-        if tool == None:
-           tool = FindBlacksmithTool( Player.Backpack )
-           if tool == None:
-               Player.HeadMessage( colors[ 'red' ], 'Ran out of tools!' )
-               return False
+    itemToSmelt = FindItem(itemID, Player.Backpack)
+    if itemToSmelt is None:
+        return True
 
-        Items.UseItem( tool )
-        Gumps.WaitForGump( 949095101, 2000 )
-        Gumps.SendAction( 949095101, 14 )
+    if not _open_smelt_gump(tool):
+        return False
 
-        Target.WaitForTarget( 2000, True )
-        Target.TargetExecute( itemToSmelt.Serial )
+    while itemToSmelt is not None:
+        tool = Items.FindBySerial(tool.Serial)
+        if tool is None:
+            tool = get_smith_tool()
+            if tool is None:
+                Misc.SendMessage('[smith] Ran out of tools!', colors['red'])
+                return False
+            if not _open_smelt_gump(tool):
+                return False
 
-        # Wait for the smelting to finish
-        Misc.Pause( 1000 )
+        Target.Cancel()
+        Misc.Pause(200)
+        Gumps.SendAction(BLACKSMITH_GUMP_ID, 14)
+        if not Target.WaitForTarget(3000, False):
+            Misc.SendMessage('[smith] Smelt target cursor did not appear.', colors['yellow'])
+            break
+        Target.TargetExecute(itemToSmelt.Serial)
+        Misc.Pause(1200)
 
-        # Close the Blacksmithing gump
-        Gumps.WaitForGump( 949095101, 2000 )
-        Gumps.SendAction( 949095101, 0 )
-
-        itemToSmelt = FindItem( itemID, Player.Backpack )
+        itemToSmelt = FindItem(itemID, Player.Backpack)
 
     return True
 
@@ -90,18 +233,18 @@ def TrainBlacksmithing():
         Player.HeadMessage( colors[ 'green' ], 'Your Blacksmithy is already at its skill cap!' )
         return
 
-    tool = FindBlacksmithTool( Player.Backpack )
-    if tool == None:
-        Player.HeadMessage( colors[ 'red' ], 'No tools to train with!' )
+    tool = get_smith_tool()
+    if tool is None:
+        Misc.SendMessage('[smith] No tools found and could not craft one — stopping.', colors['red'])
         return
 
     while not Player.IsGhost and Player.GetRealSkillValue( 'Blacksmith' ) < Player.GetSkillCap( 'Blacksmith' ):
         # Make sure the tool isn't broken. If it is broken, this will return None
         tool = Items.FindBySerial( tool.Serial )
-        if tool == None:
-            tool = FindBlacksmithTool( Player.Backpack )
-            if tool == None:
-                Player.HeadMessage( colors[ 'red' ], 'Ran out of tools!' )
+        if tool is None:
+            tool = get_smith_tool()
+            if tool is None:
+                Misc.SendMessage('[smith] Ran out of tools and could not replenish — stopping.', colors['red'])
                 break
 
         # Select the item to craft
@@ -115,87 +258,61 @@ def TrainBlacksmithing():
             itemToCraft = blacksmithCraftables[ 'maul' ]
         elif Player.GetSkillValue( 'Blacksmith' ) < 55.0:
             itemToCraft = blacksmithCraftables[ 'cutlass' ]
-        elif Player.GetSkillValue( 'Blacksmith' ) < 59.5:
-            itemToCraft = blacksmithCraftables[ 'longsword' ]
-        elif Player.GetSkillValue( 'Blacksmith' ) < 95.6:
-            itemToCraft = blacksmithCraftables[ 'short spear' ]
-        elif Player.GetSkillValue( 'Blacksmith' ) < 106.4:
-            itemToCraft = blacksmithCraftables[ 'platemail gorget' ]
-        elif Player.GetSkillValue( 'Blacksmith' ) < 108.9:
-            itemToCraft = blacksmithCraftables[ 'platemail gloves' ]
-        elif Player.GetSkillValue( 'Blacksmith' ) < 116.3:
-            itemToCraft = blacksmithCraftables[ 'platemail arms' ]
-        elif Player.GetSkillValue( 'Blacksmith' ) < 118.8:
-            itemToCraft = blacksmithCraftables[ 'platemail legs' ]
         else:
-            itemToCraft = blacksmithCraftables[ 'platemail (tunic)' ]
+            itemToCraft = blacksmithCraftables[ 'longsword' ]
 
-        enoughResourcesToCraftWith = True
-        ironIngots = FindNumberOfItems( 0x1BF2, Player.Backpack, 0x0000 )
-        if ironIngots[ 0x1BF2 ] < itemToCraft.resourcesNeeded[ 'ingots' ]:
-            if itemToCraft.name == 'short spear':
-                smeltSuccessful = SmeltItems( 0x1403 )
-                if not smeltSuccessful:
-                    return
-                ironIngots = FindNumberOfItems( 0x1BF2, Player.Backpack, 0x0000 )
-                if ironIngots[ 0x1BF2 ] < itemToCraft.resourcesNeeded[ 'ingots' ]:
-                    enoughResourcesToCraftWith = False
-            else:
-                enoughResourcesToCraftWith = False
+        # Proactively top up ingots before crafting
+        if FindNumberOfItems( INGOT_ID, Player.Backpack )[ INGOT_ID ] < LOW_INGOTS:
+            Misc.SendMessage( '[smith] Ingots low — pulling from materials box.', colors['yellow'] )
+            pull_ingots( REFILL_INGOTS )
 
-        if not enoughResourcesToCraftWith:
-            Player.HeadMessage( colors[ 'red' ], 'Out of resources to craft with!' )
-            return
-
-        Items.UseItem( tool )
-        for path in itemToCraft.gumpPath:
-            Gumps.WaitForGump( path.gumpID, 2000 )
-            Gumps.SendAction( path.gumpID, path.buttonID )
-
-        # Close the Blacksmithing gump
-        Gumps.WaitForGump( itemToCraft.gumpPath[ 0 ].gumpID, 5000 )
-        Gumps.SendAction( itemToCraft.gumpPath[ 0 ].gumpID, 0 )
-
-        itemType = None
-        if itemToCraft.name == 'mace':
-            itemType = 0x0F5C
-        elif itemToCraft.name == 'maul':
-            itemType = 0x143B
-        elif itemToCraft.name == 'cutlass':
-            itemType = 0x1441
-        elif itemToCraft.name == 'longsword':
-            itemType = 0x0F61
-        elif itemToCraft.name == 'short spear':
-            itemType = 0x1403
-        elif itemToCraft.name == 'platemail gorget':
-            itemType = 0x1413
-        elif itemToCraft.name == 'platemail gloves':
-            itemType = 0x1414
-        elif itemToCraft.name == 'platemail arms':
-            itemType = 0x1410
-        elif itemToCraft.name == 'platemail legs':
-            itemType = 0x1411
-        elif itemToCraft.name == 'platemail (tunic)':
-            itemType = 0x1415
-        item = FindItem( itemType, Player.Backpack )
-
-        if slayerBag != None and Journal.SearchByType( 'You have successfully crafted a slayer', 'Regular' ):
+        gump_opened = False
+        for _ in range(5):
             Journal.Clear()
-            item = FindItem( 0x1403, Player.Backpack )
-            if slayerBag == 'pet':
-                pet = FindPet()
-                MoveItem( Items, Misc, item, pet.Backpack )
-                Mobiles.UseMobile( pet )
-                Misc.Pause( config.dragDelayMilliseconds )
+            Items.UseItem( tool.Serial )
+            if Gumps.WaitForGump( BLACKSMITH_GUMP_ID, 3000 ):
+                gump_opened = True
+                break
+            if Journal.Search('You must wait'):
+                Misc.Pause(2000)
             else:
-                MoveItem( Items, Misc, item, slayerBag )
+                break
+        if not gump_opened:
+            Misc.SendMessage( '[smith] Crafting gump did not open — stopping.', colors['red'] )
+            return
+        gump_id = BLACKSMITH_GUMP_ID
+        for i, path in enumerate( itemToCraft.gumpPath ):
+            Gumps.SendAction( gump_id, path.buttonID )
+            if i < len( itemToCraft.gumpPath ) - 1:
+                Misc.Pause( 500 )
+        Misc.Pause( 1000 )
 
-        if Player.Weight > Player.MaxWeight:
-            smeltSuccessful = SmeltItems( itemType )
-            if not smeltSuccessful:
+        gump_lines = [str(l).lower() for l in (Gumps.LastGumpGetLineList() or [])]
+
+        if any( 'you have worn out your tool' in l for l in gump_lines ):
+            Misc.SendMessage( '[smith] Tool worn out — replacing.', colors['yellow'] )
+            Gumps.SendAction( gump_id, 0 )
+            Misc.Pause( 500 )
+            tool = get_smith_tool()
+            if tool is None:
+                break
+
+        if any( any( p.lower() in l for p in RESOURCE_FAIL_PHRASES ) for l in gump_lines ):
+            Misc.SendMessage( '[smith] Out of resources — pulling from materials box.', colors['yellow'] )
+            pull_ingots( 50 )
+            if FindNumberOfItems( INGOT_ID, Player.Backpack )[ INGOT_ID ] < itemToCraft.resourcesNeeded[ 'ingots' ]:
+                Misc.SendMessage( '[smith] Materials box empty — stopping.', colors['red'] )
                 return
+            continue
 
-        Misc.Pause( 100 )
+        # Smelt everything we may have crafted — check every item type in the craftables list
+        for craftable in blacksmithCraftables.values():
+            if craftable.itemID is not None and FindItem(craftable.itemID, Player.Backpack) is not None:
+                if not SmeltItems(craftable.itemID):
+                    Misc.SendMessage('[smith] Smelt incomplete — will retry next cycle.', colors['yellow'])
 
 # Start Blacksmithing training
+prompt_tools_box()
+prompt_materials_box()
+transfer_colored_ingots_to_box()
 TrainBlacksmithing()

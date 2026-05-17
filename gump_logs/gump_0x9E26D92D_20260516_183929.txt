@@ -1,0 +1,550 @@
+Gump ID : 2653346093  (0x9E26D92D)
+Captured: 2026-05-16 18:39:29.646000
+Tool    : 0x40072D17
+Probe   : buttons 1-100 step 7
+
+=== INITIAL PAGE ===
+  line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+  line   1: <CENTER>CATEGORIES</CENTER>
+  line   2: <CENTER>SELECTIONS</CENTER>
+  line   3: <CENTER>NOTICES</CENTER>
+  line   4: EXIT
+  line   5: CANCEL MAKE
+  line   6: REPAIR ITEM
+  line   7: MARK ITEM
+  line   8: ENHANCE ITEM
+  line   9: ALTER ITEM (GARGOYLE)
+  line  10: NON QUEST ITEM
+  line  11: MAKE LAST
+  line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+  line  13: SMELT ITEM
+  line  14: IRON (~1_AMT~)
+  line  15: RED SCALES (~1_AMT~)
+  line  16: LAST TEN
+  line  17: Metal Armor
+  line  18: Helmets
+  line  19: Shields
+  line  20: Bladed
+  line  21: Axes
+  line  22: Polearms
+  line  23: Bashing
+  line  24: Cannons
+  line  25: Throwing
+  line  26: Miscellaneous
+  line  27: dragon gloves
+  line  28: dragon helm
+  line  29: dragon leggings
+  line  30: dragon sleeves
+  line  31: dragon breastplate
+  line  32: crushed glass
+  line  33: powdered iron
+  line  34: metal keg
+  line  35: exodus sacrificial dagger
+
+=== BUTTON PROBE (only buttons that change content are shown) ===
+
+  [button 1]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: ringmail gloves
+    line  28: ringmail leggings
+    line  29: ringmail sleeves
+    line  30: ringmail tunic
+    line  31: chainmail coif
+    line  32: chainmail leggings
+    line  33: chainmail tunic
+    line  34: platemail arms
+    line  35: platemail gloves
+    line  36: platemail gorget
+    line  37: NEXT PAGE
+    line  38: PREV PAGE
+    line  39: platemail legs
+    line  40: platemail (tunic)
+    line  41: platemail (female)
+    line  42: dragon barding deed
+    line  43: platemail mempo
+    line  44: platemail do
+    line  45: platemail hiro sode
+    line  46: platemail suneate
+    line  47: platemail haidate
+    line  48: gargish platemail arms
+    line  49: NEXT PAGE
+    line  50: PREV PAGE
+    line  51: gargish platemail chest
+    line  52: gargish platemail leggings
+    line  53: gargish platemail kilt
+    line  54: gargish platemail arms
+    line  55: gargish platemail chest
+    line  56: gargish platemail leggings
+    line  57: gargish platemail kilt
+    line  58: Gargish Amulet
+
+  [button 8]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: bascinet
+    line  28: close helmet
+    line  29: helmet
+    line  30: norse helm
+    line  31: plate helm
+    line  32: chainmail hatsuburi
+    line  33: platemail hatsuburi
+    line  34: heavy platemail jingasa
+    line  35: light platemail jingasa
+    line  36: small platemail jingasa
+    line  37: NEXT PAGE
+    line  38: PREV PAGE
+    line  39: decorative platemail kabuto
+    line  40: platemail battle kabuto
+    line  41: standard platemail kabuto
+    line  42: circlet
+    line  43: royal circlet
+    line  44: gemmed circlet
+
+  [button 15]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: buckler 
+    line  28: bronze shield
+    line  29: heater shield
+    line  30: metal shield
+    line  31: metal kite shield
+    line  32: tear kite shield
+    line  33: chaos shield
+    line  34: order shield
+    line  35: small plate shield
+    line  36: gargish kite shield
+    line  37: NEXT PAGE
+    line  38: PREV PAGE
+    line  39: large plate shield
+    line  40: medium plate shield
+    line  41: gargish Chaos shield
+    line  42: gargish Order shield
+    line  43: shield orb
+
+  [button 22]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: bone harvester
+    line  28: broadsword
+    line  29: crescent blade
+    line  30: cutlass
+    line  31: dagger
+    line  32: katana
+    line  33: kryss
+    line  34: longsword
+    line  35: scimitar
+    line  36: viking sword
+    line  37: NEXT PAGE
+    line  38: PREV PAGE
+    line  39: no-dachi
+    line  40: wakizashi
+    line  41: lajatang
+    line  42: daisho
+    line  43: tekagi
+    line  44: shuriken
+    line  45: kama
+    line  46: sai
+    line  47: radiant scimitar
+    line  48: war cleaver
+    line  49: NEXT PAGE
+    line  50: PREV PAGE
+    line  51: elven spellblade
+    line  52: assassin spike
+    line  53: leafblade
+    line  54: rune blade
+    line  55: elven machete
+    line  56: Rune Carving Knife
+    line  57: Cold Forged Blade
+    line  58: Overseer Sundered Blade
+    line  59: Luminous Rune Blade
+    line  60: true spellblade
+    line  61: NEXT PAGE
+    line  62: PREV PAGE
+    line  63: icy spellblade
+    line  64: fiery spellblade
+    line  65: spellblade of defense
+    line  66: true assassin spike
+    line  67: charged assassin spike
+    line  68: magekiller assassin spike
+    line  69: wounding assassin spike
+    line  70: true leafblade
+    line  71: magekiller leafblade
+    line  72: leafblade of ease
+    line  73: NEXT PAGE
+    line  74: PREV PAGE
+    line  75: knight's war cleaver
+    line  76: butcher's war cleaver
+    line  77: serrated war cleaver
+    line  78: true war cleaver
+    line  79: Orcish Machete
+    line  80: machete of defense
+    line  81: Diseased Machete
+    line  82: runesabre
+    line  83: mage's rune blade
+    line  84: rune blade of knowledge
+    line  85: NEXT PAGE
+    line  86: PREV PAGE
+    line  87: icy scimitar
+    line  88: twinkling scimitar
+    line  89: bone machete
+    line  90: gargish katana
+    line  91: gargish kryss
+    line  92: gargish bone harvester
+    line  93: gargish tekagi
+    line  94: gargish daisho
+    line  95: dread sword
+    line  96: gargish talwar
+    line  97: NEXT PAGE
+    line  98: PREV PAGE
+    line  99: gargish dagger
+    line 100: bloodblade
+    line 101: shortblade
+
+  [button 29]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: axe
+    line  28: battle axe
+    line  29: double axe
+    line  30: executioner's axe
+    line  31: large battle axe
+    line  32: two handed axe
+    line  33: war axe
+    line  34: ornate axe
+    line  35: guardian axe
+    line  36: singing axe
+    line  37: NEXT PAGE
+    line  38: PREV PAGE
+    line  39: thundering axe
+    line  40: heavy ornate axe
+    line  41: gargish battle axe
+    line  42: gargish axe
+    line  43: dual short axes
+
+  [button 36]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: bardiche
+    line  28: bladed staff
+    line  29: double bladed staff
+    line  30: halberd
+    line  31: lance
+    line  32: pike
+    line  33: short spear
+    line  34: scythe
+    line  35: spear
+    line  36: war fork
+    line  37: NEXT PAGE
+    line  38: PREV PAGE
+    line  39: gargish bardiche
+    line  40: gargish war fork
+    line  41: gargish scythe
+    line  42: gargish pike
+    line  43: gargish lance
+    line  44: dual pointed spear
+
+  [button 43]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: hammer pick
+    line  28: mace
+    line  29: maul
+    line  30: scepter
+    line  31: war mace
+    line  32: war hammer
+    line  33: tessen
+    line  34: diamond mace
+    line  35: Shard Thrasher
+    line  36: ruby mace
+    line  37: NEXT PAGE
+    line  38: PREV PAGE
+    line  39: emerald mace
+    line  40: sapphire mace
+    line  41: silver-etched mace
+    line  42: gargish war hammer
+    line  43: gargish maul
+    line  44: gargish tessen
+    line  45: disc mace
+
+  [button 50]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: cannonball
+    line  28: grapeshot
+    line  29: culverin
+    line  30: carronade
+
+  [button 57]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: boomerang
+    line  28: cyclone
+    line  29: soul glaive
+
+  [button 64]
+    line   0: <CENTER>BLACKSMITHING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: SMELT ITEM
+    line  14: IRON (~1_AMT~)
+    line  15: RED SCALES (~1_AMT~)
+    line  16: LAST TEN
+    line  17: Metal Armor
+    line  18: Helmets
+    line  19: Shields
+    line  20: Bladed
+    line  21: Axes
+    line  22: Polearms
+    line  23: Bashing
+    line  24: Cannons
+    line  25: Throwing
+    line  26: Miscellaneous
+    line  27: dragon gloves
+    line  28: dragon helm
+    line  29: dragon leggings
+    line  30: dragon sleeves
+    line  31: dragon breastplate
+    line  32: crushed glass
+    line  33: powdered iron
+    line  34: metal keg
+    line  35: exodus sacrificial dagger
+
+  [button 71 — closed the gump]
+
+[could not reopen gump before button 78 — stopping]

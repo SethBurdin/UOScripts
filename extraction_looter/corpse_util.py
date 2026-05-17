@@ -129,10 +129,21 @@ def skin_corpse(corpse, tool):
     return True
 
 
+SCISSORS_ID = 0x0F9F
+
+
+def find_scissors():
+    """Return scissors from the player's backpack, or None."""
+    return Items.FindByID(SCISSORS_ID, -1, Player.Backpack.Serial)
+
+
 def cut_hides_in_backpack(scissors):
     """
     Use scissors on every raw hide stack in the player's backpack.
     Raw hides (0x1079) become cut leather (0x1081) after cutting.
+    Call this before transferring to the beetle so only cut leather is stored.
+
+    Retries on "You must wait" server rejection to avoid action queuing.
 
     Input:
         scissors -- Item object
@@ -140,10 +151,16 @@ def cut_hides_in_backpack(scissors):
     raw_hide_id = 0x1079
     hide = Items.FindByID(raw_hide_id, -1, Player.Backpack.Serial)
     while hide is not None:
-        Items.UseItem(scissors)
-        if not Target.WaitForTarget(3000, False):
-            _log("Cut hides: target cursor never appeared.", colors['yellow'])
-            return
-        Target.TargetExecute(hide.Serial)
-        Misc.Pause(ACTION_DELAY_MS)
+        for attempt in range(5):
+            Journal.Clear()
+            Items.UseItem(scissors.Serial)
+            if not Target.WaitForTarget(3000, False):
+                _log("Cut hides: target cursor never appeared.", colors['yellow'])
+                return
+            Target.TargetExecute(hide.Serial)
+            Misc.Pause(ACTION_DELAY_MS)
+            if not Journal.Search("You must wait to perform another action."):
+                break
+            _log("Server busy — retry cut %d/5." % (attempt + 1), colors['yellow'])
+            Misc.Pause(ACTION_DELAY_MS)
         hide = Items.FindByID(raw_hide_id, -1, Player.Backpack.Serial)

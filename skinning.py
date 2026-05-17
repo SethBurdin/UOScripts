@@ -38,15 +38,13 @@ DEBUG = True
 
 # Body ID for giant beetle (pack mount)
 BEETLE_BODY_ID   = 0x0317
-BEETLE_SERIAL    = 0x0000476D
+BEETLE_SCAN_RANGE = 10
 
 # Item IDs for hides / leather that appear on / from a corpse
 HIDE_ITEM_IDS = [
     cloth['piles of hides'].itemID,    # 0x1079  raw hides on corpse
     cloth['pieces of leather'].itemID, # 0x1081  cut leather after skinning
 ]
-
-SCISSORS_ID = 0x0F9F   # scissors — needed to cut raw hides into leather
 
 # Dragon scale IDs — confirm against in-game SingleClick if wrong on this shard
 SCALE_ITEM_IDS = [0x26B4, 0x26B5, 0x26B6, 0x26B7, 0x26B8, 0x26B9]
@@ -187,13 +185,32 @@ def skin_corpse(tool, corpse):
 # ---------------------------------------------------------------------------
 
 def find_beetle():
-    '''Returns the Mobile object for the player's pack beetle using the hardcoded serial.'''
-    beetle = Mobiles.FindBySerial(BEETLE_SERIAL)
-    if beetle is None:
-        log('Beetle not found (serial=0x%X). Is it in range?' % BEETLE_SERIAL, 'error')
-        return None
-    log('Beetle: "%s" serial=0x%X' % (beetle.Name, beetle.Serial), 'ok')
-    return beetle
+    '''
+    Auto-detect the pack beetle.
+    1. Body-ID scan for BEETLE_BODY_ID within BEETLE_SCAN_RANGE tiles.
+    2. Fallback: any nearby non-human mobile with a backpack.
+    Returns the Mobile, or None if not found.
+    '''
+    filt          = Mobiles.Filter()
+    filt.RangeMax = BEETLE_SCAN_RANGE
+    filt.IsHuman  = False
+
+    for mob in Mobiles.ApplyFilter(filt):
+        if mob.Serial == Player.Serial:
+            continue
+        if mob.Body == BEETLE_BODY_ID and mob.Backpack is not None:
+            log('Beetle found (body ID): "%s" serial=0x%X' % (mob.Name, mob.Serial), 'ok')
+            return mob
+
+    for mob in Mobiles.ApplyFilter(filt):
+        if mob.Serial == Player.Serial:
+            continue
+        if mob.Backpack is not None:
+            log('Pack animal found (fallback): "%s" serial=0x%X' % (mob.Name, mob.Serial), 'ok')
+            return mob
+
+    log('No pack animal detected within %d tiles.' % BEETLE_SCAN_RANGE, 'error')
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -246,17 +263,27 @@ def transfer_resources(corpse, beetle):
 # Step 5 - Pull hides from beetle, cut, return leather
 # ---------------------------------------------------------------------------
 
+SCISSORS_ID = 0x0F9F
+
+
 def _cut_hides_in_backpack(scissors):
-    '''Use scissors on every raw hide stack in the backpack.'''
+    '''Use scissors on every raw hide stack in the backpack.
+    Retries on "You must wait" to avoid action queuing.'''
     raw_hide_id = cloth['piles of hides'].itemID
     hide = Items.FindByID(raw_hide_id, -1, Player.Backpack.Serial)
     while hide is not None:
-        Items.UseItem(scissors)
-        if not Target.WaitForTarget(3000, False):
-            log('_cut_hides: target cursor never appeared.', 'warn')
-            return
-        Target.TargetExecute(hide.Serial)
-        Misc.Pause(ACTION_DELAY_MS)
+        for attempt in range(5):
+            Journal.Clear()
+            Items.UseItem(scissors.Serial)
+            if not Target.WaitForTarget(3000, False):
+                log('_cut_hides: target cursor never appeared.', 'warn')
+                return
+            Target.TargetExecute(hide.Serial)
+            Misc.Pause(ACTION_DELAY_MS)
+            if not Journal.Search("You must wait to perform another action."):
+                break
+            log('Server busy — retry cut %d/5.' % (attempt + 1), 'warn')
+            Misc.Pause(ACTION_DELAY_MS)
         hide = Items.FindByID(raw_hide_id, -1, Player.Backpack.Serial)
 
 
@@ -324,5 +351,4 @@ else:
             for corpse in skinnable:
                 if skin_corpse(tool, corpse):
                     transfer_resources(corpse, beetle)
-
-        process_beetle_hides(beetle)
+                    process_beetle_hides(beetle)

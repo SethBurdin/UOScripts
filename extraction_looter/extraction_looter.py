@@ -3,7 +3,7 @@
 #
 # Flow:
 #   1. Prompt for farm rune name.
-#   2. Prompt player to target the pack beetle.
+#   2. Auto-detect the pack beetle (body-ID scan, then any non-human with a backpack).
 #   3. Recall to farm location via runebook.
 #   4. Optionally walk waypoints to the loot zone.
 #   5. Loop: detect threats, find corpses, skin, loot, transfer to beetle.
@@ -24,7 +24,7 @@ from extraction_looter.nav          import (load_waypoints, walk_waypoints,
 from extraction_looter.stealth      import threat_nearby, handle_threat
 from extraction_looter.corpse_util  import (scan_nearby_corpses, open_corpse,
                                             skin_corpse, find_skinning_tool,
-                                            cut_hides_in_backpack)
+                                            find_scissors, cut_hides_in_backpack)
 from extraction_looter.loot_util    import collect_from_corpse
 from extraction_looter.containers_util import transfer_to_beetle, drop_on_ground
 from extraction_looter.inspect_items   import is_leather
@@ -53,7 +53,8 @@ THREAT_TIMEOUT_MS = 60000   # ms before aborting due to persistent threat
 SCAN_RANGE        = 2       # corpse scan radius (tiles)
 IDLE_WAIT_MS      = 2000    # ms to wait between scans when no corpses found
 
-SCISSORS_ID       = 0x0F9F  # scissors for cutting raw hides
+PACK_BEETLE_BODY  = 0x00EF  # giant/pack beetle body graphic (matches mining.py)
+BEETLE_SCAN_RANGE = 10      # tile radius for auto-detect
 
 # Farm locations shown in the startup prompt (rune names must match the runebook)
 FARM_LOCATIONS = [
@@ -100,19 +101,38 @@ def _prompt_farm_location():
     return None
 
 
-def _prompt_beetle():
-    """Ask player to target the pack beetle. Returns Mobile or None."""
-    log("Target your pack beetle:", colors['cyan'])
-    serial = Target.PromptTarget("Click your pack beetle:")
-    if not serial:
-        log("No beetle selected — aborting.", colors['red'])
-        return None
-    beetle = Mobiles.FindBySerial(int(serial))
-    if beetle is None:
-        log("Beetle mobile not found (0x%X) — is it in range?" % int(serial), colors['red'])
-        return None
-    log("Beetle locked: %s (0x%X)." % (beetle.Name, beetle.Serial), colors['green'])
-    return beetle
+def _find_beetle():
+    """
+    Auto-detect the pack beetle using mining.py's two-step approach:
+      1. Body-ID scan for PACK_BEETLE_BODY (0x00EF) within BEETLE_SCAN_RANGE tiles.
+      2. Fallback: any nearby non-human mobile that has a backpack.
+
+    Returns Mobile or None.
+    """
+    filt          = Mobiles.Filter()
+    filt.RangeMax = BEETLE_SCAN_RANGE
+    filt.IsHuman  = False
+
+    # Step 1 — body-ID match, confirmed to have an inventory
+    for mob in Mobiles.ApplyFilter(filt):
+        if mob.Serial == Player.Serial:
+            continue
+        if mob.Body == PACK_BEETLE_BODY and mob.Backpack is not None:
+            log("Pack beetle found by body ID: %s (0x%X)." % (mob.Name, mob.Serial),
+                colors['green'])
+            return mob
+
+    # Step 2 — any non-human with a backpack
+    for mob in Mobiles.ApplyFilter(filt):
+        if mob.Serial == Player.Serial:
+            continue
+        if mob.Backpack is not None:
+            log("Pack animal found (fallback): %s (0x%X)." % (mob.Name, mob.Serial),
+                colors['green'])
+            return mob
+
+    log("No pack animal detected within %d tiles." % BEETLE_SCAN_RANGE, colors['red'])
+    return None
 
 
 def _get_beetle_pack(beetle):
@@ -126,9 +146,15 @@ def _get_beetle_pack(beetle):
 
 # ─── Extract loop ─────────────────────────────────────────────────────────────
 
+CUT_LEATHER_ID = 0x1081   # pieces of leather produced after cutting raw hides
+
+
 def _process_corpses(beetle_pack, tool, scissors):
     """
     Scan, skin, loot, and transfer all nearby corpses.
+
+    Leather flow: corpse → player backpack → cut with scissors → beetle
+    Magic item flow: corpse → beetle directly
 
     Returns:
         beetle_full -- bool  True if a transfer was rejected (beetle pack full)
@@ -146,27 +172,40 @@ def _process_corpses(beetle_pack, tool, scissors):
         # Skin first so hides appear on the corpse
         skin_corpse(corpse, tool)
 
-        # Cut any raw hides that landed in the backpack
-        if scissors is not None:
-            cut_hides_in_backpack(scissors)
-
-        # Open the corpse and collect items per loot mode
+        # Open corpse and collect items per loot mode
         if not open_corpse(corpse):
             log("Could not open corpse 0x%X." % corpse.Serial, colors['yellow'])
             continue
 
         items = collect_from_corpse(corpse, LOOT_MODE)
+
+        # Stage 1 — stage leather to backpack; send magic items straight to beetle
         for item in items:
-            moved, full = transfer_to_beetle(item, beetle_pack)
+            if is_leather(item):
+                Items.Move(item, Player.Backpack, item.Amount)
+                Misc.Pause(1200)
+            else:
+                moved, full = transfer_to_beetle(item, beetle_pack)
+                if full:
+                    beetle_full = True
+                    if LOOT_UNTIL_FULL:
+                        break
+
+        # Stage 2 — cut all raw hides now in the backpack
+        if scissors is not None:
+            cut_hides_in_backpack(scissors)
+
+        # Stage 3 — transfer cut leather from backpack to beetle
+        leather = Items.FindByID(CUT_LEATHER_ID, -1, Player.Backpack.Serial)
+        while leather is not None:
+            moved, full = transfer_to_beetle(leather, beetle_pack)
             if full:
                 beetle_full = True
-                if is_leather(item):
-                    # Drop leather on the ground; don't leave it behind
-                    drop_on_ground(item)
+                drop_on_ground(leather)
                 if LOOT_UNTIL_FULL:
-                    log("Beetle full — finishing current corpse then returning home.",
-                        colors['yellow'])
+                    log("Beetle full — returning home.", colors['yellow'])
                     break
+            leather = Items.FindByID(CUT_LEATHER_ID, -1, Player.Backpack.Serial)
 
     return beetle_full
 
@@ -182,13 +221,14 @@ def _extract_loop(beetle, beetle_pack, waypoints):
         'beetle_full' | 'threat_timeout' | 'ghost'
     """
     tool     = find_skinning_tool()
-    scissors = Items.FindByID(SCISSORS_ID, -1, Player.Backpack.Serial)
+    scissors = find_scissors()
 
     if tool is None:
         log("No skinning knife or dagger in backpack — leather will not be processed.",
             colors['yellow'])
     if scissors is None:
-        log("No scissors in backpack — raw hides will not be cut.", colors['yellow'])
+        log("No scissors in backpack — raw hides will not be cut before transfer.",
+            colors['yellow'])
 
     no_corpse_ticks = 0
 
@@ -198,9 +238,8 @@ def _extract_loop(beetle, beetle_pack, waypoints):
             cleared = handle_threat(beetle.Serial, THREAT_POLL_MS, THREAT_TIMEOUT_MS)
             if not cleared:
                 return 'threat_timeout'
-            # Refresh tool/scissors after hiding (they should still be in backpack)
             tool     = find_skinning_tool()
-            scissors = Items.FindByID(SCISSORS_ID, -1, Player.Backpack.Serial)
+            scissors = find_scissors()
 
         # ── Process corpses ──────────────────────────────────────────────────
         beetle_full = _process_corpses(beetle_pack, tool, scissors)
@@ -235,8 +274,8 @@ def main():
 
     log("Target: %s" % farm_rune, colors['cyan'])
 
-    # ── Beetle selection ──────────────────────────────────────────────────────
-    beetle = _prompt_beetle()
+    # ── Beetle detection ──────────────────────────────────────────────────────
+    beetle = _find_beetle()
     if beetle is None:
         return
 

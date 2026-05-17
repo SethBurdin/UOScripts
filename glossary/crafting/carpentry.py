@@ -18,6 +18,7 @@ carpentryTools = [
     tools[ 'scorp' ],
     tools[ 'smoothing plane' ],
     tools[ 'hammer' ],
+    tools[ 'smith\'s hammer' ],  # 0x13E3, any hue — plain iron through valorite runic
 ]
 
 def FindCarpentryTool( container ):
