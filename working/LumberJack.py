@@ -124,6 +124,7 @@ CONTAINER_IDS = [
 
 # Session-cached serial of the home storage container (set on first use).
 _home_container_serial = None
+_pet_serial = None
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -236,22 +237,6 @@ def split_logs():
 # ─────────────────────────────────────────────────────────────────────────────
 # Pack beetle — find and transfer wood
 # ─────────────────────────────────────────────────────────────────────────────
-# def find_pack_animal():
-#     """
-#     Auto-detect a nearby follower with a backpack (i.e. a pack beetle).
-#     Returns the Mobile, or None if none found.
-#     """
-#     f = Mobiles.Filter()
-#     f.RangeMax = 3
-#     f.IsHuman  = False
-#     f.Friend   = True   # followers / pets only
-#     nearby = Mobiles.ApplyFilter(f)
-#     for beetle in nearby:
-#         if beetle.Serial == Player.Serial:
-#             continue
-#         if beetle.Backpack is not None:
-#             return beetle
-#     return None
 
 def discover_pet():
     """Mount-test nearby non-human mobiles to lock in the pet serial."""
@@ -301,26 +286,29 @@ def discover_pet():
 def transfer_wood_to_beetle(beetle):
     bp = Player.Backpack
     if bp is None:
-        return
+        return 0, False
 
-    log("Player.Mount=%s — dismounting." % Player.Mount, 0x3B)
-    Mobiles.UseMobile(Player.Serial)
-    Misc.Pause(1500)
+    # Dismount first — the beetle is invisible as a separate mobile while mounted
+    if Player.Mount is not None:
+        log("Dismounting to transfer wood...", 0x3B)
+        Mobiles.UseMobile(Player.Serial)
+        Misc.Pause(1500)
 
-    if _pet_serial is None:
+    # Resolve beetle after dismount: parameter → cached global → configured serial
+    if beetle is None and _pet_serial is not None:
         beetle = Mobiles.FindBySerial(_pet_serial)
-    if _pet_serial is None:
-        log("Beetle not found after dismount – cannot transfer.", 0x25)
-        Mobiles.UseMobile(beetle)
-        Misc.Pause(1200)
-        return
+    if beetle is None and cfg.beetle_serial is not None:
+        beetle = Mobiles.FindBySerial(cfg.beetle_serial)
+    if beetle is None:
+        log("No beetle found – cannot transfer.", 0x25)
+        return 0, False
 
-    beetle_pack = _pet_serial.Backpack
+    beetle_pack = beetle.Backpack
     if beetle_pack is None:
         log("Beetle backpack not accessible (out of range?).", 0x25)
-        Mobiles.UseMobile(_pet_serial)
+        Mobiles.UseMobile(beetle.Serial)
         Misc.Pause(1200)
-        return
+        return 0, False
 
     moved = 0
     beetle_full = False
@@ -429,8 +417,9 @@ def _step_toward(tx, ty):
 
 def _try_unstick(goal_x, goal_y):
     """
-    Try stepping perpendicular to the goal to break free from a blocked tile
-    (e.g. a tree static sitting directly between player and destination).
+    Try stepping perpendicular to the goal to navigate around a blocking tree.
+    Takes 4 perpendicular steps (enough to clear trees wider than 1 tile), then
+    lets the main walk loop resume forward progress from the new position.
     Tries clockwise then counter-clockwise 90° relative to the current heading.
     """
     pos = Player.Position
@@ -449,15 +438,13 @@ def _try_unstick(goal_x, goal_y):
         direction = dir_map.get((sx, sy))
         if not direction:
             continue
-        for _ in range(2):
+        for _ in range(4):
             Player.Walk(direction)
             Misc.Pause(cfg.walk_pause)
         new_pos = Player.Position
         if new_pos.X != pos.X or new_pos.Y != pos.Y:
-            # Cleared the obstacle — take 2 steps toward goal so we don't
-            # immediately collide with the same tree again on the next iteration.
-            _step_toward(goal_x, goal_y)
-            _step_toward(goal_x, goal_y)
+            # Moved clear of the obstacle — let the main loop resume forward progress.
+            log("Unstuck via %s." % direction, 0x3B)
             return
 
 
@@ -469,7 +456,7 @@ def walk_adjacent_to(tx, ty):
     Includes stuck detection: after 2 consecutive non-moving steps,
     tries a perpendicular nudge to route around blocking tree tiles.
     """
-    max_steps = 40
+    max_steps = 80
     stuck = 0
     for _ in range(max_steps):
         pos = Player.Position
@@ -704,7 +691,11 @@ def deposit_wood_to_container():
         Mobiles.UseMobile(Player.Serial)
         Misc.Pause(1500)
 
-    beetle = find_pack_animal()
+    beetle = None
+    if _pet_serial is not None:
+        beetle = Mobiles.FindBySerial(_pet_serial)
+    if beetle is None and cfg.beetle_serial is not None:
+        beetle = Mobiles.FindBySerial(cfg.beetle_serial)
     moved  = 0
 
     sources = []

@@ -55,6 +55,7 @@ class cfg:
     ]
 
     home_container_serial = None  # resolved at runtime from config.quick_dropbox
+    home_forge_serial     = 0x400750FE
     pickaxe_box_serial    = 0x4005AA6E  # serial of the box at home holding spare pickaxes
 
     # Auto mode
@@ -132,10 +133,10 @@ def get_tool():
     return None
 
 
-def find_forge_nearby():
-    """Scan the immediate area for a forge and return its serial, or None."""
+def find_forge_nearby(search_range=4):
+    """Scan the area for a forge and return its serial, or None."""
     for fid in FORGE_IDS:
-        forge = Items.FindByID(fid, -1, -1, 4)
+        forge = Items.FindByID(fid, -1, -1, search_range)
         if forge is not None:
             return forge.Serial
     return None
@@ -519,11 +520,6 @@ def _remount_if_needed():
         Misc.Pause(1500)
 
 
-def _can_travel():
-    """Return True if the player has enough Magery or Chivalry to gate/recall home."""
-    return (Player.GetSkillValue('Chivalry') > 30 or
-            Player.GetSkillValue('Magery')   > 30)
-
 
 def handle_overweight():
     """
@@ -615,9 +611,6 @@ def transfer_to_mount():
             break
         ore = Items.FindByID(oid, -1, Player.Backpack.Serial)
         while ore is not None:
-            pre_count = Items.FindByID(oid, -1, mount.Backpack.Serial)
-            pre_amount = pre_count.Amount if pre_count is not None else 0
-
             Items.Move(ore, mount.Backpack, ore.Amount)
             Misc.Pause(cfg.pause_after_transfer)
 
@@ -1024,10 +1017,14 @@ def run_mining_loop():
             log("Weight %d / %d – acting on beetle type."
                 % (Player.Weight, Player.MaxWeight), 0x25)
             if pack_beetle_serial:
-                if push_ore_to_inventory() == 'full':
+                _push_result = push_ore_to_inventory()
+                if _push_result == 'full':
                     log("Pack animal full – going home to smelt.", 0x25)
                     _home_deposit()
                     break
+                elif _push_result == 'none':
+                    log("Pack animal not reachable – clearing serial.", 0x25)
+                    pack_beetle_serial = None
             if not handle_overweight():
                 log("Still overweight after smelt/transfer – attempting bank run.", 0x25)
                 if not bank_ingots():
@@ -1140,11 +1137,14 @@ def _find_mining_runebook():
     """Return (runebook, spots) so the gump is only opened once."""
     if cfg.auto_mining_runebook is not None:
         rb = find_runebook_by_label(cfg.auto_mining_runebook)
-        if rb is not None:
-            spots = find_runes_matching(rb, cfg.auto_mining_rune_filter)
-            if spots:
-                return rb, spots
-        return None, []
+        if rb is None:
+            log("No runebook labeled '%s' found in backpack." % cfg.auto_mining_runebook, 0x25)
+            return None, []
+        spots = find_runes_matching(rb, cfg.auto_mining_rune_filter)
+        if not spots:
+            log("Runebook '%s' found but no runes match filter '%s'." % (cfg.auto_mining_runebook, cfg.auto_mining_rune_filter), 0x25)
+            return None, []
+        return rb, spots
     for item in Player.Backpack.Contains:
         if item.ItemID == RUNEBOOK_ITEM_ID:
             spots = find_runes_matching(item, cfg.auto_mining_rune_filter)
@@ -1161,6 +1161,7 @@ def auto_mine_spot(home_rb):
     Gates home via home_rb if overweight, returning False so the caller knows
     the player relocated. Returns True when the spot is normally exhausted.
     """
+    global pack_beetle_serial, fire_beetle_serial
     if Player.Mount is not None:
         Mobiles.UseMobile(Player.Serial)
         Misc.Pause(1500)
@@ -1181,10 +1182,14 @@ def auto_mine_spot(home_rb):
             if pack_beetle_serial is None and fire_beetle_serial is None:
                 find_beetles()
             if pack_beetle_serial:
-                if push_ore_to_inventory() == 'full':
+                _push_result = push_ore_to_inventory()
+                if _push_result == 'full':
                     log("Pack animal full – going home to smelt.", 0x25)
                     _home_deposit()
                     return False
+                elif _push_result == 'none':
+                    log("Pack animal not reachable – clearing serial.", 0x25)
+                    pack_beetle_serial = None
             if not handle_overweight():
                 log("Still overweight after smelt – running bank run.", 0x25)
                 returned = bank_ingots()
@@ -1256,11 +1261,6 @@ def run_auto_mode():
 
         for slot, name in spots:
             _remount_if_needed()
-            if _count_tools() < 4 and cfg.pickaxe_box_serial is not None:
-                need = 4 - _count_tools()
-                log("Only %d pickaxe(s) — topping up before traveling." % _count_tools(), 0x3B)
-                _grab_pickaxes_from_box(need)
-                Misc.Pause(cfg.pause_after_transfer)
             if _count_tools() == 0:
                 log("No pickaxes — stopping.", 0x25)
                 return
@@ -1272,8 +1272,28 @@ def run_auto_mode():
             result = auto_mine_spot(home_rb)
             if result is None:
                 return   # no pickaxes — stop entirely
-            if not result:
-                # Went home mid-cycle — re-acquire runebooks from new location
+
+            # After each spot, check if the beetle has ore OR the drop box has ore to smelt.
+            # Do this whether the spot finished normally (True) or we already went home (False).
+            beetle_has_ore = False
+            if pack_beetle_serial is not None:
+                mob = Mobiles.FindBySerial(pack_beetle_serial)
+                if mob is not None and mob.Backpack is not None:
+                    beetle_has_ore = any(
+                        Items.FindByID(oid, -1, mob.Backpack.Serial) is not None
+                        for oid in ORE_IDS
+                    )
+
+            if beetle_has_ore or Player.Weight >= Player.MaxWeight - cfg.weight_headroom:
+                log("Offloading beetle and smelting drop box before next spot.", 0x026C)
+                _home_deposit()
+                mining_rb, spots = _find_mining_runebook()
+                home_rb = find_runebook_by_label(cfg.auto_home_runebook)
+                if mining_rb is None or home_rb is None:
+                    log("Lost runebooks after gating home — stopping.", 0x25)
+                    return
+            elif not result:
+                # Went home mid-cycle for another reason — re-acquire runebooks
                 mining_rb, spots = _find_mining_runebook()
                 home_rb = find_runebook_by_label(cfg.auto_home_runebook)
                 if mining_rb is None or home_rb is None:
@@ -1290,80 +1310,83 @@ def run_auto_mode():
 
 def _home_deposit():
     """
-    Travel home, walk to drop position, smelt with fire beetle, deposit ingots and ore.
-    Shared by finish(), grab_pickaxe_from_box(), and the tinkering fallback.
+    Ensure player is home, dump everything to the drop box, smelt all ore in the box,
+    deposit resulting ingots, then top up pickaxes to 4.
+    Skips travel if the drop box is already in range (player is already home).
     Returns True if home was reached (deposit attempted regardless of container availability).
     """
     global forge_serial
-    home_rb = find_runebook_by_label(cfg.auto_home_runebook)
-    if home_rb is None:
-        log("No home runebook – cannot go home.", 0x25)
-        return False
-    _remount_if_needed()
-    log("Heading home...", 0x026C)
-    if not travel_to_runebook(home_rb, RECALL_TRAVEL_DELAY):
-        log("Could not travel home.", 0x25)
-        return False
-    for _ in range(2):
-        Player.Walk('Right')
-        Misc.Pause(400)
-    for _ in range(2):
-        Player.Walk('Up')
-        Misc.Pause(400)
+
+    # ── Travel home only if drop box is out of range ──────────────────────────
+    dest = Items.FindBySerial(_config.quick_dropbox)
+    if dest is None:
+        home_rb = find_runebook_by_label(cfg.auto_home_runebook)
+        if home_rb is None:
+            log("No home runebook – cannot go home.", 0x25)
+            return False
+        _remount_if_needed()
+        log("Heading home...", 0x026C)
+        if not travel_to_runebook(home_rb, RECALL_TRAVEL_DELAY):
+            log("Could not travel home.", 0x25)
+            return False
+        for _ in range(2):
+            Player.Walk('Right')
+            Misc.Pause(400)
+        for _ in range(2):
+            Player.Walk('Up')
+            Misc.Pause(400)
+        dest = Items.FindBySerial(_config.quick_dropbox)
+
     if Player.Mount is not None:
         Mobiles.UseMobile(Player.Serial)
         Misc.Pause(1500)
     pack, fire = find_beetles()
 
-    if fire is not None:
-        log("Smelting backpack ore with fire beetle...")
-        smelt_with_fire_beetle(fire)
-        if pack is not None and pack.Backpack is not None:
-            Items.UseItem(pack.Backpack)
-            Items.WaitForContents(pack.Backpack, 3000)
-            Misc.Pause(600)
-            log("Smelting pack animal ore with fire beetle...")
-            for oid in ORE_IDS:
-                ore = Items.FindByID(oid, -1, pack.Backpack.Serial)
-                while ore is not None:
-                    Items.Move(ore, Player.Backpack, ore.Amount)
-                    Misc.Pause(cfg.pause_after_transfer)
-                    smelt_with_fire_beetle(fire)
-                    ore = Items.FindByID(oid, -1, pack.Backpack.Serial)
-
-    dest = Items.FindBySerial(_config.quick_dropbox)
     if dest is None:
         log("Drop container (0x%X) not found." % _config.quick_dropbox, 0x25)
     else:
-        # Always transfer whatever remains in the pack beetle to the drop box.
-        # If a fire beetle already smelted everything above, these calls are no-ops.
+        # ── Step 1: player ore + ingots → drop box ────────────────────────────
+        _deposit_stacks(Player.Backpack.Serial, ORE_IDS,   dest, "ore")
+        _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
+
+        # ── Step 2: beetle ore + ingots → drop box ────────────────────────────
         if pack is not None and pack.Backpack is not None:
             Items.UseItem(pack.Backpack)
             Items.WaitForContents(pack.Backpack, 3000)
-            Misc.Pause(600)
+            Misc.Pause(1200)
             _deposit_stacks(pack.Backpack.Serial, ORE_IDS,   dest, "ore from beetle")
             _deposit_stacks(pack.Backpack.Serial, INGOT_IDS, dest, "ingots from beetle")
 
-        _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
-        _deposit_stacks(Player.Backpack.Serial, ORE_IDS,   dest, "remaining ore")
-
-        # Smelt ore sitting in the drop box
-        smelt_forge = fire.Serial if fire is not None else forge_serial
+        # ── Step 3: smelt all ore in drop box ─────────────────────────────────
+        smelt_forge = None
+        if fire is not None:
+            smelt_forge = fire.Serial
+        if smelt_forge is None and cfg.home_forge_serial is not None:
+            smelt_forge = cfg.home_forge_serial
         if smelt_forge is None:
-            smelt_forge = find_forge_nearby()
+            smelt_forge = find_forge_nearby(search_range=10)
+
         if smelt_forge is not None:
             prev_forge   = forge_serial
             forge_serial = smelt_forge
-            Items.UseItem(dest.Serial)
+            Items.UseItem(dest)
             Items.WaitForContents(dest, 3000)
-            Misc.Pause(600)
-            n = smelt_from_backpack(dest.Serial)
+            Misc.Pause(1200)
+            total_smelted = smelt_from_backpack(dest.Serial)
             forge_serial = prev_forge
-            if n:
-                log("Smelted %d stack(s) from drop box." % n)
-                _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots (post-smelt)")
+            if total_smelted:
+                log("Smelted %d stack(s) from drop box." % total_smelted)
+            # ── Step 4: deposit ingots produced by smelt ──────────────────────
+            _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots (post-smelt)")
         else:
             log("No forge available — ore left in drop box for manual smelt.", 0x3B)
+
+    # ── Step 5: top up pickaxes to 4 ─────────────────────────────────────────
+    need = max(0, 4 - _count_tools())
+    if need > 0 and cfg.pickaxe_box_serial is not None:
+        log("Topping up pickaxes (%d needed)..." % need, 0x3B)
+        _grab_pickaxes_from_box(need)
+
     return True
 
 
@@ -1371,9 +1394,7 @@ def _count_tools():
     """Count total mining tools in the player's backpack."""
     count = 0
     for tid in MINING_TOOL_IDS:
-        stack = Items.FindByID(tid, -1, Player.Backpack.Serial)
-        if stack is not None:
-            count += stack.Amount
+        count += Items.ContainerCount(Player.Backpack.Serial, tid, -1)
     return count
 
 
@@ -1418,7 +1439,7 @@ def _grab_pickaxes_from_box(needed):
 
 def grab_pickaxe_from_box():
     """
-    Travel home, deposit ore/ingots, then grab 4 pickaxes from cfg.pickaxe_box_serial.
+    Travel home, deposit, smelt, and top up pickaxes via _home_deposit().
     Returns True if the player now has at least one pickaxe.
     """
     if cfg.pickaxe_box_serial is None:
@@ -1426,7 +1447,6 @@ def grab_pickaxe_from_box():
         return False
     if not _home_deposit():
         return False
-    _grab_pickaxes_from_box(4)
     return _count_tools() > 0
 
 
@@ -1443,15 +1463,25 @@ def finish():
 def main():
     log("=== Mining Script ===", 0x0481)
     mode = select_mode()
-    beetle = find_beetles()
-    ## need to find beetle type. and determine if we store or smelt through both mining loops. could also account for other non rideable pack animals.
-    ## Need to make sure if tinker skill that it makes a new pickaxe before it drops off.
-    ## Pass beetle as needed so we only need to detect beetle the first time.
-    ## If we can detect if it's bonded, we can then decide whether we need to mount the pet before moving on or gate based on magery.
-    ## 
+
     if mode == 'manual':
+        pack, _ = find_beetles()
+        player_has_ore = any(Items.FindByID(oid, -1, Player.Backpack.Serial) is not None for oid in ORE_IDS)
+        needs_deposit  = player_has_ore or Player.Weight >= Player.MaxWeight - cfg.weight_headroom
+        if not needs_deposit and pack is not None and pack.Backpack is not None:
+            Items.UseItem(pack.Backpack)
+            Items.WaitForContents(pack.Backpack, 3000)
+            Misc.Pause(1200)
+            if any(Items.FindByID(oid, -1, pack.Backpack.Serial) is not None for oid in ORE_IDS):
+                needs_deposit = True
+        if needs_deposit:
+            log("Starting with ore or overweight – depositing before mining.", 0x3B)
+            _home_deposit()
         run_mining_loop()
     else:
+        # Auto mode: always home-deposit first (location check + deposit + smelt + pickaxes).
+        log("Heading home to deposit and prepare...", 0x026C)
+        _home_deposit()
         run_auto_mode()
 
 

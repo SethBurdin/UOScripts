@@ -138,7 +138,7 @@ def find_runebook_by_label(label):
         if item.ItemID != RUNEBOOK_ITEM_ID:
             continue
         props = Items.GetPropStringList(item.Serial) or []
-        if any(p.strip().lower() == target for p in props):
+        if any(target in p.strip().lower() for p in props):
             return item
     return None
 
@@ -313,13 +313,22 @@ def gate_via_book(book, button_id, settle_delay=3000):
     Use this when the button ID is already known (e.g. from exported JSON data).
     book may be an Item object or an integer serial.
     Returns True if the gump opened and the action was sent, False otherwise.
+
+    Explicitly closes any lingering runebook gump before opening the target book.
+    Without this, WaitForGump returns immediately on a stale gump from a
+    previously opened book (same gump ID 89), causing the button to fire on
+    the wrong book's slot.
     """
     if isinstance(book, int):
         book = Items.FindBySerial(book)
     if book is None:
         _log("Runebook not found.", 33)
         return False
+    if Gumps.HasGump():
+        Gumps.SendAction(RUNEBOOK_GUMP_ID, 0)
+        Misc.Pause(400)
     Items.UseItem(book)
+    Misc.Pause(300)
     if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
         _log("Runebook gump timed out.", 33)
         return False

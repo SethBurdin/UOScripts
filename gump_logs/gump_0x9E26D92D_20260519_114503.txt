@@ -1,0 +1,520 @@
+Gump ID : 2653346093  (0x9E26D92D)
+Captured: 2026-05-19 11:45:03.782000
+Tool    : 0x4002CE44
+Probe   : buttons 1-100 step 7
+
+=== INITIAL PAGE ===
+  line   0: <CENTER>TINKERING MENU</CENTER>
+  line   1: <CENTER>CATEGORIES</CENTER>
+  line   2: <CENTER>SELECTIONS</CENTER>
+  line   3: <CENTER>NOTICES</CENTER>
+  line   4: EXIT
+  line   5: CANCEL MAKE
+  line   6: REPAIR ITEM
+  line   7: DO NOT MARK
+  line   8: ENHANCE ITEM
+  line   9: ALTER ITEM (GARGOYLE)
+  line  10: NON QUEST ITEM
+  line  11: MAKE LAST
+  line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+  line  13: IRON (~1_AMT~)
+  line  14: LAST TEN
+  line  15: Jewelry
+  line  16: Wooden Items
+  line  17: Tools
+  line  18: Parts
+  line  19: Utensils
+  line  20: Miscellaneous
+  line  21: Assemblies
+  line  22: Traps
+  line  23: Magic Jewelry
+  line  24: scissors
+  line  25: mortar and pestle
+  line  26: scorp
+  line  27: tinker's tools
+  line  28: hatchet
+  line  29: draw knife
+  line  30: sewing kit
+  line  31: saw
+  line  32: dovetail saw
+  line  33: froe
+  line  34: NEXT PAGE
+  line  35: PREV PAGE
+  line  36: shovel
+  line  37: hammer
+  line  38: tongs
+  line  39: smith's hammer
+  line  40: sledge hammer
+  line  41: inshave
+  line  42: pickaxe
+  line  43: lockpick
+  line  44: skillet
+  line  45: flour sifter
+  line  46: NEXT PAGE
+  line  47: PREV PAGE
+  line  48: fletcher's tools
+  line  49: mapmaker's pen
+  line  50: scribe's pen
+  line  51: clippers
+  line  52: metal container engraving tool
+  line  53: pitchfork
+
+=== BUTTON PROBE (only buttons that change content are shown) ===
+
+  [button 1]
+    line   0: <CENTER>TINKERING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: DO NOT MARK
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: IRON (~1_AMT~)
+    line  14: LAST TEN
+    line  15: Jewelry
+    line  16: Wooden Items
+    line  17: Tools
+    line  18: Parts
+    line  19: Utensils
+    line  20: Miscellaneous
+    line  21: Assemblies
+    line  22: Traps
+    line  23: Magic Jewelry
+    line  24: ring
+    line  25: bracelet
+    line  26: gargish necklace
+    line  27: gargish bracelet
+    line  28: gargish ring
+    line  29: gargish earrings
+    line  30: star sapphire ring
+    line  31: star sapphire necklace (silver)
+    line  32: star sapphire necklace (jewelled)
+    line  33: star sapphire earrings
+    line  34: NEXT PAGE
+    line  35: PREV PAGE
+    line  36: star sapphire necklace (golden)
+    line  37: star sapphire bracelet
+    line  38: emerald ring
+    line  39: emerald necklace (silver)
+    line  40: emerald necklace (jewelled)
+    line  41: emerald earrings
+    line  42: emerald necklace (golden)
+    line  43: emerald bracelet
+    line  44: sapphire ring
+    line  45: sapphire necklace (silver)
+    line  46: NEXT PAGE
+    line  47: PREV PAGE
+    line  48: sapphire necklace (jewelled)
+    line  49: sapphire earrings
+    line  50: sapphire necklace (golden)
+    line  51: sapphire bracelet
+    line  52: ruby ring
+    line  53: ruby necklace (silver)
+    line  54: ruby necklace (jewelled)
+    line  55: ruby earrings
+    line  56: ruby necklace (golden)
+    line  57: ruby bracelet
+    line  58: NEXT PAGE
+    line  59: PREV PAGE
+    line  60: citrine ring
+    line  61: citrine necklace (silver)
+    line  62: citrine necklace (jewelled)
+    line  63: citrine earrings
+    line  64: citrine necklace (golden)
+    line  65: citrine bracelet
+    line  66: amethyst ring
+    line  67: amethyst necklace (silver)
+    line  68: amethyst necklace (jewelled)
+    line  69: amethyst earrings
+    line  70: NEXT PAGE
+    line  71: PREV PAGE
+    line  72: amethyst necklace (golden)
+    line  73: amethyst bracelet
+    line  74: tourmaline ring
+    line  75: tourmaline necklace (silver)
+    line  76: tourmaline necklace (jewelled)
+    line  77: tourmaline earrings
+    line  78: tourmaline necklace (golden)
+    line  79: tourmaline bracelet
+    line  80: amber ring
+    line  81: amber necklace (silver)
+    line  82: NEXT PAGE
+    line  83: PREV PAGE
+    line  84: amber necklace (jewelled)
+    line  85: amber earrings
+    line  86: amber necklace (golden)
+    line  87: amber bracelet
+    line  88: diamond ring
+    line  89: diamond necklace (silver)
+    line  90: diamond necklace (jewelled)
+    line  91: diamond earrings
+    line  92: diamond necklace (golden)
+    line  93: diamond bracelet
+    line  94: NEXT PAGE
+    line  95: PREV PAGE
+    line  96: krampus minion earrings
+
+  [button 8]
+    line   0: <CENTER>TINKERING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: DO NOT MARK
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: IRON (~1_AMT~)
+    line  14: LAST TEN
+    line  15: Jewelry
+    line  16: Wooden Items
+    line  17: Tools
+    line  18: Parts
+    line  19: Utensils
+    line  20: Miscellaneous
+    line  21: Assemblies
+    line  22: Traps
+    line  23: Magic Jewelry
+    line  24: nunchaku
+    line  25: jointing plane
+    line  26: moulding planes
+    line  27: smoothing plane
+    line  28: clock frame
+    line  29: axle
+    line  30: rolling pin
+    line  31: ramrod
+    line  32: softened reeds
+    line  33: round basket
+    line  34: NEXT PAGE
+    line  35: PREV PAGE
+    line  36: bushel
+    line  37: small bushel
+    line  38: picnic basket
+    line  39: winnowing basket
+    line  40: square basket
+    line  41: basket
+    line  42: tall round basket
+    line  43: small square basket
+    line  44: tall basket
+    line  45: small round basket
+    line  46: NEXT PAGE
+    line  47: PREV PAGE
+
+  [button 15]
+    line   0: <CENTER>TINKERING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: DO NOT MARK
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: IRON (~1_AMT~)
+    line  14: LAST TEN
+    line  15: Jewelry
+    line  16: Wooden Items
+    line  17: Tools
+    line  18: Parts
+    line  19: Utensils
+    line  20: Miscellaneous
+    line  21: Assemblies
+    line  22: Traps
+    line  23: Magic Jewelry
+    line  24: scissors
+    line  25: mortar and pestle
+    line  26: scorp
+    line  27: tinker's tools
+    line  28: hatchet
+    line  29: draw knife
+    line  30: sewing kit
+    line  31: saw
+    line  32: dovetail saw
+    line  33: froe
+    line  34: NEXT PAGE
+    line  35: PREV PAGE
+    line  36: shovel
+    line  37: hammer
+    line  38: tongs
+    line  39: smith's hammer
+    line  40: sledge hammer
+    line  41: inshave
+    line  42: pickaxe
+    line  43: lockpick
+    line  44: skillet
+    line  45: flour sifter
+    line  46: NEXT PAGE
+    line  47: PREV PAGE
+    line  48: fletcher's tools
+    line  49: mapmaker's pen
+    line  50: scribe's pen
+    line  51: clippers
+    line  52: metal container engraving tool
+    line  53: pitchfork
+
+  [button 22]
+    line   0: <CENTER>TINKERING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: DO NOT MARK
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: IRON (~1_AMT~)
+    line  14: LAST TEN
+    line  15: Jewelry
+    line  16: Wooden Items
+    line  17: Tools
+    line  18: Parts
+    line  19: Utensils
+    line  20: Miscellaneous
+    line  21: Assemblies
+    line  22: Traps
+    line  23: Magic Jewelry
+    line  24: gears
+    line  25: clock parts
+    line  26: barrel tap
+    line  27: springs
+    line  28: sextant parts
+    line  29: barrel hoops
+    line  30: hinge
+    line  31: bola balls
+    line  32: jeweled filigree
+
+  [button 29]
+    line   0: <CENTER>TINKERING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: DO NOT MARK
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: IRON (~1_AMT~)
+    line  14: LAST TEN
+    line  15: Jewelry
+    line  16: Wooden Items
+    line  17: Tools
+    line  18: Parts
+    line  19: Utensils
+    line  20: Miscellaneous
+    line  21: Assemblies
+    line  22: Traps
+    line  23: Magic Jewelry
+    line  24: butcher knife
+    line  25: spoon (left)
+    line  26: spoon (right)
+    line  27: plate
+    line  28: fork (left)
+    line  29: fork (right)
+    line  30: cleaver
+    line  31: knife (left)
+    line  32: knife (right)
+    line  33: goblet
+    line  34: NEXT PAGE
+    line  35: PREV PAGE
+    line  36: pewter mug
+    line  37: skinning knife
+    line  38: gargish cleaver
+    line  39: gargish butcher's knife
+
+  [button 36]
+    line   0: <CENTER>TINKERING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: DO NOT MARK
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: IRON (~1_AMT~)
+    line  14: LAST TEN
+    line  15: Jewelry
+    line  16: Wooden Items
+    line  17: Tools
+    line  18: Parts
+    line  19: Utensils
+    line  20: Miscellaneous
+    line  21: Assemblies
+    line  22: Traps
+    line  23: Magic Jewelry
+    line  24: key ring
+    line  25: candelabra
+    line  26: scales
+    line  27: iron key
+    line  28: globe
+    line  29: spyglass
+    line  30: lantern
+    line  31: heating stand
+    line  32: shoji lantern
+    line  33: paper lantern
+    line  34: NEXT PAGE
+    line  35: PREV PAGE
+    line  36: round paper lantern
+    line  37: wind chimes
+    line  38: fancy wind chimes
+    line  39: Ter-Mur style candelabra
+    line  40: Gorgon Lens
+    line  41: dragon lamp
+    line  42: stained glass lamp
+    line  43: tall double lamp
+    line  44: NEXT PAGE
+    line  45: PREV PAGE
+    line  46: NEXT PAGE
+    line  47: PREV PAGE
+    line  48: candied staff
+
+  [button 43]
+    line   0: <CENTER>TINKERING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: DO NOT MARK
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: IRON (~1_AMT~)
+    line  14: LAST TEN
+    line  15: Jewelry
+    line  16: Wooden Items
+    line  17: Tools
+    line  18: Parts
+    line  19: Utensils
+    line  20: Miscellaneous
+    line  21: Assemblies
+    line  22: Traps
+    line  23: Magic Jewelry
+    line  24: axle with gears
+    line  25: clock parts
+    line  26: sextant parts
+    line  27: clock (right)
+    line  28: clock (left)
+    line  29: sextant
+    line  30: bola
+    line  31: potion keg
+    line  32: leather wolf assembly
+    line  33: clockwork scorpion assembly
+    line  34: NEXT PAGE
+    line  35: PREV PAGE
+    line  36: vollem assembly
+    line  37: hitching rope
+    line  38: hitching post (replica)
+    line  39: arcanic rune stone
+    line  40: void orb
+    line  41: advanced training dummy (south)
+    line  42: advanced training dummy (east)
+    line  43: distillery (south)
+    line  44: distillery (east)
+    line  45: NEXT PAGE
+    line  46: PREV PAGE
+    line  47: telescope
+    line  48: oracle of the sea
+    line  49: Grinder
+    line  50: Steam Powered Beverage Maker
+
+  [button 50]
+    line   0: <CENTER>TINKERING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: DO NOT MARK
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: IRON (~1_AMT~)
+    line  14: LAST TEN
+    line  15: Jewelry
+    line  16: Wooden Items
+    line  17: Tools
+    line  18: Parts
+    line  19: Utensils
+    line  20: Miscellaneous
+    line  21: Assemblies
+    line  22: Traps
+    line  23: Magic Jewelry
+    line  24: dart trap
+    line  25: poison trap
+    line  26: explosion trap
+
+  [button 57]
+    line   0: <CENTER>TINKERING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: DO NOT MARK
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: IRON (~1_AMT~)
+    line  14: LAST TEN
+    line  15: Jewelry
+    line  16: Wooden Items
+    line  17: Tools
+    line  18: Parts
+    line  19: Utensils
+    line  20: Miscellaneous
+    line  21: Assemblies
+    line  22: Traps
+    line  23: Magic Jewelry
+    line  24: brilliant amber bracelet
+    line  25: fire ruby bracelet
+    line  26: dark sapphire bracelet
+    line  27: white pearl bracelet
+    line  28: ecru citrine ring
+    line  29: blue diamond ring
+    line  30: perfect emerald ring
+    line  31: turquoise ring
+    line  32: Resilient Bracer
+    line  33: Essence of Battle
+    line  34: NEXT PAGE
+    line  35: PREV PAGE
+    line  36: Pendant of the Magi
+
+  [button 64 — closed the gump]
+
+[could not reopen gump before button 71 — stopping]

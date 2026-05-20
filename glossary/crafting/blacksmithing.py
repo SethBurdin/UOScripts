@@ -145,7 +145,7 @@ blacksmithCraftables = {
         retainsColor = True,
         minSkill = 56.4,
         resourcesNeeded = { 'ingots': 10 },
-        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 1 ), GumpSelection( 2653346093, 65 ) )
     ),
     'platemail legs': BlacksmithCraftable(
         name = 'platemail legs',
@@ -352,7 +352,7 @@ blacksmithCraftables = {
         retainsColor = True,
         minSkill = 24.3,
         resourcesNeeded = { 'ingots': 8 },
-        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 23 ) )
     ),
     'dagger': BlacksmithCraftable(
         name = 'dagger',
@@ -388,7 +388,7 @@ blacksmithCraftables = {
         retainsColor = True,
         minSkill = 28.0,
         resourcesNeeded = { 'ingots': 12 },
-        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 37 ) )
+        gumpPath = ( GumpSelection( 2653346093, 22 ), GumpSelection( 2653346093, 51 ) )
     ),
     'scimitar': BlacksmithCraftable(
         name = 'scimitar',
@@ -541,7 +541,7 @@ blacksmithCraftables = {
         retainsColor = True,
         minSkill = 14.5,
         resourcesNeeded = { 'ingots': 6 },
-        gumpPath = ( GumpSelection( 2653346093, 64 ), GumpSelection( 2653346093, 9 ) )
+        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 9 ) )
     ),
     'maul': BlacksmithCraftable(
         name = 'maul',
@@ -550,7 +550,7 @@ blacksmithCraftables = {
         retainsColor = True,
         minSkill = 19.4,
         resourcesNeeded = { 'ingots': 10 },
-        gumpPath = ( GumpSelection( 2653346093, 64 ), GumpSelection( 2653346093, 16 ) )
+        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 16 ) )
     ),
     'war mace': BlacksmithCraftable(
         name = 'war mace',
@@ -568,7 +568,19 @@ blacksmithCraftables = {
         retainsColor = True,
         minSkill = 34.2,
         resourcesNeeded = { 'ingots': 16 },
-        gumpPath = ( GumpSelection( 2653346093, 64 ), GumpSelection( 2653346093, 30 ) )
+        gumpPath = ( GumpSelection( 2653346093, 43 ), GumpSelection( 2653346093, 37 ) )
+    ),
+
+
+    ### Throwing: Gump Button 57 ###
+    'soul glaive': BlacksmithCraftable(
+        name = 'soul glaive',
+        itemID = 0x090A,
+        retainsMark = True,
+        retainsColor = True,
+        minSkill = 91.0,
+        resourcesNeeded = { 'ingots': 10 },
+        gumpPath = ( GumpSelection( 2653346093, 57 ), GumpSelection( 2653346093, 16 ) )
     ),
 
 

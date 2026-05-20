@@ -3294,3 +3294,80 @@
 2026-05-09 14:16:03  Added 'Strength' -> spellbook.
 2026-05-09 14:16:05  Added 'Reactive Armor' -> spellbook.
 2026-05-09 14:16:07  Added 'Clumsy' -> spellbook.
+
+============================================================
+  RUN START  2026-05-19 08:06:52
+============================================================
+2026-05-19 08:06:57  Target the spellbook to fill...
+2026-05-19 08:07:02  Target is not a recognised spellbook. Stopping.
+
+============================================================
+  RUN START  2026-05-19 08:07:06
+============================================================
+2026-05-19 08:07:09  Target the spellbook to fill...
+2026-05-19 08:07:10  Filling spellbook 0x4006DCCC from chest 0x400F3F52...
+2026-05-19 08:07:12  Added 'Earthquake' -> spellbook.
+2026-05-19 08:07:12  'Energy Vortex' (0x1F66) not in chest.
+2026-05-19 08:07:14  Added 'Resurrection' -> spellbook.
+2026-05-19 08:07:14  'Summon Air Elemental' (0x1F68) not in chest.
+2026-05-19 08:07:15  'Summon Daemon' (0x1F69) not in chest.
+2026-05-19 08:07:15  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-05-19 08:07:15  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-05-19 08:07:16  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-05-19 08:07:18  Added 'Chain Lightning' -> spellbook.
+2026-05-19 08:07:20  Added 'Energy Field' -> spellbook.
+2026-05-19 08:07:22  Added 'Flamestrike' -> spellbook.
+2026-05-19 08:07:24  Added 'Gate Travel' -> spellbook.
+2026-05-19 08:07:26  Added 'Mana Vampire' -> spellbook.
+2026-05-19 08:07:28  Added 'Mass Dispel' -> spellbook.
+2026-05-19 08:07:30  Added 'Meteor Swarm' -> spellbook.
+2026-05-19 08:07:32  Added 'Polymorph' -> spellbook.
+2026-05-19 08:07:34  Added 'Dispel' -> spellbook.
+2026-05-19 08:07:36  Added 'Energy Bolt' -> spellbook.
+2026-05-19 08:07:38  Added 'Explosion' -> spellbook.
+2026-05-19 08:07:40  Added 'Invisibility' -> spellbook.
+2026-05-19 08:07:40  'Mark' (0x1F59) not in chest.
+2026-05-19 08:07:42  Added 'Mass Curse' -> spellbook.
+2026-05-19 08:07:44  Added 'Paralyze Field' -> spellbook.
+2026-05-19 08:07:46  Added 'Reveal' -> spellbook.
+2026-05-19 08:07:48  Added 'Blade Spirits' -> spellbook.
+2026-05-19 08:07:50  Added 'Dispel Field' -> spellbook.
+2026-05-19 08:07:52  Added 'Incognito' -> spellbook.
+2026-05-19 08:07:54  Added 'Magic Reflection' -> spellbook.
+2026-05-19 08:07:56  Added 'Mind Blast' -> spellbook.
+2026-05-19 08:07:58  Added 'Paralyze' -> spellbook.
+2026-05-19 08:08:00  Added 'Poison Field' -> spellbook.
+2026-05-19 08:08:02  Added 'Summon Creature' -> spellbook.
+2026-05-19 08:08:04  Added 'Arch Cure' -> spellbook.
+2026-05-19 08:08:06  Added 'Arch Protection' -> spellbook.
+2026-05-19 08:08:08  Added 'Curse' -> spellbook.
+2026-05-19 08:08:10  Added 'Fire Field' -> spellbook.
+2026-05-19 08:08:12  Added 'Greater Heal' -> spellbook.
+2026-05-19 08:08:14  Added 'Lightning' -> spellbook.
+2026-05-19 08:08:16  Added 'Mana Drain' -> spellbook.
+2026-05-19 08:08:18  Added 'Recall' -> spellbook.
+2026-05-19 08:08:20  Added 'Bless' -> spellbook.
+2026-05-19 08:08:22  Added 'Fireball' -> spellbook.
+2026-05-19 08:08:24  Added 'Magic Lock' -> spellbook.
+2026-05-19 08:08:26  Added 'Poison' -> spellbook.
+2026-05-19 08:08:28  Added 'Telekinesis' -> spellbook.
+2026-05-19 08:08:30  Added 'Teleport' -> spellbook.
+2026-05-19 08:08:32  Added 'Unlock' -> spellbook.
+2026-05-19 08:08:34  Added 'Wall of Stone' -> spellbook.
+2026-05-19 08:08:36  Added 'Agility' -> spellbook.
+2026-05-19 08:08:38  Added 'Cunning' -> spellbook.
+2026-05-19 08:08:40  Added 'Cure' -> spellbook.
+2026-05-19 08:08:42  Added 'Harm' -> spellbook.
+2026-05-19 08:08:44  Added 'Magic Trap' -> spellbook.
+2026-05-19 08:08:46  Added 'Magic Untrap' -> spellbook.
+2026-05-19 08:08:48  Added 'Protection' -> spellbook.
+2026-05-19 08:08:50  Added 'Strength' -> spellbook.
+2026-05-19 08:08:52  Added 'Reactive Armor' -> spellbook.
+2026-05-19 08:08:54  Added 'Clumsy' -> spellbook.
+2026-05-19 08:08:56  Added 'Create Food' -> spellbook.
+2026-05-19 08:08:58  Added 'Feeblemind' -> spellbook.
+2026-05-19 08:09:00  Added 'Heal' -> spellbook.
+2026-05-19 08:09:02  Added 'Magic Arrow' -> spellbook.
+2026-05-19 08:09:04  Added 'Night Sight' -> spellbook.
+2026-05-19 08:09:06  Added 'Weaken' -> spellbook.
+2026-05-19 08:09:06  FILL done.  Added: 57   Missing from chest: 7
