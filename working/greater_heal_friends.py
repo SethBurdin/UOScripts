@@ -1,126 +1,120 @@
-import sys, os
+import sys, os, time
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from utilities.items import FindItem
+if False:
+    from razorenhanced_stubs import *
+
 from utilities.mobiles import GetEmptyMobileList
 from glossary.colors import colors
-from System.Collections.Generic import List
 
-if Misc.ShardName() == 'UO Evolution':
-    petsToCheck = [
-        0x00037C0A, # Horse
-        0x00041BDC # Zazzy
-    ]
-else:
-    petsToCheck = [
-        0x00037C0A, # Horse
-        0x00041BDC # Zazzy
-    ]
+# ── Config ────────────────────────────────────────────────────────────────────
+SCAN_RANGE        = 8     # tile radius to scan for friends
+BLESS_DURATION_SEC = 120  # seconds before re-blessing a target
 
-#for pet in petsToCheck:
-#    Timer.Create( 'distanceTimer%s' % pet, 1 )
+# ── Bless timing tracker ──────────────────────────────────────────────────────
+_bless_times = {}   # { serial: timestamp of last bless cast }
 
-def TestBandagesApplying():
-    # Fetch the Journal entries (oldest to newest)
-    regularText = Journal.GetTextByType( 'Regular' )
+def _is_blessed(mob):
+    return time.time() - _bless_times.get(mob.Serial, 0) < BLESS_DURATION_SEC
 
-    # Reverse the Journal entries so that we read from newest to oldest
-    regularText.Reverse()
 
-    # Read back until the bandages were started to see if they have finished applying
-    for line in regularText[ 0 : len( regularText ) ]:
-        if line == 'You begin applying the bandages.':
-            break
-        if ( line == 'You finish applying the bandages.' or
-                line == 'You heal what little damage your patient had.' or
-                line == 'You did not stay close enough to heal your patient!' or
-                line == 'You apply the bandages, but they barely help.' or
-                line == 'That being is not damaged!' or
-                line == 'You fail to resurrect the creature.' or
-                line == 'You are able to resurrect your patient.' or
-                line == 'You have cured the target of all poisons!' or
-                line == 'That is too far away.' ):
-            return False
+# ── Friend scan ───────────────────────────────────────────────────────────────
+
+def _get_friends():
+    """Returns living (non-ghost) friendly mobiles within range."""
+    f = Mobiles.Filter()
+    f.IsGhost  = 0
+    f.Friend   = 1
+    f.RangeMin = 0
+    f.RangeMax = SCAN_RANGE
+    result = GetEmptyMobileList(Mobiles)
+    result.AddRange(Mobiles.ApplyFilter(f))
+    return result
+
+def _get_ghosts():
+    """Returns friendly ghosts within range."""
+    f = Mobiles.Filter()
+    f.IsGhost  = 1
+    f.Friend   = 1
+    f.RangeMin = 0
+    f.RangeMax = SCAN_RANGE
+    result = GetEmptyMobileList(Mobiles)
+    result.AddRange(Mobiles.ApplyFilter(f))
+    return result
+
+
+# ── Resurrect ────────────────────────────────────────────────────────────────
+
+def ResurrectGhosts():
+    """Cast Resurrection on each friendly ghost in range.
+    Returns True if at least one cast was made."""
+    ghosts = _get_ghosts()
+    if len(ghosts) == 0:
+        return False
+    for ghost in ghosts:
+        Player.HeadMessage(colors['cyan'], 'Resurrecting %s' % ghost.Name)
+        Spells.CastMagery('Resurrection')
+        if Target.WaitForTarget(5000, False):
+            Target.TargetExecute(ghost)
+        Misc.Pause(2000)
     return True
 
 
-# def WaitForBandagesToApply():
-#     bandageDone = False
-#     secondsCounter = 0
-#     while TestBandagesApplying():
-#         Misc.Pause( 300 )
-#         secondsCounter += 1
-#         Misc.SendMessage( '%i seconds since bandage started' % ( secondsCounter ) )
-#     return
-
+# ── Heal / cure ───────────────────────────────────────────────────────────────
 
 def HealPets():
-    global petsToCheck
-    
-    
-    petFilter = Mobiles.Filter()
-    petFilter.IsGhost = 0
-    petFilter.Friend = 1
-    petFilter.RangeMin = 0
-    petFilter.RangeMax = 8
-    
-    pets = GetEmptyMobileList(Mobiles)
-    pets.AddRange(Mobiles.ApplyFilter(petFilter))
-    if len(pets) == 0:
-        return
+    """Priority 1 — cure any poisoned friend.
+       Priority 2 — heal the lowest-HP friend.
+       Returns True if a spell was cast."""
+    friends = _get_friends()
+    if len(friends) == 0:
+        return False
 
-    petToHeal = Mobiles.Select(pets, 'Weakest')
-
-    if petToHeal.Hits == petToHeal.HitsMax:
-        petFilter.Poisoned = 1
-        pets = GetEmptyMobileList(Mobiles)
-        pets.AddRange(Mobiles.ApplyFilter(petFilter))
-        if len(pets) == 0:
-            return
-        else:
-            petToHeal = Mobiles.Select(pets, 'Weakest')
-    if not petToHeal.Poisoned:
-        Spells.CastMagery("Greater Heal")
-        Target.WaitForTarget(5000, False)
-        Target.TargetExecute(petToHeal)
-        Player.HeadMessage(colors['cyan'], 'Healing %s (currently %i%% health)' % (petToHeal.Name, (float(petToHeal.Hits) / float(petToHeal.HitsMax) * 100)))
-        Misc.Pause(1700)
-    elif petToHeal.Poisoned:
-        Spells.CastMagery("Arch Cure")
-        Target.WaitForTarget(4000, False)
-        Target.TargetExecute(petToHeal)
-        Player.HeadMessage(colors['cyan'], 'Curing %s (currently %i%% health)' % (petToHeal.Name, (float(petToHeal.Hits) / float(petToHeal.HitsMax) * 100)))
+    # Priority 1: poisoned targets
+    poisoned = [m for m in friends if m.Poisoned]
+    if poisoned:
+        target = min(poisoned, key=lambda m: m.Hits)
+        Player.HeadMessage(colors['cyan'], 'Curing %s (%d%%)' % (
+            target.Name, int(float(target.Hits) / target.HitsMax * 100)))
+        Spells.CastMagery('Arch Cure')
+        if Target.WaitForTarget(4000, False):
+            Target.TargetExecute(target)
         Misc.Pause(1500)
+        return True
 
-    # WaitForBandagesToApply()
-    return
+    # Priority 2: damaged targets
+    damaged = [m for m in friends if m.HitsMax > 0 and m.Hits < m.HitsMax]
+    if damaged:
+        target = min(damaged, key=lambda m: float(m.Hits) / m.HitsMax)
+        Player.HeadMessage(colors['cyan'], 'Healing %s (%d%%)' % (
+            target.Name, int(float(target.Hits) / target.HitsMax * 100)))
+        Spells.CastMagery('Greater Heal')
+        if Target.WaitForTarget(5000, False):
+            Target.TargetExecute(target)
+        Misc.Pause(1700)
+        return True
+
+    return False
 
 
-BLESS_CHECK_TICKS = 200   # ~30 s at 150 ms per idle tick
+# ── Bless ─────────────────────────────────────────────────────────────────────
 
 def BlessFriends():
-    petFilter          = Mobiles.Filter()
-    petFilter.IsGhost  = 0
-    petFilter.Friend   = 1
-    petFilter.RangeMin = 0
-    petFilter.RangeMax = 8
-
-    pets = GetEmptyMobileList(Mobiles)
-    pets.AddRange(Mobiles.ApplyFilter(petFilter))
-
-    for pet in pets:
-        Spells.CastMagery( 'Bless' )
-        Target.WaitForTarget( 5000, False )
-        Target.TargetExecute( pet )
-        Player.HeadMessage( colors['cyan'], 'Blessing %s' % pet.Name )
-        Misc.Pause( 1700 )
+    """Bless any friend who hasn't been blessed within BLESS_DURATION_SEC."""
+    for mob in _get_friends():
+        if not _is_blessed(mob):
+            Player.HeadMessage(colors['cyan'], 'Blessing %s' % mob.Name)
+            Spells.CastMagery('Bless')
+            if Target.WaitForTarget(5000, False):
+                Target.TargetExecute(mob)
+            _bless_times[mob.Serial] = time.time()
+            Misc.Pause(1700)
 
 
-bless_counter = BLESS_CHECK_TICKS   # fire on first pass
+# ── Main loop ─────────────────────────────────────────────────────────────────
+
 while not Player.IsGhost:
-    HealPets()
-    bless_counter += 1
-    if bless_counter >= BLESS_CHECK_TICKS:
-        BlessFriends()
-        bless_counter = 0
-    Misc.Pause( 150 )
+    if not ResurrectGhosts():
+        if not HealPets():
+            BlessFriends()
+    Misc.Pause(150)

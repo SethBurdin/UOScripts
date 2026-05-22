@@ -3371,3 +3371,74 @@
 2026-05-19 08:09:04  Added 'Night Sight' -> spellbook.
 2026-05-19 08:09:06  Added 'Weaken' -> spellbook.
 2026-05-19 08:09:06  FILL done.  Added: 57   Missing from chest: 7
+
+============================================================
+  RUN START  2026-05-19 23:28:20
+============================================================
+2026-05-19 23:28:27  Target the spellbook to fill...
+2026-05-19 23:28:31  Filling spellbook 0x4011FC2E from chest 0x400F3F52...
+2026-05-19 23:28:31  'Earthquake' (0x1F65) not in chest.
+2026-05-19 23:28:32  'Energy Vortex' (0x1F66) not in chest.
+2026-05-19 23:28:32  'Resurrection' (0x1F67) not in chest.
+2026-05-19 23:28:32  'Summon Air Elemental' (0x1F68) not in chest.
+2026-05-19 23:28:33  'Summon Daemon' (0x1F69) not in chest.
+2026-05-19 23:28:33  'Summon Earth Elemental' (0x1F6A) not in chest.
+2026-05-19 23:28:33  'Summon Fire Elemental' (0x1F6B) not in chest.
+2026-05-19 23:28:33  'Summon Water Elemental' (0x1F6C) not in chest.
+2026-05-19 23:28:35  Added 'Chain Lightning' -> spellbook.
+2026-05-19 23:28:37  Added 'Energy Field' -> spellbook.
+2026-05-19 23:28:39  Added 'Flamestrike' -> spellbook.
+2026-05-19 23:28:41  Added 'Gate Travel' -> spellbook.
+2026-05-19 23:28:43  Added 'Mana Vampire' -> spellbook.
+2026-05-19 23:28:44  'Mass Dispel' (0x1F62) not in chest.
+2026-05-19 23:28:44  'Meteor Swarm' (0x1F63) not in chest.
+2026-05-19 23:28:46  Added 'Polymorph' -> spellbook.
+2026-05-19 23:28:46  'Dispel' (0x1F55) not in chest.
+2026-05-19 23:28:48  Added 'Energy Bolt' -> spellbook.
+2026-05-19 23:28:50  Added 'Explosion' -> spellbook.
+2026-05-19 23:28:52  Added 'Invisibility' -> spellbook.
+2026-05-19 23:28:53  'Mark' (0x1F59) not in chest.
+2026-05-19 23:28:53  'Mass Curse' (0x1F5A) not in chest.
+2026-05-19 23:28:53  'Paralyze Field' (0x1F5B) not in chest.
+2026-05-19 23:28:55  Added 'Reveal' -> spellbook.
+2026-05-19 23:28:57  Added 'Blade Spirits' -> spellbook.
+2026-05-19 23:28:59  Added 'Dispel Field' -> spellbook.
+2026-05-19 23:29:01  Added 'Incognito' -> spellbook.
+2026-05-19 23:29:03  Added 'Magic Reflection' -> spellbook.
+2026-05-19 23:29:05  Added 'Mind Blast' -> spellbook.
+2026-05-19 23:29:07  Added 'Paralyze' -> spellbook.
+2026-05-19 23:29:09  Added 'Poison Field' -> spellbook.
+2026-05-19 23:29:11  Added 'Summon Creature' -> spellbook.
+2026-05-19 23:29:13  Added 'Arch Cure' -> spellbook.
+2026-05-19 23:29:15  Added 'Arch Protection' -> spellbook.
+2026-05-19 23:29:17  Added 'Curse' -> spellbook.
+2026-05-19 23:29:19  Added 'Fire Field' -> spellbook.
+2026-05-19 23:29:21  Added 'Greater Heal' -> spellbook.
+2026-05-19 23:29:23  Added 'Lightning' -> spellbook.
+2026-05-19 23:29:25  Added 'Mana Drain' -> spellbook.
+2026-05-19 23:29:27  Added 'Recall' -> spellbook.
+2026-05-19 23:29:29  Added 'Bless' -> spellbook.
+2026-05-19 23:29:31  Added 'Fireball' -> spellbook.
+2026-05-19 23:29:33  Added 'Magic Lock' -> spellbook.
+2026-05-19 23:29:35  Added 'Poison' -> spellbook.
+2026-05-19 23:29:37  Added 'Telekinesis' -> spellbook.
+2026-05-19 23:29:39  Added 'Teleport' -> spellbook.
+2026-05-19 23:29:41  Added 'Unlock' -> spellbook.
+2026-05-19 23:29:43  Added 'Wall of Stone' -> spellbook.
+2026-05-19 23:29:44  'Agility' (0x1F35) not in chest.
+2026-05-19 23:29:44  'Cunning' (0x1F36) not in chest.
+2026-05-19 23:29:46  Added 'Cure' -> spellbook.
+2026-05-19 23:29:46  'Harm' (0x1F38) not in chest.
+2026-05-19 23:29:48  Added 'Magic Trap' -> spellbook.
+2026-05-19 23:29:49  'Magic Untrap' (0x1F3A) not in chest.
+2026-05-19 23:29:51  Added 'Protection' -> spellbook.
+2026-05-19 23:29:51  'Strength' (0x1F3C) not in chest.
+2026-05-19 23:29:53  Added 'Reactive Armor' -> spellbook.
+2026-05-19 23:29:55  Added 'Clumsy' -> spellbook.
+2026-05-19 23:29:57  Added 'Create Food' -> spellbook.
+2026-05-19 23:29:59  Added 'Feeblemind' -> spellbook.
+2026-05-19 23:30:01  Added 'Heal' -> spellbook.
+2026-05-19 23:30:03  Added 'Magic Arrow' -> spellbook.
+2026-05-19 23:30:05  Added 'Night Sight' -> spellbook.
+2026-05-19 23:30:07  Added 'Weaken' -> spellbook.
+2026-05-19 23:30:07  FILL done.  Added: 45   Missing from chest: 19

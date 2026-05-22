@@ -32,7 +32,6 @@ from glossary.runebook_handler import (
     travel_to_runebook, RUNEBOOK_ITEM_ID,
 )
 from utilities.items import FindItem, MoveItem
-import config
 from System.Collections.Generic import List
 from System import Int32
 
@@ -43,6 +42,9 @@ CLOTH_ID  = 0x0F9A   # bolts of cloth   (produced by loom)
 
 # Body IDs for sheep variants (unshorn & shorn)
 SHEEP_BODY_IDS = [ 0x00CF, 0x00D0 ]
+
+PACK_BEETLE_BODY     = 0x00EF   # giant/pack beetle body ID
+WEIGHT_OFFLOAD_PCT   = 0.75     # offload wool to beetle at this fraction of max weight
 
 # ── Runebook patrol config ─────────────────────────────────────────────────────
 SHEEP_RUNEBOOK_LABEL = 'sheep'    # label of the runebook to use for patrol
@@ -81,7 +83,56 @@ def Prompt( question, options, timeout = 30 ):
     return 1
 
 
+# ── Session state ─────────────────────────────────────────────────────────────
+_pack_beetle_serial = None
+
+
 # ── Helpers ───────────────────────────────────────────────────────────────────
+
+def FindPackBeetle():
+    '''Return a nearby pack beetle Mobile, or None. Caches the serial across calls.'''
+    global _pack_beetle_serial
+    if _pack_beetle_serial is not None:
+        mob = Mobiles.FindBySerial( _pack_beetle_serial )
+        if mob is not None and mob.Backpack is not None:
+            return mob
+        _pack_beetle_serial = None
+    filt            = Mobiles.Filter()
+    filt.RangeMax   = 10
+    filt.IsHuman    = False
+    for mob in Mobiles.ApplyFilter( filt ):
+        if mob.Serial == Player.Serial:
+            continue
+        if mob.Body == PACK_BEETLE_BODY and mob.Backpack is not None:
+            _pack_beetle_serial = mob.Serial
+            return mob
+    for mob in Mobiles.ApplyFilter( filt ):
+        if mob.Serial == Player.Serial:
+            continue
+        if mob.Backpack is not None:
+            _pack_beetle_serial = mob.Serial
+            return mob
+    return None
+
+
+def OffloadWoolToBeetle():
+    '''Move all wool from backpack to the pack beetle. Returns True if anything moved.'''
+    beetle = FindPackBeetle()
+    if beetle is None:
+        Misc.SendMessage( 'No pack beetle found (serial=%s) — carrying wool.' % _pack_beetle_serial, colors[ 'yellow' ] )
+        return False
+    Misc.SendMessage( 'Offloading to %s (0x%X)...' % ( beetle.Name, beetle.Serial ), colors[ 'cyan' ] )
+    moved = 0
+    wool = Items.FindByID( WOOL_ID, -1, Player.Backpack.Serial )
+    while wool is not None:
+        Items.Move( wool, beetle.Backpack, wool.Amount )
+        Misc.Pause( 1200 )
+        moved += 1
+        wool = Items.FindByID( WOOL_ID, -1, Player.Backpack.Serial )
+    if moved:
+        Misc.SendMessage( 'Offloaded %d wool stack(s) to %s.' % ( moved, beetle.Name ), colors[ 'cyan' ] )
+    return moved > 0
+
 
 def GetShearTool():
     '''Returns a dagger or skinning knife from the player backpack, or None.'''
@@ -381,6 +432,8 @@ def _shear_all_nearby( tool ):
         return 0
     sheared = set()
     for animal in sheep:
+        if Player.Weight >= Player.MaxWeight * WEIGHT_OFFLOAD_PCT:
+            OffloadWoolToBeetle()
         fresh = Mobiles.FindBySerial( animal.Serial )
         if fresh is None or fresh.Serial in sheared:
             continue
@@ -392,15 +445,14 @@ def _shear_all_nearby( tool ):
         Items.UseItem( tool )
         Target.WaitForTarget( 3000, False )
         Target.TargetExecute( fresh )
-        Timer.Create( 'shear_timeout', 5000 )
-        while Timer.Check( 'shear_timeout' ):
-            if ( Journal.SearchByType( 'You shear',     'Regular' ) or
-                 Journal.SearchByType( 'already shorn', 'Regular' ) or
-                 Journal.SearchByType( 'wool',          'Regular' ) ):
+        Timer.Create( 'shear_wait', 2000 )
+        while Timer.Check( 'shear_wait' ):
+            if ( Journal.Search( 'gathered wool' ) or
+                 Journal.Search( 'already been shorn' ) or
+                 Journal.Search( 'You shear' ) ):
                 break
-            Misc.Pause( 100 )
+            Misc.Pause( 50 )
         sheared.add( fresh.Serial )
-        Misc.Pause( config.dragDelayMilliseconds )
     return len( sheared )
 
 
@@ -436,6 +488,9 @@ def PatrolRunebook():
 
     # ── Patrol loop ───────────────────────────────────────────────────────────
     for slot, name in spots:
+        if Player.Weight >= Player.MaxWeight * WEIGHT_OFFLOAD_PCT:
+            Misc.SendMessage( 'Weight %d/%d — offloading to beetle.' % ( Player.Weight, Player.MaxWeight ), colors[ 'yellow' ] )
+            OffloadWoolToBeetle()
         Misc.SendMessage( 'Traveling to %s (slot %d)...' % ( name, slot ), colors[ 'cyan' ] )
         if not travel_to_slot( runebook, slot, RECALL_CAST_DELAY ):
             Misc.SendMessage( 'Travel failed — skipping %s.' % name, colors[ 'yellow' ] )

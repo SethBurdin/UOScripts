@@ -284,6 +284,14 @@ def TrainBlacksmithing():
             Player.HeadMessage(colors['cyan'], recommended)
             Timer.Create('smith_msg', 15000)
 
+        if item_info.itemID is not None and Player.Weight >= Player.MaxWeight - 30:
+            Misc.SendMessage('[smith] Backpack heavy — smelting before next craft.', colors['yellow'])
+            if Gumps.HasGump():
+                Gumps.SendAction(BLACKSMITH_GUMP_ID, 0)
+                Misc.Pause(500)
+            SmeltItems(item_info.itemID)
+            continue
+
         if FindNumberOfItems(INGOT_ID, Player.Backpack)[INGOT_ID] < LOW_INGOTS:
             Misc.SendMessage('[smith] Ingots low — pulling from materials box.', colors['yellow'])
             pull_ingots(REFILL_INGOTS)
@@ -313,7 +321,10 @@ def TrainBlacksmithing():
 
         after = Items.ContainerCount(Player.Backpack.Serial, item_info.itemID, -1)
         if after <= before:
-            if Journal.Search('That container cannot hold more weight'):
+            if (Journal.Search('cannot hold more weight') or
+                    Journal.Search('cannot hold more items') or
+                    Journal.Search('cannot hold any more') or
+                    Player.Weight >= Player.MaxWeight - 5):
                 Misc.SendMessage('[smith] Backpack overweight — smelting.', colors['yellow'])
                 SmeltItems(item_info.itemID)
                 continue

@@ -1,68 +1,270 @@
 """
-Razor Enhanced API Import Helper - Enhanced Edition
+Razor Enhanced API Stubs
+    Defines typed classes for all Razor Enhanced API globals so Pylance / VS Code
+    can show attribute and method autocomplete.
 
-Import this at the top of your scripts to get full IntelliSense support in VS Code.
-These imports won't be executed at runtime because Razor Enhanced injects
-these modules as globals, but they help Pylance understand your code.
-
-Usage:
-    # Add at the top of any script for IntelliSense:
-    if False:  # IDE only, never runs
+Usage (add to the top of any script):
+    if False:  # IDE only — Razor Enhanced injects these as globals at runtime
         from razorenhanced_stubs import *
-
-Alternative (runtime-safe):
-    try:
-        from razorenhanced_stubs import *
-    except:
-        pass  # Razor Enhanced provides these as globals at runtime
-
-The 'if False:' approach is preferred because it's clearer that it's IDE-only.
 """
 
-# This will never actually run in Razor Enhanced, but Pylance will read it
-from typing import TYPE_CHECKING
+from __future__ import annotations
+from typing import Any, List, Optional, Union, overload
 
-if TYPE_CHECKING:
-    # Type checking only - these imports help IDEs understand the code
-    # Import all Razor Enhanced API modules
-    import Player as Player
-    import Mobiles as Mobiles
-    import Items as Items
-    import Misc as Misc
-    import Target as Target
-    import Spells as Spells
-    import Journal as Journal
-    import Gumps as Gumps
-    import Timer as Timer
-    
-    # Import commonly used System types
-    from System import Byte, UInt16, UInt32, Int32, String
-    from System.Collections.Generic import List
-    
-    # Re-export specific classes for easier access
-    from Mobiles import Mobile, Filter as MobileFilter
-    from Items import Item
-    
-    __all__ = [
-        # API Modules
-        'Player',
-        'Mobiles',
-        'Items',
-        'Misc',
-        'Target',
-        'Spells',
-        'Journal',
-        'Gumps',
-        'Timer',
-        # System Types
-        'Byte',
-        'UInt16',
-        'UInt32',
-        'Int32',
-        'String',
-        'List',
-        # Commonly Used Classes
-        'Mobile',
-        'MobileFilter',
-        'Item',
-    ]
+
+# ── Supporting types ──────────────────────────────────────────────────────────
+
+class Point3D:
+    """Tile coordinate returned by Player.Position, Mobile.Position, etc."""
+    X: int
+    Y: int
+    Z: int
+
+
+# ── Item / ItemFilter ─────────────────────────────────────────────────────────
+
+class Item:
+    Serial: int
+    ItemID: int
+    Name: str
+    Position: Point3D
+    Container: int          # serial of direct parent container
+    RootContainer: int      # serial of top-level container (player serial if in bag)
+    Amount: int
+    Hue: int
+    Durability: int
+    Contains: List[Item]    # items inside this container (may be empty list)
+
+
+class ItemFilter:
+    """Populate then pass to Items.ApplyFilter()."""
+    Enabled: bool
+    Name: str
+    RangeMin: int
+    RangeMax: int
+    OnGround: bool
+    IsContainer: bool
+    Hue: int
+    ItemID: int
+
+
+# ── Mobile / MobileFilter ─────────────────────────────────────────────────────
+
+class Mobile:
+    Serial: int
+    Name: str
+    Position: Point3D
+    Direction: int          # facing direction (0-7, N/NE/E/SE/S/SW/W/NW)
+    MobileID: int           # body / animation ID
+    Hits: int
+    HitsMax: int
+    Notoriety: int          # 1=innocent 2=friend 3=animal 4=criminal 5=enemy 6=murderer 8=invulnerable
+    WarMode: bool
+    Poisoned: bool
+    IsHuman: bool
+    Backpack: Item
+
+    def DistanceTo(self, target: Union[Mobile, Item]) -> int: ...
+
+
+class MobileFilter:
+    """Populate then pass to Mobiles.ApplyFilter()."""
+    Enabled: bool
+    Name: str
+    RangeMin: int
+    RangeMax: int
+    IsGhost: bool
+    IsHuman: bool
+    IsMounted: bool
+    Warmode: bool
+    Notoriety: int
+
+
+# ── Player ────────────────────────────────────────────────────────────────────
+
+class _PlayerClass:
+    IsGhost: bool
+    Connected: bool
+    Serial: int
+    Name: str
+    Position: Point3D
+    Map: str                # map name (e.g. 'Felucca')
+    Backpack: Item
+    Bank: Item
+    Mount: Optional[Item]
+    Mana: int
+    ManaMax: int
+    Hits: int
+    HitsMax: int
+    Weight: int
+    MaxWeight: int
+    WarMode: bool
+    Followers: int
+    Poisoned: bool
+    MobileID: int           # player body type
+
+    def UseSkill(self, skill_name: str) -> None: ...
+    def Attack(self, serial: int) -> None: ...
+
+    @overload
+    def ChatSay(self, message: str) -> None: ...
+    @overload
+    def ChatSay(self, hue: int, message: str) -> None: ...
+    def ChatSay(self, *args: Any) -> None: ...  # type: ignore[misc]
+
+    def HeadMessage(self, color: int, message: str) -> None: ...
+    def Walk(self, direction: str) -> None: ...
+    def GetItemOnLayer(self, layer: str) -> Optional[Item]: ...
+    def EquipItem(self, serial: int) -> None: ...
+    def BuffsExist(self, buff_name: str) -> bool: ...
+    def InRangeItem(self, item: Union[Item, int], range: int) -> bool: ...
+    def DistanceTo(self, target: Union[Mobile, Item]) -> int: ...
+    def GetSkillValue(self, skill_name: str) -> float: ...
+    def GetRealSkillValue(self, skill_name: str) -> float: ...
+    def GetSkillCap(self, skill_name: str) -> float: ...
+
+
+# ── Mobiles ───────────────────────────────────────────────────────────────────
+
+class _MobilesClass:
+    def Filter(self) -> MobileFilter: ...
+    def ApplyFilter(self, filter: MobileFilter) -> List[Mobile]: ...
+    def FindBySerial(self, serial: int) -> Optional[Mobile]: ...
+    def UseMobile(self, serial: int) -> None: ...
+    def Select(self, mobile_list: List[Mobile], sort_type: str) -> Optional[Mobile]: ...
+    def Message(self, serial: int, hue: int, text: str) -> None: ...
+    def WaitForProps(self, serial: int, timeout_ms: int) -> bool: ...
+    def GetPropStringList(self, serial: int) -> List[str]: ...
+    def IgnoreObject(self, mobile: Mobile) -> None: ...
+
+
+# ── Items ─────────────────────────────────────────────────────────────────────
+
+class _ItemsClass:
+    def Filter(self) -> ItemFilter: ...
+    def ApplyFilter(self, filter: ItemFilter) -> List[Item]: ...
+    def FindBySerial(self, serial: int) -> Optional[Item]: ...
+
+    @overload
+    def FindByID(self, item_id: int, hue: int, container_serial: int) -> Optional[Item]: ...
+    @overload
+    def FindByID(self, item_id: int, hue: int, container_serial: int, range: int) -> Optional[Item]: ...
+    def FindByID(self, *args: Any) -> Optional[Item]: ...  # type: ignore[misc]
+
+    def FindAllByID(self, item_id: int, hue: int, container_serial: int, range: int = -1) -> List[Item]: ...
+    def UseItem(self, item: Union[Item, int]) -> None: ...
+    def SingleClick(self, item: Union[Item, int]) -> None: ...
+    def WaitForContents(self, serial: int, timeout_ms: int) -> bool: ...
+    def WaitForProps(self, item: Union[Item, int], timeout_ms: int) -> bool: ...
+    def GetPropStringList(self, serial: int) -> List[str]: ...
+    def GetPropValue(self, item: Union[Item, int], property_name: str) -> Any: ...
+    def Move(self, item: Union[Item, int], dest: Union[Item, int], amount: int) -> None: ...
+    def MoveOnGround(self, item: Union[Item, int], amount: int, x: int, y: int, z: int) -> None: ...
+    def UseItemByID(self, item_id: int, hue: int) -> None: ...
+    def Message(self, serial: int, hue: int, text: str) -> None: ...
+    def Select(self, item_list: List[Item], sort_type: str) -> Optional[Item]: ...
+    def ContainerCount(self, container_serial: int, item_id: int, hue: int) -> int: ...
+
+
+# ── Misc ──────────────────────────────────────────────────────────────────────
+
+class _MiscClass:
+    def Pause(self, milliseconds: int) -> None: ...
+    def SendMessage(self, text: str, hue: int = ...) -> None: ...
+    def WaitForContext(self, serial: int, timeout_ms: int) -> bool: ...
+    def ContextReply(self, serial: int, option_index: int) -> None: ...
+    def MouseLocation(self) -> Point3D: ...
+    def MouseMove(self, x: int, y: int) -> None: ...
+    def ShardName(self) -> str: ...
+    def ReadSharedValue(self, key: str) -> Any: ...
+    def CheckSharedValue(self, key: str) -> bool: ...
+    def SetSharedValue(self, key: str, value: Any) -> None: ...
+    def InputBox(self, prompt: str) -> str: ...
+    def UseSkill(self, skill_name: str) -> None: ...
+
+
+# ── Gumps ─────────────────────────────────────────────────────────────────────
+
+class _GumpsClass:
+    def WaitForGump(self, gump_id: int, timeout_ms: int) -> bool: ...
+    def SendAction(self, gump_id: int, button_id: int) -> None: ...
+    def CloseGump(self, gump_id: int = ...) -> None: ...
+    def HasGump(self) -> bool: ...
+    def CurrentGump(self) -> int: ...
+    def LastGumpGetLineList(self) -> List[str]: ...
+    def IsValid(self, gump_id: int) -> bool: ...
+
+
+# ── Timer ─────────────────────────────────────────────────────────────────────
+
+class _TimerClass:
+    def Create(self, timer_name: str, milliseconds: int) -> None: ...
+    def Check(self, timer_name: str) -> bool: ...   # True while running, False when expired
+    def Remaining(self, timer_name: str) -> int: ... # ms left
+
+
+# ── Journal ───────────────────────────────────────────────────────────────────
+
+class _JournalClass:
+    def Search(self, phrase: str) -> bool: ...
+    def SearchByName(self, phrase: str, name: str) -> bool: ...
+    def SearchByType(self, phrase: str, message_type: str) -> bool: ...
+    def Clear(self) -> None: ...
+    def GetTextByType(self, message_type: str) -> List[str]: ...
+
+
+# ── Spells ────────────────────────────────────────────────────────────────────
+
+class _SpellsClass:
+    def CastMagery(self, spell_name: str) -> None: ...
+    def CastChivalry(self, spell_name: str) -> None: ...
+    def CastNinjitsu(self, spell_name: str) -> None: ...
+    def CastMysticism(self, spell_name: str) -> None: ...
+    def CastNecro(self, spell_name: str) -> None: ...
+    def CastSpellweaving(self, spell_name: str) -> None: ...
+    def Cast(self, spell_name: str) -> None: ...
+
+
+# ── Target ────────────────────────────────────────────────────────────────────
+
+class _TargetClass:
+    def WaitForTarget(self, timeout_ms: int, get_from_cursor: bool = False) -> bool: ...
+
+    @overload
+    def TargetExecute(self, serial: int) -> None: ...
+    @overload
+    def TargetExecute(self, x: int, y: int, z: int) -> None: ...
+    @overload
+    def TargetExecute(self, x: int, y: int, z: int, item_id: int) -> None: ...
+    def TargetExecute(self, *args: Any) -> None: ...  # type: ignore[misc]
+
+    def TargetExecuteRelative(self, serial: int, offset: int) -> None: ...
+    def PromptTarget(self, prompt_text: str, hue: int = ...) -> int: ...
+    def HasTarget(self) -> bool: ...
+    def SetLast(self, serial: int) -> None: ...
+    def Cancel(self) -> None: ...
+    def ClearQueue(self) -> None: ...
+    def ClearLastandQueue(self) -> None: ...
+
+
+# ── Module-level instances (provided by Razor Enhanced as globals at runtime) ─
+
+Player:  _PlayerClass
+Mobiles: _MobilesClass
+Items:   _ItemsClass
+Misc:    _MiscClass
+Gumps:   _GumpsClass
+Timer:   _TimerClass
+Journal: _JournalClass
+Spells:  _SpellsClass
+Target:  _TargetClass
+
+
+__all__ = [
+    'Point3D',
+    'Item', 'ItemFilter',
+    'Mobile', 'MobileFilter',
+    'Player', 'Mobiles', 'Items',
+    'Misc', 'Gumps', 'Timer',
+    'Journal', 'Spells', 'Target',
+]

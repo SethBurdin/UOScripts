@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import config
 from glossary.colors import colors
 from glossary.runebook_handler import find_runebook_by_label, travel_to_runebook, travel_to_named_rune
+from glossary.enemies import GetEnemies
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 PET_FOLLOW_RANGE     = 1      # tiles — beyond this the pet is recalled
@@ -24,6 +25,11 @@ FOLLOW_MAX_CHECKS     = 3     # max polls waiting for pet to arrive (total wait 
 PET_SCAN_RANGE        = 30     # tile radius to search for a friendly mobile
 GUARD_BREAK_DISTANCE  = 1    # tiles player must move from guard origin before pet is immediately recalled
 
+ENEMY_SCAN_RANGE    = 12   # tile radius to scan for hostile mobs each tick
+KILL_ENGAGE_RANGE   = 1    # Chebyshev pet-to-enemy distance that triggers recall phase
+GUARD_TRIGGER_RANGE = 2    # enemy-to-player distance that triggers "all guard"
+HUNT_GUARD_TIMEOUT  = 12   # seconds to wait in phase 3 for enemy to close
+
 # Animal Whispering mastery spell
 WHISPER_ENABLED      = True
 WHISPER_INTERVAL_SEC = 1800  # seconds between casts (30 min)
@@ -31,6 +37,7 @@ WHISPER_INTERVAL_SEC = 1800  # seconds between casts (30 min)
 # Pet context menu entry indices (right-click the pet)
 PET_CMD_FOLLOW = 2   # "Command: Follow"
 PET_CMD_GUARD  = 3   # "Command: Guard"
+PET_CMD_KILL   = 4   # "Command: Kill" — if mobs aren't attacked, verify index with gump_dump.py
 
 # Items auto-looted by Razor's AutoLoot agent that should be transferred to the
 # storage chest on each banking trip. Add/remove item IDs to match your AutoLoot list.
@@ -44,6 +51,8 @@ TRANSFER_ITEMS = [
     0x26B9,   # blue scales
     0x14EB,   # treasure map
     0x14EC,   # treasure map (decoded)
+    # alchemy reagents (all share ItemID 0x423A, hue distinguishes variant)
+    0x423A,   # potash / black powder / charcoal / saltpeter
     # gems
     0x0F26,   # diamond
     0x0F25,   # amber
@@ -74,6 +83,7 @@ FARM_LOCATIONS = [
     'balron',    # Balrons
     'ancient',   # Ancient Wyrms
     'titans',    # Titans
+    'cavetroll', # Cave Trolls
 ]
 
 GOLD_ITEM_ID = 0x0EED
@@ -123,8 +133,8 @@ def _pet_cmd(serial, entry, target_serial=None):
     if Misc.WaitForContext(serial, 2000):
         Misc.ContextReply(serial, entry)
         if target_serial is not None:
-            if Target.WaitForTarget(3000, False):
-                Target.TargetExecute(target_serial)
+            Target.WaitForTarget(3000, False)
+            Target.TargetExecute(target_serial)
     Misc.Pause(400)
 
 
@@ -345,6 +355,91 @@ def recall_pet(pet):
     return False
 
 
+def shutdown():
+    """Called on every script exit — guard pet then recall home."""
+    log("Shutting down — returning home.", colors['cyan'])
+    if not Player.IsGhost:
+        Player.ChatSay("all guard me")
+        rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
+        if rb is not None and travel_to_runebook(rb, RECALL_SETTLE_DELAY):
+            for direction in ('East', 'North', 'West', 'West'):
+                Player.Walk(direction)
+                Misc.Pause(600)
+    log("Guardian stopped.", colors['cyan'])
+
+
+def hunt_cycle(pet, enemy_serial):
+    """Send pet to kill an enemy, recall when engaged, guard when enemy closes.
+
+    Phase 1 — watch until pet is within KILL_ENGAGE_RANGE of the enemy (or enemy dies).
+    Phase 2 — recall pet using existing leash loop.
+    Phase 3 — issue guard once enemy closes to GUARD_TRIGGER_RANGE; timeout after HUNT_GUARD_TIMEOUT s.
+
+    Returns True if guard was issued, False otherwise.
+    """
+    # ── Phase 1: engagement watch ──────────────────────────────────────────────
+    log("Hunting — waiting for pet to engage...", colors['yellow'])
+    prev_enemy_dist  = None
+    phase1_deadline  = time.time() + 30  # give up if pet never closes on enemy
+    while not Player.IsGhost and time.time() < phase1_deadline:
+        check_pet_health(pet)
+        fresh = find_pet()
+        if fresh is not None:
+            pet = fresh
+        enemy = Mobiles.FindBySerial(enemy_serial)
+        if enemy is None:
+            log("Enemy defeated.", colors['green'])
+            return False  # enemy gone, no guard cycle needed
+        curr_enemy_dist = Player.DistanceTo(enemy)
+        if prev_enemy_dist is not None and curr_enemy_dist > prev_enemy_dist + 3:
+            log("Enemy fleeing — re-tagging and recalling.", colors['yellow'])
+            Player.ChatSay("all kill")
+            Misc.Pause(300)
+            if Target.WaitForTarget(2000, False):
+                Target.TargetExecute(enemy_serial)
+            Player.ChatSay("all follow me")
+            break  # pet tagged and recalled; enemy will follow via aggro
+        prev_enemy_dist = curr_enemy_dist
+        pet_to_enemy = max(
+            abs(pet.Position.X - enemy.Position.X),
+            abs(pet.Position.Y - enemy.Position.Y),
+        )
+        if pet_to_enemy <= KILL_ENGAGE_RANGE:
+            log("Pet engaged — recalling.", colors['yellow'])
+            break
+        Misc.Pause(CHECK_INTERVAL)
+
+    # ── Phase 2: rapid recall (1s poll — much tighter than the 4s leash loop) ──
+    log("Recalling pet after engagement.", colors['yellow'])
+    for i in range(10):
+        if i % 3 == 0:
+            Player.ChatSay("all follow me")
+        Misc.Pause(1000)
+        fresh = find_pet()
+        if fresh is not None:
+            pet = fresh
+            if Player.DistanceTo(pet) <= PET_FOLLOW_RANGE:
+                break
+
+    # ── Phase 3: guard when enemy closes ──────────────────────────────────────
+    log("Waiting for enemy to close (guard trigger = %d tiles)..." % GUARD_TRIGGER_RANGE, colors['yellow'])
+    deadline = time.time() + HUNT_GUARD_TIMEOUT
+    while time.time() < deadline and not Player.IsGhost:
+        fresh = find_pet()
+        if fresh is not None:
+            pet = fresh
+        enemy = Mobiles.FindBySerial(enemy_serial)
+        if enemy is None or Player.DistanceTo(enemy) <= GUARD_TRIGGER_RANGE:
+            if pet is not None:
+                _pet_cmd(pet.Serial, PET_CMD_GUARD)
+            log("Guard issued — enemy in range.", colors['cyan'])
+            return True
+        Misc.Pause(500)
+
+    log("Hunt guard timeout — resuming normal loop.", colors['yellow'])
+    return False
+
+
 # ─── Main loop ────────────────────────────────────────────────────────────────
 
 def main():
@@ -395,64 +490,114 @@ def main():
     log("Guardian started.", colors['cyan'])
 
     is_guarding = False
+    is_hunting  = False
     guard_pos   = None  # player tile when "all guard me" was last issued
+
+    # Default to guard immediately so the pet is already protecting on script start.
+    # Voice command works at any distance (covers drop-off / resume scenarios).
+    if find_pet() is not None:
+        Player.ChatSay("all guard me")
+        is_guarding = True
+        guard_pos   = (Player.Position.X, Player.Position.Y)
+        log("Default guard active.", colors['cyan'])
 
     Journal.Clear()
     log("Say 'bank' to deposit and stop.", colors['cyan'])
 
-    while not Player.IsGhost:
-        if Journal.Search(Player.Name + ": bank"):
-            Journal.Clear()
-            log("Bank command — depositing and stopping.", colors['yellow'])
-            rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
-            if rb is not None:
-                do_banking(rb)
-            log("Done. Script stopped.", colors['cyan'])
-            break
+    try:
+        while not Player.IsGhost:
+            if Journal.Search(Player.Name + ": bank"):
+                Journal.Clear()
+                log("Bank command — depositing and stopping.", colors['yellow'])
+                rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
+                if rb is not None:
+                    do_banking(rb)
+                break
 
-        bank_gold_if_heavy()
+            bank_gold_if_heavy()
 
-        pet = find_pet()
+            pet = find_pet()
 
-        # Break guard the moment the player moves far enough from the guard origin.
-        if is_guarding and guard_pos is not None:
-            pos = Player.Position
-            if max(abs(pos.X - guard_pos[0]), abs(pos.Y - guard_pos[1])) > GUARD_BREAK_DISTANCE:
+            # Break guard the moment the player moves far enough from the guard origin.
+            if is_guarding and guard_pos is not None:
+                pos = Player.Position
+                if max(abs(pos.X - guard_pos[0]), abs(pos.Y - guard_pos[1])) > GUARD_BREAK_DISTANCE:
+                    is_guarding = False
+                    guard_pos   = None
+                    Player.ChatSay("all follow me")
+
+            if pet is None:
+                log("No pet found.", colors['yellow'])
                 is_guarding = False
                 guard_pos   = None
-                Player.ChatSay("all follow me")
+                Misc.Pause(CHECK_INTERVAL)
+                continue
 
-        if pet is None:
-            log("No pet found.", colors['yellow'])
-            is_guarding = False
-            guard_pos   = None
-            Misc.Pause(CHECK_INTERVAL)
-            continue
+            guard_pet_if_low(pet)
+            check_pet_health(pet)
+            cast_animal_whispering(pet)
 
-        guard_pet_if_low(pet)
-        check_pet_health(pet)
-        cast_animal_whispering(pet)
+            # ── Recall if too far (skipped while guarding — pet drifts naturally) ──
+            if not is_guarding and Player.DistanceTo(pet) > PET_FOLLOW_RANGE:
+                guard_pos = None
+                arrived   = recall_pet(pet)
+                if not arrived:
+                    fresh = find_pet()
+                    if fresh is None or Player.DistanceTo(fresh) > PET_FOLLOW_RANGE + 1:
+                        Misc.Pause(CHECK_INTERVAL)
+                        continue
+                    pet = fresh
 
-        if Player.DistanceTo(pet) > PET_FOLLOW_RANGE:
-            is_guarding = False
-            guard_pos   = None
-            arrived = recall_pet(pet)
-            if not arrived:
-                # Pet may have settled just outside PET_FOLLOW_RANGE (UO natural follow
-                # distance is ~2 tiles). Refresh and fall through to guard if close enough.
-                fresh = find_pet()
-                if fresh is None or Player.DistanceTo(fresh) > PET_FOLLOW_RANGE + 1:
+            # ── Enemy scan → kill, or guard if clear ──────────────────────────
+            # Guard and kill are mutually exclusive each tick: issuing both back-to-back
+            # on the same pet causes the second context-menu call to silently fail.
+            enemies = [] if is_hunting else list(GetEnemies(Mobiles, 0, ENEMY_SCAN_RANGE))
+
+            if enemies:
+                nearest = min(enemies, key=lambda e: Player.DistanceTo(e))
+                if Player.DistanceTo(nearest) <= GUARD_TRIGGER_RANGE:
+                    # Enemy already on us — engage and guard in place (no pull cycle).
+                    if not is_guarding:
+                        log("Enemy on us: %s — engaging in place." % nearest.Name, colors['yellow'])
+                        Player.ChatSay("all kill")
+                        Misc.Pause(300)
+                        if Target.WaitForTarget(2000, False):
+                            Target.TargetExecute(nearest.Serial)
+                        # No guard command here — it overrides kill and prevents the pet attacking
+                        is_guarding = True
+                        guard_pos   = (Player.Position.X, Player.Position.Y)
+                else:
+                    # Enemy at range — send pet to intercept and draw it back.
+                    log("Enemy: %s — sending pet to kill." % nearest.Name, colors['red'])
+                    Player.ChatSay("all kill")
+                    Misc.Pause(300)
+                    if Target.WaitForTarget(2000, False):
+                        Target.TargetExecute(nearest.Serial)
+                    is_guarding = False
+                    guard_pos   = None
+                    is_hunting  = True
+                    did_guard   = hunt_cycle(pet, nearest.Serial)
+                    is_hunting  = False
+                    pet         = find_pet() or pet
+                    if did_guard:
+                        is_guarding = True
+                        guard_pos   = (Player.Position.X, Player.Position.Y)
+                    else:
+                        is_guarding = False
+                        guard_pos   = None
                     Misc.Pause(CHECK_INTERVAL)
                     continue
-                pet = fresh
 
-        if not is_guarding:
-            pos = Player.Position
-            _pet_cmd(pet.Serial, PET_CMD_GUARD)
-            is_guarding = True
-            guard_pos   = (pos.X, pos.Y)
+            if not is_guarding:
+                pos = Player.Position
+                _pet_cmd(pet.Serial, PET_CMD_GUARD)
+                is_guarding = True
+                guard_pos   = (pos.X, pos.Y)
 
-        Misc.Pause(CHECK_INTERVAL)
+            Misc.Pause(CHECK_INTERVAL)
+
+    finally:
+        shutdown()
 
 
 main()

@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\sethb\\\\apps\\\\razor-enhanced\" -Filter \"*stub*\" -Recurse -ErrorAction SilentlyContinue)",
-      "Bash(Select-Object FullName)"
+      "Bash(Select-Object FullName)",
+      "WebSearch"
     ]
   }
 }

@@ -222,23 +222,24 @@ def travel_to_named_rune(runebook, rune_name, settle_delay=2000):
 # for a full 16-slot book). _extract_rune_block finds them by locating the last
 # contiguous run of ≤16 name-like entries.
 
-def _extract_rune_block(lines):
+def _extract_rune_block(lines, book_name=''):
     """
     Extract rune names from the gump line list.
 
-    The gump dumps rune names AND their sextant coordinates. Coordinate strings
-    always contain a comma (e.g. "98o 26'N, 13o 42'W"). Regular rune names never do.
-    Strategy: skip empties, digit-only entries, known labels, and comma-containing
-    strings, then take the first 16 results — those are the rune names in slot order.
+    The gump text includes the runebook's own name before the rune entries.
+    Pass book_name (lowercase) to exclude it so slot indices stay correct.
+    Coordinate strings start with digits and are skipped automatically.
     """
     candidates = []
     for line in lines:
         entry = line.strip()
         if not entry:
             continue
-        if entry[0].isdigit():      # coordinate strings start with digits (e.g. "98o 26'N")
+        if entry[0].isdigit():
             continue
         if entry.lower() in _GUMP_LABELS:
+            continue
+        if book_name and entry.lower() == book_name:
             continue
         candidates.append(entry)
         if len(candidates) == 16:
@@ -257,8 +258,9 @@ def get_runebook_runes(runebook):
         _log("Runebook gump timed out.", 33)
         return []
     lines = Gumps.LastGumpGetLineList()
-    _log("Raw gump lines (%d): %s" % (len(lines), lines))
-    runes = _extract_rune_block(lines)
+    props = Items.GetPropStringList(runebook.Serial) or []
+    book_name = props[0].strip().lower() if props else ''
+    runes = _extract_rune_block(lines, book_name)
     _log("Parsed %d rune(s): %s" % (len(runes), [n for _, n in runes]))
     return runes
 
