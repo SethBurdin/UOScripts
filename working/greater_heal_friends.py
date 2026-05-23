@@ -63,17 +63,24 @@ def ResurrectGhosts():
 # ── Heal / cure ───────────────────────────────────────────────────────────────
 
 def HealPets():
-    """Priority 1 — cure any poisoned friend.
-       Priority 2 — heal the lowest-HP friend.
+    """Priority 1 — cure any poisoned target (self first, then lowest-HP friend).
+       Priority 2 — heal the lowest-HP target among self + friends.
        Returns True if a spell was cast."""
     friends = _get_friends()
-    if len(friends) == 0:
-        return False
 
-    # Priority 1: poisoned targets
-    poisoned = [m for m in friends if m.Poisoned]
-    if poisoned:
-        target = min(poisoned, key=lambda m: m.Hits)
+    # Priority 1: poisoned targets — self first, then friends
+    if Player.Poisoned:
+        Player.HeadMessage(colors['cyan'], 'Curing self (%d%%)' % (
+            int(float(Player.Hits) / Player.HitsMax * 100)))
+        Spells.CastMagery('Arch Cure')
+        if Target.WaitForTarget(4000, False):
+            Target.TargetExecute(Player.Serial)
+        Misc.Pause(1500)
+        return True
+
+    poisoned_friends = [m for m in friends if m.Poisoned]
+    if poisoned_friends:
+        target = min(poisoned_friends, key=lambda m: m.Hits)
         Player.HeadMessage(colors['cyan'], 'Curing %s (%d%%)' % (
             target.Name, int(float(target.Hits) / target.HitsMax * 100)))
         Spells.CastMagery('Arch Cure')
@@ -82,15 +89,21 @@ def HealPets():
         Misc.Pause(1500)
         return True
 
-    # Priority 2: damaged targets
-    damaged = [m for m in friends if m.HitsMax > 0 and m.Hits < m.HitsMax]
+    # Priority 2: heal lowest-HP target among self + friends
+    candidates = list(friends)
+    if Player.HitsMax > 0 and Player.Hits < Player.HitsMax:
+        candidates.append(Player)
+
+    damaged = [m for m in candidates if m.HitsMax > 0 and m.Hits < m.HitsMax]
     if damaged:
         target = min(damaged, key=lambda m: float(m.Hits) / m.HitsMax)
+        name = 'self' if target.Serial == Player.Serial else target.Name
         Player.HeadMessage(colors['cyan'], 'Healing %s (%d%%)' % (
-            target.Name, int(float(target.Hits) / target.HitsMax * 100)))
+            name, int(float(target.Hits) / target.HitsMax * 100)))
         Spells.CastMagery('Greater Heal')
+        serial = Player.Serial if target.Serial == Player.Serial else target.Serial
         if Target.WaitForTarget(5000, False):
-            Target.TargetExecute(target)
+            Target.TargetExecute(serial)
         Misc.Pause(1700)
         return True
 

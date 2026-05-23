@@ -78,7 +78,8 @@ def find_pack_animal():
     Returns the Mobile, or None if none found.
     """
     f = Mobiles.Filter()
-    f.RangeMax = 3
+    f.Enabled  = True
+    f.RangeMax = 10
     f.IsHuman  = False
     f.Friend   = True   # followers / pets only
     nearby = Mobiles.ApplyFilter(f)

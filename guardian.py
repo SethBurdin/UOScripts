@@ -97,6 +97,9 @@ _pet_serial      = None
 _session_start   = None
 _session_gold    = 0
 _last_whisper    = 0.0
+_kill_times      = {}   # { enemy_serial: timestamp } — throttle repeated kill commands
+
+KILL_COOLDOWN_SEC = 8   # minimum seconds between kill commands for the same enemy
 
 
 def _append_gold_stat(gold_this_trip):
@@ -518,8 +521,11 @@ def main():
 
             pet = find_pet()
 
-            # Break guard the moment the player moves far enough from the guard origin.
-            if is_guarding and guard_pos is not None:
+            # Break guard when the player moves far enough from the guard origin.
+            # Suppressed while enemies are adjacent — combat movement would otherwise
+            # trigger "all follow me" every tick and cause a kill/follow spam loop.
+            close_combat = len(GetEnemies(Mobiles, 0, GUARD_TRIGGER_RANGE)) > 0
+            if is_guarding and guard_pos is not None and not close_combat:
                 pos = Player.Position
                 if max(abs(pos.X - guard_pos[0]), abs(pos.Y - guard_pos[1])) > GUARD_BREAK_DISTANCE:
                     is_guarding = False
@@ -557,13 +563,16 @@ def main():
                 nearest = min(enemies, key=lambda e: Player.DistanceTo(e))
                 if Player.DistanceTo(nearest) <= GUARD_TRIGGER_RANGE:
                     # Enemy already on us — engage and guard in place (no pull cycle).
-                    if not is_guarding:
+                    # Issue kill once per cooldown — prevents spam when guard breaks
+                    # during combat movement and the branch re-fires every tick.
+                    if time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC:
                         log("Enemy on us: %s — engaging in place." % nearest.Name, colors['yellow'])
                         Player.ChatSay("all kill")
                         Misc.Pause(300)
                         if Target.WaitForTarget(2000, False):
                             Target.TargetExecute(nearest.Serial)
-                        # No guard command here — it overrides kill and prevents the pet attacking
+                        _kill_times[nearest.Serial] = time.time()
+                    if not is_guarding:
                         is_guarding = True
                         guard_pos   = (Player.Position.X, Player.Position.Y)
                 else:

@@ -451,7 +451,7 @@ def _shear_all_nearby( tool ):
                  Journal.Search( 'already been shorn' ) or
                  Journal.Search( 'You shear' ) ):
                 break
-            Misc.Pause( 50 )
+            Misc.Pause(900)
         sheared.add( fresh.Serial )
     return len( sheared )
 

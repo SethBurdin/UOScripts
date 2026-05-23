@@ -299,6 +299,7 @@ def travel_to_slot(runebook, slot, settle_delay=2000):
         return False
 
     mana_before = Player.Mana
+    Misc.Pause(settle_delay)
     Gumps.SendAction(RUNEBOOK_GUMP_ID, button_base + slot)
     if needs_mana and not _wait_for_mana_drop(mana_before):
         _log("Travel fizzled — mana did not drop.", 33)
