@@ -19,6 +19,9 @@ from glossary.runebook_handler import find_runebook_by_label, travel_to_named_ru
 
 MAX_WAYPOINT_DISTANCE = 150   # abort if nearest waypoint is farther than this
 
+# Closed-state ItemIDs for common UO door types (metal, wood, bar, etc.)
+_DOOR_ITEM_IDS = set(range(0x0675, 0x0695)) | set(range(0x06C5, 0x06D5))
+
 _TAG = '[nav]'
 
 
@@ -26,17 +29,43 @@ def _log(msg, color=colors['cyan']):
     Misc.SendMessage(_TAG + ' ' + msg, color)
 
 
+def _open_nearby_doors(radius=2):
+    """
+    Scan for door items within radius tiles and double-click each one.
+    Returns the number of doors opened.
+    """
+    f          = Items.Filter()
+    f.Enabled  = True
+    f.RangeMin = 0
+    f.RangeMax = radius
+    opened = 0
+    for item in Items.ApplyFilter(f):
+        if item.ItemID in _DOOR_ITEM_IDS:
+            _log("Opening door 0x%X (ItemID 0x%04X)." % (item.Serial, item.ItemID),
+                 colors['yellow'])
+            Items.UseItem(item.Serial)
+            Misc.Pause(600)
+            opened += 1
+    return opened
+
+
 def _walk_to(x, y):
     """
     Pathfind to (x, y) using PathFinding.Go.
-    Returns True if destination was reached, False if stuck.
+    If stuck, tries to open nearby doors and retries once.
+    Returns True if destination was reached, False if still stuck.
     """
     route              = PathFinding.Route()
     route.X            = x
     route.Y            = y
     route.DebugMessage = False
     route.StopIfStuck  = True
-    return PathFinding.Go(route)
+    if PathFinding.Go(route):
+        return True
+    if _open_nearby_doors():
+        _log("Retrying pathfind after opening door(s)...", colors['yellow'])
+        return PathFinding.Go(route)
+    return False
 
 
 def load_waypoints(path):
@@ -103,32 +132,33 @@ def walk_waypoints(waypoints, start_index=None):
             _log("Stuck at waypoint %d (%d, %d) — continuing." % (i, x, y), colors['yellow'])
 
 
-def recall_to_farm(farm_rune, home_runebook_name, settle_delay=2000):
+def recall_to_farm(farm_rune, runebook_name, settle_delay=2000):
     """
-    Find the home runebook and recall to the named farm rune.
+    Find the runebook by label in the player's backpack and recall to the named rune.
 
     Input:
-        farm_rune          -- str, rune name in the runebook
-        home_runebook_name -- str, label on the runebook item
-        settle_delay       -- int, ms to wait after landing
+        farm_rune     -- str, rune name in the runebook
+        runebook_name -- str, label on the backpack runebook
+        settle_delay  -- int, ms to wait after landing
 
     Returns:
         bool  True on success
     """
-    rb = find_runebook_by_label(home_runebook_name)
+    rb = find_runebook_by_label(runebook_name)
     if rb is None:
-        _log("Runebook '%s' not found in backpack." % home_runebook_name, colors['red'])
+        _log("Runebook '%s' not found in backpack." % runebook_name, colors['red'])
         return False
     _log("Recalling to '%s'..." % farm_rune)
     return travel_to_named_rune(rb, farm_rune, settle_delay)
 
 
-def recall_home(home_runebook_name, settle_delay=2000):
+def recall_home(home_runebook_name, home_rune_name, settle_delay=2000):
     """
-    Find the home runebook and recall to its default rune.
+    Find the home runebook by label and recall to the named home rune.
 
     Input:
         home_runebook_name -- str, label on the runebook item
+        home_rune_name     -- str, name of the home rune inside the runebook
         settle_delay       -- int, ms to wait after landing
 
     Returns:
@@ -138,5 +168,5 @@ def recall_home(home_runebook_name, settle_delay=2000):
     if rb is None:
         _log("Runebook '%s' not found in backpack." % home_runebook_name, colors['red'])
         return False
-    _log("Recalling home...")
-    return travel_to_runebook(rb, settle_delay)
+    _log("Recalling home to '%s'..." % home_rune_name)
+    return travel_to_named_rune(rb, home_rune_name, settle_delay)

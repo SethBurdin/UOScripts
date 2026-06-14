@@ -16,7 +16,65 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import math
 import time
 import random
+import re
 from glossary.colors import colors
+
+# ── Sextant coordinate conversion ─────────────────────────────────────────────
+# Reference point: tile (1323, 1624) = 0°N 0°E on Felucca/Trammel.
+# Adjust these if the shard uses a different world size or origin.
+_ORIGIN_X       = 1323
+_ORIGIN_Y       = 1624
+_TILES_PER_DEG  = 43.0555   # tiles per degree of arc
+
+
+def _fix_deg(val, max_deg):
+    """
+    When players transcribe '49°' from the game font they often write '490'
+    because '°' looks like '0'.  If val is out of range and divisible by 10,
+    strip the trailing zero.
+    """
+    if val > max_deg and val % 10 == 0:
+        return val // 10
+    return val
+
+
+def sextant_to_xy(text):
+    """
+    Parse a UO sextant string and return (x, y) tile coordinates, or None.
+
+    Accepts:
+        "1639, 1532"           -- raw tile x,y
+        "9 14'N 91 37'W"       -- space-separated deg min dir
+        "100o25'S,40o04'E"     -- 'o' or '°' as degree symbol
+        "490 2'S 1090 53'W"    -- trailing 0 used in place of degree symbol
+    """
+    text = text.strip()
+
+    # Raw tile coordinates: "1639, 1532"
+    m = re.match(r'^(\d+)\s*,\s*(\d+)$', text)
+    if m:
+        return int(m.group(1)), int(m.group(2))
+
+    # Sextant: lat then lon, both with optional degree marker
+    pat = (r'(\d+)\s*[o°]?\s*(\d+)[\'\"]\s*([NSns])'
+           r'[,\s]+'
+           r'(\d+)\s*[o°]?\s*(\d+)[\'\"]\s*([EWew])')
+    m = re.search(pat, text)
+    if not m:
+        return None
+
+    lat_deg = _fix_deg(int(m.group(1)), 90)
+    lat_min = int(m.group(2))
+    lat_dir = m.group(3).upper()
+    lon_deg = _fix_deg(int(m.group(4)), 180)
+    lon_min = int(m.group(5))
+    lon_dir = m.group(6).upper()
+
+    lat = lat_deg + lat_min / 60.0
+    lon = lon_deg + lon_min / 60.0
+    x = round(_ORIGIN_X + (1 if lon_dir == 'E' else -1) * lon * _TILES_PER_DEG)
+    y = round(_ORIGIN_Y + (1 if lat_dir == 'S' else -1) * lat * _TILES_PER_DEG)
+    return x, y
 
 # ── Tracking gump constants (confirmed from train_Tracking.py) ───────────────
 TRACKING_GUMP   = 2976808305

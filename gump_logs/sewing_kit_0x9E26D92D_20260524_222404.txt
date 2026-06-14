@@ -1,0 +1,534 @@
+Gump ID : 2653346093  (0x9E26D92D)
+Captured: 2026-05-24 22:24:04.714000
+Tool    : sewing kit (0x40092217)
+Probe   : buttons 1-100 step 7
+
+=== INITIAL PAGE ===
+  line   0: <CENTER>TAILORING MENU</CENTER>
+  line   1: <CENTER>CATEGORIES</CENTER>
+  line   2: <CENTER>SELECTIONS</CENTER>
+  line   3: <CENTER>NOTICES</CENTER>
+  line   4: EXIT
+  line   5: CANCEL MAKE
+  line   6: REPAIR ITEM
+  line   7: MARK ITEM
+  line   8: ENHANCE ITEM
+  line   9: ALTER ITEM (GARGOYLE)
+  line  10: NON QUEST ITEM
+  line  11: MAKE LAST
+  line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+  line  13: LEATHER/HIDES(~1_AMT~)
+  line  14: LAST TEN
+  line  15: Materials
+  line  16: Hats
+  line  17: Shirts and Pants
+  line  18: Miscellaneous
+  line  19: Footwear
+  line  20: Leather Armor
+  line  21: Cloth Armor
+  line  22: Studded Armor
+  line  23: Female Armor
+  line  24: Bone Armor
+  line  25: studded gorget
+  line  26: studded gloves
+  line  27: studded sleeves
+  line  28: studded leggings
+  line  29: studded tunic
+  line  30: studded mempo
+  line  31: studded do
+  line  32: studded hiro sode
+  line  33: studded suneate
+  line  34: studded haidate
+  line  35: NEXT PAGE
+  line  36: PREV PAGE
+  line  37: hide tunic
+  line  38: hide pauldrons
+  line  39: hide gloves
+  line  40: hide pants
+  line  41: hide gorget
+
+=== BUTTON PROBE (only buttons that change content are shown) ===
+
+  [button 1]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: cut-up cloth
+    line  26: combine cloth
+    line  27: powder charge
+    line  28: abyssal cloth
+
+  [button 8]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: skullcap
+    line  26: bandana
+    line  27: floppy hat
+    line  28: cap
+    line  29: wide-brim hat
+    line  30: straw hat
+    line  31: tall straw hat
+    line  32: wizard's hat
+    line  33: bonnet
+    line  34: feathered hat
+    line  35: NEXT PAGE
+    line  36: PREV PAGE
+    line  37: tricorne hat
+    line  38: jester hat
+    line  39: cloth ninja hood
+    line  40: kasa
+    line  41: orc mask
+    line  42: bear mask
+    line  43: deer mask
+    line  44: tribal mask
+    line  45: tribal mask
+    line  46: Chef's Toque
+    line  47: NEXT PAGE
+    line  48: PREV PAGE
+    line  49: krampus minion hat
+    line  50: assassin's cowl
+
+  [button 15]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: doublet
+    line  26: shirt
+    line  27: fancy shirt
+    line  28: tunic
+    line  29: surcoat
+    line  30: plain dress
+    line  31: fancy dress
+    line  32: cloak
+    line  33: robe
+    line  34: jester suit
+    line  35: NEXT PAGE
+    line  36: PREV PAGE
+    line  37: fur cape
+    line  38: gilded dress
+    line  39: cloth ninja jacket
+    line  40: kamishimo
+    line  41: hakama-shita
+    line  42: male kimono
+    line  43: female kimono
+    line  44: jin-baori
+    line  45: short pants
+    line  46: long pants
+    line  47: NEXT PAGE
+    line  48: PREV PAGE
+    line  49: kilt
+    line  50: skirt
+    line  51: hakama
+    line  52: tattsuke-hakama
+    line  53: elven shirt
+    line  54: elven shirt
+    line  55: elven pants
+    line  56: elven robe
+    line  57: female elven robe
+    line  58: woodland belt
+    line  59: NEXT PAGE
+    line  60: PREV PAGE
+    line  61: gargish robe
+    line  62: gargish fancy robe
+    line  63: robe of rite
+    line  64: Gilded Kilt
+    line  65: Checkered Kilt
+    line  66: Fancy Kilt
+    line  67: Flowered Dress
+    line  68: Evening Gown
+
+  [button 22]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: body sash
+    line  26: half apron
+    line  27: full apron
+    line  28: obi
+    line  29: elven quiver
+    line  30: quiver of fire
+    line  31: quiver of ice
+    line  32: Quiver of Blight
+    line  33: Quiver of Lightning
+    line  34: leather container engraving tool
+    line  35: NEXT PAGE
+    line  36: PREV PAGE
+    line  37: Gargish Half Apron
+    line  38: gargish sash
+    line  39: oil cloth
+    line  40: goza (east)
+    line  41: goza (south)
+    line  42: square goza (east)
+    line  43: square goza (south)
+    line  44: brocade goza (east)
+    line  45: brocade goza (south)
+    line  46: square brocade goza (east)
+    line  47: NEXT PAGE
+    line  48: PREV PAGE
+    line  49: square brocade goza (south)
+    line  50: square goza
+    line  51: mace belt
+    line  52: sword belt
+
+  [button 29]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: elven boots
+    line  26: fur boots
+    line  27: ninja tabi
+    line  28: waraji and tabi
+    line  29: sandals
+    line  30: shoes
+    line  31: boots
+    line  32: thigh boots
+    line  33: Gargish Leather Talons
+    line  34: Jester Shoes
+    line  35: NEXT PAGE
+    line  36: PREV PAGE
+    line  37: krampus minion boots
+    line  38: krampus minion talons
+
+  [button 36]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: Spell Woven Britches
+    line  26: Song Woven Mantle
+    line  27: Stitcher's Mittens
+    line  28: leather gorget
+    line  29: leather cap
+    line  30: leather gloves
+    line  31: leather sleeves
+    line  32: leather leggings
+    line  33: leather tunic
+    line  34: leather jingasa
+    line  35: NEXT PAGE
+    line  36: PREV PAGE
+    line  37: leather mempo
+    line  38: leather do
+    line  39: leather hiro sode
+    line  40: leather suneate
+    line  41: leather haidate
+    line  42: leather ninja pants
+    line  43: leather ninja jacket
+    line  44: leather ninja belt
+    line  45: leather ninja mitts
+    line  46: leather ninja hood
+    line  47: NEXT PAGE
+    line  48: PREV PAGE
+    line  49: leaf tunic
+    line  50: leaf arms
+    line  51: leaf gloves
+    line  52: leaf leggings
+    line  53: leaf gorget
+    line  54: leaf tonlet
+    line  55: gargish leather arms
+    line  56: gargish leather chest
+    line  57: gargish leather leggings
+    line  58: gargish leather kilt
+    line  59: NEXT PAGE
+    line  60: PREV PAGE
+    line  61: gargish leather arms
+    line  62: gargish leather chest
+    line  63: gargish leather leggings
+    line  64: gargish leather kilt
+    line  65: Gargish Leather Wing Armor
+    line  66: Tiger Pelt Chest
+    line  67: Tiger Pelt Leggings
+    line  68: Tiger Pelt Shorts
+    line  69: Tiger Pelt Helm
+    line  70: Tiger Pelt Collar
+    line  71: NEXT PAGE
+    line  72: PREV PAGE
+    line  73: Dragon Turtle Hide Chest
+    line  74: Dragon Turtle Hide Leggings
+    line  75: Dragon Turtle Hide Helm
+    line  76: Dragon Turtle Hide Arms
+
+  [button 43]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: gargish cloth arms
+    line  26: gargish cloth chest
+    line  27: gargish cloth leggings
+    line  28: gargish cloth kilt
+    line  29: gargish cloth arms
+    line  30: gargish cloth chest
+    line  31: gargish cloth leggings
+    line  32: gargish cloth kilt
+    line  33: gargish cloth wing armor
+
+  [button 50]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: studded gorget
+    line  26: studded gloves
+    line  27: studded sleeves
+    line  28: studded leggings
+    line  29: studded tunic
+    line  30: studded mempo
+    line  31: studded do
+    line  32: studded hiro sode
+    line  33: studded suneate
+    line  34: studded haidate
+    line  35: NEXT PAGE
+    line  36: PREV PAGE
+    line  37: hide tunic
+    line  38: hide pauldrons
+    line  39: hide gloves
+    line  40: hide pants
+    line  41: hide gorget
+
+  [button 57]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: leather shorts
+    line  26: leather skirt
+    line  27: leather bustier
+    line  28: studded bustier
+    line  29: female leather armor
+    line  30: studded armor
+    line  31: Tiger Pelt Bustier
+    line  32: Tiger Pelt Long Skirt
+    line  33: Tiger Pelt Skirt
+    line  34: Dragon Turtle Hide Bustier
+
+  [button 64]
+    line   0: <CENTER>TAILORING MENU</CENTER>
+    line   1: <CENTER>CATEGORIES</CENTER>
+    line   2: <CENTER>SELECTIONS</CENTER>
+    line   3: <CENTER>NOTICES</CENTER>
+    line   4: EXIT
+    line   5: CANCEL MAKE
+    line   6: REPAIR ITEM
+    line   7: MARK ITEM
+    line   8: ENHANCE ITEM
+    line   9: ALTER ITEM (GARGOYLE)
+    line  10: NON QUEST ITEM
+    line  11: MAKE LAST
+    line  12: ~1_DONE~/~2_TOTAL~ COMPLETED
+    line  13: LEATHER/HIDES(~1_AMT~)
+    line  14: LAST TEN
+    line  15: Materials
+    line  16: Hats
+    line  17: Shirts and Pants
+    line  18: Miscellaneous
+    line  19: Footwear
+    line  20: Leather Armor
+    line  21: Cloth Armor
+    line  22: Studded Armor
+    line  23: Female Armor
+    line  24: Bone Armor
+    line  25: bone helmet
+    line  26: bone gloves
+    line  27: bone arms
+    line  28: bone leggings
+    line  29: bone armor
+    line  30: orc helm
+
+  [button 71 — closed the gump]
+
+[could not reopen gump before button 78 — stopping]

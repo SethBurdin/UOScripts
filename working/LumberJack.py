@@ -96,7 +96,16 @@ class cfg:
 # ─────────────────────────────────────────────────────────────────────────────
 # Item IDs
 # ─────────────────────────────────────────────────────────────────────────────
-HATCHET_IDS      = [0x0F43, 0x0F3F, 0x143E]   # hatchets / axes for chopping
+HATCHET_IDS      = [
+    0x0F43,   # Hatchet
+    0x0F3F,   # Hatchet (alt graphic)
+    0x143E,   # Double Axe
+    0x1443,   # Two Handed Axe  ← golden two handed axe
+    0x0F49,   # Axe
+    0x0F47,   # Battle Axe
+    0x0F4B,   # Large Battle Axe
+    0x0F45,   # Executioner's Axe
+]
 LOG_ID           = 0x1BDD                      # used by find_logs() for splitting
 RUNEBOOK_ID      = 0x22C5                      # runebook graphic ID
 RUNEBOOK_NAME    = "home"                      # name of the runebook to recall from
@@ -111,6 +120,13 @@ LOG_IDS = [
 ]
 BOARD_IDS = [
     0x1BD7,   # regular / oak / ash / yew / heartwood / bloodwood / frostwood boards
+]
+
+# Misc loot that drops while lumberjacking — deposited to home container on each trip.
+MISC_LOOT_IDS = [
+    0x318F,   # bark fragment
+    0x3190,   # parasitic plant
+    0x3191,   # luminescent fungi
 ]
 
 # Common secure container graphic IDs scanned when depositing at home.
@@ -415,37 +431,26 @@ def _step_toward(tx, ty):
     return False
 
 
-def _try_unstick(goal_x, goal_y):
+def _perp_direction(goal_x, goal_y, cw=True):
     """
-    Try stepping perpendicular to the goal to navigate around a blocking tree.
-    Takes 4 perpendicular steps (enough to clear trees wider than 1 tile), then
-    lets the main walk loop resume forward progress from the new position.
-    Tries clockwise then counter-clockwise 90° relative to the current heading.
+    Return the walk direction 90° perpendicular to the heading toward (goal_x, goal_y).
+    cw=True  → clockwise rotation  (e.g. heading North → West)
+    cw=False → counter-clockwise   (e.g. heading North → East)
+    Returns None if already at the goal tile.
     """
     pos = Player.Position
     dx = goal_x - pos.X
     dy = goal_y - pos.Y
-    dir_map = {
+    pdx, pdy = (dy, -dx) if cw else (-dy, dx)
+    sx = 1 if pdx > 0 else (-1 if pdx < 0 else 0)
+    sy = 1 if pdy > 0 else (-1 if pdy < 0 else 0)
+    if sx == 0 and sy == 0:
+        return None
+    return {
         ( 0, -1): "North",    ( 1, -1): "Northeast", ( 1,  0): "East",
         ( 1,  1): "Southeast",( 0,  1): "South",     (-1,  1): "Southwest",
         (-1,  0): "West",     (-1, -1): "Northwest",
-    }
-    for pdx, pdy in [(dy, -dx), (-dy, dx)]:
-        sx = 1 if pdx > 0 else (-1 if pdx < 0 else 0)
-        sy = 1 if pdy > 0 else (-1 if pdy < 0 else 0)
-        if sx == 0 and sy == 0:
-            continue
-        direction = dir_map.get((sx, sy))
-        if not direction:
-            continue
-        for _ in range(4):
-            Player.Walk(direction)
-            Misc.Pause(cfg.walk_pause)
-        new_pos = Player.Position
-        if new_pos.X != pos.X or new_pos.Y != pos.Y:
-            # Moved clear of the obstacle — let the main loop resume forward progress.
-            log("Unstuck via %s." % direction, 0x3B)
-            return
+    }.get((sx, sy))
 
 
 def walk_adjacent_to(tx, ty):
@@ -453,25 +458,66 @@ def walk_adjacent_to(tx, ty):
     Walk to any tile adjacent to (tx, ty).
     The tree tile itself is impassable, so we stand next to it.
     Returns True when we are within 1 tile of the target.
-    Includes stuck detection: after 2 consecutive non-moving steps,
-    tries a perpendicular nudge to route around blocking tree tiles.
+
+    Uses a committed sidestep: once blocked, walks the full SIDESTEP_BUDGET steps
+    in one perpendicular direction before retrying forward.  This prevents the
+    oscillation that occurs when interleaved forward steps undo perpendicular progress.
+    Bails early when no direction produces any movement (unreachable tree).
     """
-    max_steps = 80
+    SIDESTEP_BUDGET = 8
+    MAX_IDLE = 10   # give up if no movement for this many consecutive steps
+    max_steps = 120
     stuck = 0
+    sidestep_dir = None
+    sidestep_count = 0
+    sidestep_cw = True
+    idle = 0
+
     for _ in range(max_steps):
         pos = Player.Position
         if abs(pos.X - tx) <= 1 and abs(pos.Y - ty) <= 1:
             return True
         prev = (pos.X, pos.Y)
-        _step_toward(tx, ty)
-        new_pos = Player.Position
-        if (new_pos.X, new_pos.Y) == prev:
-            stuck += 1
-            if stuck >= 2:
-                _try_unstick(tx, ty)
-                stuck = 0
+
+        if sidestep_dir is not None and sidestep_count < SIDESTEP_BUDGET:
+            Player.Walk(sidestep_dir)
+            Misc.Pause(cfg.walk_pause)
+            sidestep_count += 1
+            new_pos = Player.Position
+            if (new_pos.X, new_pos.Y) == prev:
+                idle += 1
+                if sidestep_cw:
+                    sidestep_cw = False
+                    sidestep_dir = _perp_direction(tx, ty, cw=False)
+                    sidestep_count = 0
+                    if sidestep_dir:
+                        log("Sidestep blocked — switching to %s." % sidestep_dir, 0x3B)
+                else:
+                    sidestep_dir = None
+            else:
+                idle = 0
         else:
-            stuck = 0
+            sidestep_dir = None
+            _step_toward(tx, ty)
+            new_pos = Player.Position
+            if (new_pos.X, new_pos.Y) == prev:
+                idle += 1
+                stuck += 1
+                if stuck >= 2:
+                    sidestep_cw = True
+                    sidestep_dir = _perp_direction(tx, ty, cw=True)
+                    sidestep_count = 0
+                    stuck = 0
+                    if sidestep_dir:
+                        log("Stuck — sidestepping %s." % sidestep_dir, 0x3B)
+            else:
+                idle = 0
+                stuck = 0
+
+        if idle >= MAX_IDLE:
+            log("No movement for %d steps near (%d,%d) — tree unreachable, skipping." % (MAX_IDLE, tx, ty), 0x25)
+            return False
+
     log("Could not reach adjacent tile for (%d,%d) in %d steps." % (tx, ty, max_steps), 0x25)
     return False
 
@@ -480,26 +526,64 @@ def walk_to(tx, ty):
     """
     Walk to the exact tile (tx, ty).  Used to reach waypoints.
     Step budget scales with Manhattan distance so long walks don't fail early.
-    Includes the same stuck detection as walk_adjacent_to.
+    Uses the same committed-sidestep obstacle avoidance as walk_adjacent_to.
     """
     pos = Player.Position
     dist = abs(tx - pos.X) + abs(ty - pos.Y)
     max_steps = max(dist * 3, 30)
+    SIDESTEP_BUDGET = 8
+    MAX_IDLE = 10
     stuck = 0
+    sidestep_dir = None
+    sidestep_count = 0
+    sidestep_cw = True
+    idle = 0
+
     for _ in range(max_steps):
         pos = Player.Position
         if pos.X == tx and pos.Y == ty:
             return True
         prev = (pos.X, pos.Y)
-        _step_toward(tx, ty)
-        new_pos = Player.Position
-        if (new_pos.X, new_pos.Y) == prev:
-            stuck += 1
-            if stuck >= 2:
-                _try_unstick(tx, ty)
-                stuck = 0
+
+        if sidestep_dir is not None and sidestep_count < SIDESTEP_BUDGET:
+            Player.Walk(sidestep_dir)
+            Misc.Pause(cfg.walk_pause)
+            sidestep_count += 1
+            new_pos = Player.Position
+            if (new_pos.X, new_pos.Y) == prev:
+                idle += 1
+                if sidestep_cw:
+                    sidestep_cw = False
+                    sidestep_dir = _perp_direction(tx, ty, cw=False)
+                    sidestep_count = 0
+                    if sidestep_dir:
+                        log("Sidestep blocked — switching to %s." % sidestep_dir, 0x3B)
+                else:
+                    sidestep_dir = None
+            else:
+                idle = 0
         else:
-            stuck = 0
+            sidestep_dir = None
+            _step_toward(tx, ty)
+            new_pos = Player.Position
+            if (new_pos.X, new_pos.Y) == prev:
+                idle += 1
+                stuck += 1
+                if stuck >= 2:
+                    sidestep_cw = True
+                    sidestep_dir = _perp_direction(tx, ty, cw=True)
+                    sidestep_count = 0
+                    stuck = 0
+                    if sidestep_dir:
+                        log("Stuck — sidestepping %s." % sidestep_dir, 0x3B)
+            else:
+                idle = 0
+                stuck = 0
+
+        if idle >= MAX_IDLE:
+            log("No movement for %d steps near (%d,%d) — cannot make progress." % (MAX_IDLE, tx, ty), 0x25)
+            return False
+
     log("Could not reach (%d,%d) in %d steps." % (tx, ty, max_steps), 0x25)
     return False
 
@@ -696,16 +780,23 @@ def deposit_wood_to_container():
         beetle = Mobiles.FindBySerial(_pet_serial)
     if beetle is None and cfg.beetle_serial is not None:
         beetle = Mobiles.FindBySerial(cfg.beetle_serial)
-    moved  = 0
+    moved = 0
 
     sources = []
-    if beetle is not None and beetle.Backpack is not None:
-        sources.append(("beetle", beetle.Backpack.Serial))
+    if beetle is not None:
+        beetle_pack = beetle.Backpack
+        if beetle_pack is not None:
+            Items.UseItem(beetle_pack)
+            Items.WaitForContents(beetle_pack, 3000)
+            Misc.Pause(600)
+            sources.append(("beetle", beetle_pack.Serial))
+        else:
+            log("Beetle backpack not accessible after dismount.", 0x25)
     if Player.Backpack is not None:
         sources.append(("backpack", Player.Backpack.Serial))
 
     for _, source_serial in sources:
-        for id_list in (LOG_IDS, BOARD_IDS):
+        for id_list in (LOG_IDS, BOARD_IDS, MISC_LOOT_IDS):
             for item_id in id_list:
                 safety = 0
                 while safety < 50:

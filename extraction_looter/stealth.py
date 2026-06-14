@@ -25,18 +25,21 @@ def _log(msg, color=colors['cyan']):
     Misc.SendMessage(_TAG + ' ' + msg, color)
 
 
-def threat_nearby(hostile_range):
+def threat_nearby(hostile_range, body_ids=None):
     """
     Return True if any hostile mobile is within hostile_range tiles.
 
     Input:
         hostile_range -- int, tile radius
+        body_ids      -- list of int body IDs to match, or None for any
 
     Returns:
         bool
     """
     enemies = GetEnemies(Mobiles, minRange=0, maxRange=hostile_range,
                          notorieties=GetEnemyNotorieties())
+    if body_ids is not None:
+        enemies = [e for e in enemies if e.Body in body_ids]
     return len(enemies) > 0
 
 
@@ -60,25 +63,42 @@ def _cast_invis():
 
 def _use_hide():
     """Use the Hiding skill. Returns immediately (no confirmation check)."""
-    Misc.UseSkill("Hiding")
-    Misc.Pause(1000)
+    Player.UseSkill("Hiding")
+    Misc.Pause(1200)
 
 
-def _mount(beetle_serial):
-    """Mount the beetle so the character stays mounted while hidden."""
+def mount_beetle(beetle_serial):
+    """Mount the beetle. No-op if already mounted or beetle not found."""
     if beetle_serial is None:
+        _log("No beetle serial — skipping mount.", colors['yellow'])
         return
     if Player.Mount is not None:
-        return   # already mounted
+        _log("Already mounted — skipping.", colors['cyan'])
+        return
     beetle = Mobiles.FindBySerial(beetle_serial)
     if beetle is None:
-        _log("Beetle not in range — cannot mount.", colors['yellow'])
+        _log("Beetle (0x%X) not found — cannot mount." % beetle_serial, colors['yellow'])
         return
+    _log("Mounting %s (0x%X)..." % (beetle.Name, beetle_serial), colors['cyan'])
     Mobiles.UseMobile(beetle_serial)
     Misc.Pause(1500)
+    if Player.Mount is not None:
+        _log("Mounted.", colors['green'])
+    else:
+        _log("Mount did not confirm — still on foot.", colors['yellow'])
 
 
-def handle_threat(beetle_serial, poll_ms, timeout_ms):
+def hide_and_mount(beetle_serial):
+    """
+    Mount the beetle then hide. Used when the loot area is clear and
+    the character should go stealth until new corpses appear.
+    """
+    Misc.Pause(1000)  # let any queued actions drain before mounting
+    mount_beetle(beetle_serial)
+    _use_hide()
+
+
+def handle_threat(beetle_serial, poll_ms, timeout_ms, body_ids=None):
     """
     React to a nearby threat:
       1. Cast Invisibility (if Magery > threshold), else use Hiding skill.
@@ -97,6 +117,9 @@ def handle_threat(beetle_serial, poll_ms, timeout_ms):
     magery = Player.GetSkillValue("Magery")
     hiding = Player.GetSkillValue("Hiding")
 
+    Misc.ClearSendQueue()
+    mount_beetle(beetle_serial)
+
     if magery > MAGERY_INVIS_THRESHOLD:
         _log("Threat detected — casting Invisibility (Magery %.1f)." % magery, colors['yellow'])
         _cast_invis()
@@ -104,15 +127,13 @@ def handle_threat(beetle_serial, poll_ms, timeout_ms):
         _log("Threat detected — using Hiding (Hiding %.1f)." % hiding, colors['yellow'])
         _use_hide()
     else:
-        _log("Threat detected — no hide skill available, mounting only.", colors['red'])
-
-    _mount(beetle_serial)
+        _log("Threat detected — no hide skill available, mounted only.", colors['red'])
 
     elapsed = 0
     while elapsed < timeout_ms:
         Misc.Pause(poll_ms)
         elapsed += poll_ms
-        if not threat_nearby(20):   # wider check when polling to avoid premature resume
+        if not threat_nearby(20, body_ids):   # wider check when polling to avoid premature resume
             _log("Threat cleared — resuming.", colors['green'])
             return True
         _log("Threat still present (%ds / %ds)." % (elapsed // 1000, timeout_ms // 1000),

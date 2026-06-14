@@ -11,7 +11,10 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import config
 from glossary.colors import colors
-from glossary.runebook_handler import find_runebook_by_label, travel_to_runebook, travel_to_named_rune
+from glossary.runebook_handler import (
+    find_runebook_by_label, travel_to_named_rune,
+    arrived_at, walk_steps,
+)
 from glossary.enemies import GetEnemies
 
 # ─── Config ───────────────────────────────────────────────────────────────────
@@ -68,7 +71,8 @@ TRANSFER_ITEMS = [
 # Auto-bank gold
 WEIGHT_BANK_THRESHOLD = 0.90        # recall home when weight ratio >= this
 GOLD_DEST_SERIAL      = config.quick_dropbox
-HOME_RUNEBOOK_NAME    = "home"      # label on the runebook item (case-insensitive)
+HOME_RUNEBOOK_NAME    = "home"       # label on the runebook item (case-insensitive)
+HOME_RUNE_NAME        = "new home"  # name of the home rune inside that runebook
 FARM_RUNE_NAME        = None        # set at runtime via prompt
 RECALL_SETTLE_DELAY   = 2000        # ms to wait after recall lands
 
@@ -85,6 +89,16 @@ FARM_LOCATIONS = [
     'titans',    # Titans
     'cavetroll', # Cave Trolls
 ]
+
+# ─── Farm landing position ────────────────────────────────────────────────────
+# After recalling to the farm rune the player steps off the landing tile before
+# the guardian loop starts.  Fill in TRANSFER_FROM_POS once you recall there and
+# note Player.Position — the script will warn if the landing is wrong.
+#
+# TRANSFER_FROM_STEPS: default is one tile north.
+# If the tile north is blocked at your rune, use ['East', 'North'] instead.
+TRANSFER_FROM_POS   = None        # TODO: (x, y) — set from rune landing coords
+TRANSFER_FROM_STEPS = ['North']   # movement after landing; change per location if needed
 
 GOLD_ITEM_ID = 0x0EED
 
@@ -185,7 +199,7 @@ def _walk_to_drop():
 
 def do_banking(rb):
     """Travel home, deposit everything, then return to the farm rune."""
-    if not travel_to_runebook(rb, RECALL_SETTLE_DELAY):
+    if not travel_to_named_rune(rb, HOME_RUNE_NAME, RECALL_SETTLE_DELAY):
         log("Failed to travel home — banking aborted.", colors['red'])
         return False
     _walk_to_drop()
@@ -364,7 +378,7 @@ def shutdown():
     if not Player.IsGhost:
         Player.ChatSay("all guard me")
         rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
-        if rb is not None and travel_to_runebook(rb, RECALL_SETTLE_DELAY):
+        if rb is not None and travel_to_named_rune(rb, HOME_RUNE_NAME, RECALL_SETTLE_DELAY):
             for direction in ('East', 'North', 'West', 'West'):
                 Player.Walk(direction)
                 Misc.Pause(600)
@@ -489,6 +503,13 @@ def main():
     if not travel_to_named_rune(rb, FARM_RUNE_NAME, RECALL_SETTLE_DELAY):
         log("Failed to recall to '%s' — stopping." % FARM_RUNE_NAME, colors['red'])
         return
+
+    walk_steps(TRANSFER_FROM_STEPS)
+
+    if TRANSFER_FROM_POS is not None:
+        if not arrived_at(*TRANSFER_FROM_POS):
+            log("Location check failed — expected %s, got (%d, %d)." % (
+                TRANSFER_FROM_POS, Player.Position.X, Player.Position.Y), colors['red'])
 
     log("Guardian started.", colors['cyan'])
 

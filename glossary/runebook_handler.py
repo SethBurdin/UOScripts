@@ -19,9 +19,7 @@ RUNEBOOK_GUMP_ID           = 89
 RUNEBOOK_ITEM_ID           = 0x22C5
 RECALL_BUTTON_BASE         = 50   # slot N → button 50 + N
 GATE_BUTTON_BASE           = 100  # slot N → button 100 + N
-SACRED_JOURNEY_BUTTON_BASE = 150  # UNCONFIRMED — record a macro of Sacred Journey
-                                   # from a runebook and check the button ID
-SACRED_JOURNEY_CONFIRMED   = False # Set True once SACRED_JOURNEY_BUTTON_BASE is verified
+SACRED_JOURNEY_BUTTON_BASE = 75   # confirmed via macro recording
 
 # ─── Skill thresholds ─────────────────────────────────────────────────────────
 RECALL_MAGERY_MIN    = 30   # Magery required to use Recall
@@ -72,14 +70,24 @@ def _slot_from_lines(lines, rune_name):
 
 def _ensure_runebook_open(runebook):
     """Always open a fresh runebook gump. Returns True on success.
-    Never reuses an existing open gump — the server may have already closed it,
-    and sending SendAction on a server-closed gump causes a disconnect."""
-    Items.UseItem(runebook)
-    Misc.Pause(300)
-    if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
+    Closes any existing gump first, then retries if the server rate-limits the open."""
+    if Gumps.HasGump():
+        Gumps.SendAction(RUNEBOOK_GUMP_ID, 0)
+        Misc.Pause(400)
+    for attempt in range(1, 6):
+        Journal.Clear()
+        Items.UseItem(runebook)
+        Misc.Pause(600)
+        if Journal.Search('You must wait'):
+            _log("Rate-limited opening runebook (attempt %d) — waiting..." % attempt)
+            Misc.Pause(2000)
+            continue
+        if Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
+            return True
         _log("Runebook gump did not open.", 33)
         return False
-    return True
+    _log("Runebook gump rate-limited after retries.", 33)
+    return False
 
 
 def _open_and_find_slot(runebook, rune_name):
@@ -89,7 +97,9 @@ def _open_and_find_slot(runebook, rune_name):
     lines = Gumps.LastGumpGetLineList()
     slot = _slot_from_lines(lines, rune_name)
     if slot is None:
-        _log("Rune '%s' not found. Lines: %s" % (rune_name, lines), 33)
+        rune_candidates = [l.strip() for l in lines if l.strip() and not l.strip().isdigit()
+                           and l.strip().lower() not in _GUMP_LABELS]
+        _log("Rune '%s' not found. Gump names seen: %s" % (rune_name, rune_candidates), 33)
         # Do NOT send any gump action here — unknown buttons can drop runes.
     return slot
 
@@ -125,6 +135,34 @@ def _enter_nearby_gate(exclude_serial=None):
 
 # ─── Public API ───────────────────────────────────────────────────────────────
 
+def arrived_at(x, y, tolerance=3):
+    """Return True if the player is within tolerance Chebyshev tiles of (x, y)."""
+    pos = Player.Position
+    return max(abs(pos.X - x), abs(pos.Y - y)) <= tolerance
+
+
+def walk_steps(steps, pause_ms=600):
+    """Walk a list of cardinal direction strings (e.g. ['North'] or ['East', 'North'])."""
+    for direction in steps:
+        Player.Walk(direction)
+        Misc.Pause(pause_ms)
+
+
+def find_runebook_by_serial(serial):
+    """
+    Return the runebook Item with the given serial (works for ground items too).
+    Returns None if not found or if the item is not a runebook.
+    """
+    item = Items.FindBySerial(serial)
+    if item is None:
+        _log("Runebook serial 0x%X not found." % serial, 33)
+        return None
+    if item.ItemID != RUNEBOOK_ITEM_ID:
+        _log("Item 0x%X is not a runebook (ItemID 0x%X)." % (serial, item.ItemID), 33)
+        return None
+    return item
+
+
 def find_runebook_by_label(label):
     """
     Return the first runebook in the player's backpack whose tooltip contains label
@@ -145,45 +183,35 @@ def find_runebook_by_label(label):
 
 def travel_to_runebook(runebook, settle_delay=2000):
     """
-    Travel to the runebook's default rune by casting directly at the item.
-    Uses the same skill-priority logic as travel_to_named_rune but targets
-    the runebook rather than navigating the gump — simpler when you just want
-    the default rune (e.g. recalling home).
+    Travel to the runebook's DEFAULT rune by casting a spell targeting the book.
 
-    Priority: Chivalry > SACRED_JOURNEY_MIN → Sacred Journey
-              Overweight AND Magery > GATE_MAGERY_MIN → Gate
-              Magery > RECALL_MAGERY_MIN → Recall
+    Priority:
+      Chivalry > SACRED_JOURNEY_MIN  → Sacred Journey (no reagents)
+      Magery > RECALL_MAGERY_MIN     → Recall
     """
-    chiv       = Player.GetSkillValue('Chivalry')
-    magery     = Player.GetSkillValue('Magery')
-    overweight = Player.Weight >= Player.MaxWeight
+    chiv   = Player.GetSkillValue('Chivalry')
+    magery = Player.GetSkillValue('Magery')
 
-    if chiv > SACRED_JOURNEY_MIN and SACRED_JOURNEY_CONFIRMED:
-        spell = 'Sacred Journey'
-    elif overweight and magery > GATE_MAGERY_MIN:
-        spell = 'Gate Travel'
-    elif magery > RECALL_MAGERY_MIN:
-        spell = 'Recall'
-    else:
-        _log("Cannot travel: Magery %.1f and Chivalry %.1f both below thresholds." % (magery, chiv), 33)
-        return False
+    if chiv > SACRED_JOURNEY_MIN:
+        _log("Sacred Journey (Chiv %.1f) — default rune." % chiv)
+        return _sacred_journey_spell(runebook, settle_delay)
 
-    _log("Casting %s at runebook." % spell)
-    existing_gate = _snapshot_nearby_gate() if spell == 'Gate Travel' else None
-    mana_before = Player.Mana
-    Spells.CastMagery(spell)
-    if not Target.WaitForTarget(4000, False):
-        _log("%s: target cursor never appeared." % spell, 33)
-        return False
-    Target.TargetExecute(runebook.Serial)
-    if not _wait_for_mana_drop(mana_before):
-        _log("%s fizzled — mana did not drop." % spell, 33)
-        return False
-    if spell == 'Gate Travel':
-        if not _enter_nearby_gate(existing_gate):
+    if magery > RECALL_MAGERY_MIN:
+        _log("Recall (Magery %.1f) — default rune." % magery)
+        mana_before = Player.Mana
+        Spells.CastMagery("Recall")
+        if not Target.WaitForTarget(4000, False):
+            _log("Recall: target cursor never appeared.", 33)
             return False
-    Misc.Pause(settle_delay)
-    return True
+        Target.TargetExecute(runebook.Serial)
+        if not _wait_for_mana_drop(mana_before):
+            _log("Recall fizzled — mana did not drop.", 33)
+            return False
+        Misc.Pause(settle_delay)
+        return True
+
+    _log("Cannot travel: Chivalry %.1f and Magery %.1f both below thresholds." % (chiv, magery), 33)
+    return False
 
 
 def travel_to_named_rune(runebook, rune_name, settle_delay=2000):
@@ -202,9 +230,9 @@ def travel_to_named_rune(runebook, rune_name, settle_delay=2000):
     magery     = Player.GetSkillValue('Magery')
     overweight = Player.Weight >= Player.MaxWeight
 
-    if chiv > SACRED_JOURNEY_MIN and SACRED_JOURNEY_CONFIRMED:
-        _log("Using Sacred Journey (Chiv %.1f)." % chiv)
-        return _sacred_journey(runebook, rune_name, settle_delay)
+    if chiv > SACRED_JOURNEY_MIN:
+        _log("Sacred Journey (Chiv %.1f) — '%s'." % (chiv, rune_name))
+        return _sacred_journey_gump(runebook, rune_name, settle_delay)
     elif overweight and magery > GATE_MAGERY_MIN:
         _log("Using Gate Travel (overweight, Magery %.1f)." % magery)
         return _gate(runebook, rune_name, settle_delay)
@@ -224,27 +252,30 @@ def travel_to_named_rune(runebook, rune_name, settle_delay=2000):
 
 def _extract_rune_block(lines, book_name=''):
     """
-    Extract rune names from the gump line list.
+    Extract (slot, name) pairs for all runes in the gump.
 
-    The gump text includes the runebook's own name before the rune entries.
-    Pass book_name (lowercase) to exclude it so slot indices stay correct.
-    Coordinate strings start with digits and are skipped automatically.
+    Reuses _slot_from_lines for every candidate entry so slot assignment uses
+    the exact same backward-counting boundary rules (_GUMP_LABELS / blank /
+    all-digit) that work reliably for individual rune lookups.
+
+    Last-occurrence wins: rune names sit at the END of the gump dump, so they
+    overwrite any false-positive matches from earlier UI text that happen to
+    share the same slot count.
     """
-    candidates = []
+    seen = {}
     for line in lines:
         entry = line.strip()
-        if not entry:
+        if not entry or entry.isdigit() or entry.lower() in _GUMP_LABELS:
             continue
         if entry[0].isdigit():
             continue
-        if entry.lower() in _GUMP_LABELS:
-            continue
         if book_name and entry.lower() == book_name:
             continue
-        candidates.append(entry)
-        if len(candidates) == 16:
-            break
-    return [(i, name) for i, name in enumerate(candidates)]
+        slot = _slot_from_lines(lines, entry)
+        if slot is None or slot >= 16:
+            continue
+        seen[slot] = entry  # last wins — actual rune names appear after UI text
+    return sorted(seen.items())
 
 
 def get_runebook_runes(runebook):
@@ -253,9 +284,25 @@ def get_runebook_runes(runebook):
     The gump is left open — the next travel call will open a fresh one.
     Returns [(slot, name), ...] for all occupied slots (0-based).
     """
-    Items.UseItem(runebook)
-    if not Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
+    if Gumps.HasGump():
+        Gumps.SendAction(RUNEBOOK_GUMP_ID, 0)
+        Misc.Pause(400)
+    opened = False
+    for attempt in range(1, 6):
+        Journal.Clear()
+        Items.UseItem(runebook)
+        Misc.Pause(600)
+        if Journal.Search('You must wait'):
+            _log("Rate-limited opening runebook (attempt %d) — waiting..." % attempt)
+            Misc.Pause(2000)
+            continue
+        if Gumps.WaitForGump(RUNEBOOK_GUMP_ID, 5000):
+            opened = True
+            break
         _log("Runebook gump timed out.", 33)
+        return []
+    if not opened:
+        _log("Runebook gump rate-limited after retries.", 33)
         return []
     lines = Gumps.LastGumpGetLineList()
     props = Items.GetPropStringList(runebook.Serial) or []
@@ -273,25 +320,33 @@ def find_runes_matching(runebook, partial):
 
 def travel_to_slot(runebook, slot, settle_delay=2000):
     """
-    Travel to a specific runebook slot using the best available skill method.
-    Uses the same skill-priority logic as travel_to_named_rune.
+    Travel to a specific runebook slot via the gump.
+
+    Sacred Journey is cast as a spell targeting the runebook (avoids the
+    unconfirmed gump button base).  Gate and Recall use confirmed gump buttons.
     """
     chiv       = Player.GetSkillValue('Chivalry')
     magery     = Player.GetSkillValue('Magery')
     overweight = Player.Weight >= Player.MaxWeight
 
-    if chiv > SACRED_JOURNEY_MIN and SACRED_JOURNEY_CONFIRMED:
-        button_base = SACRED_JOURNEY_BUTTON_BASE
-        needs_mana  = False
+    if chiv > SACRED_JOURNEY_MIN:
+        _log("Sacred Journey (Chiv %.1f) — slot %d." % (chiv, slot))
+        if not _ensure_runebook_open(runebook):
+            return False
+        Gumps.SendAction(RUNEBOOK_GUMP_ID, SACRED_JOURNEY_BUTTON_BASE + slot)
+        Misc.Pause(settle_delay)
+        return True
+
     elif overweight and magery > GATE_MAGERY_MIN:
+        _log("Gate Travel (overweight, Magery %.1f) — slot %d." % (magery, slot))
         button_base = GATE_BUTTON_BASE
         needs_mana  = True
     elif magery > RECALL_MAGERY_MIN:
+        _log("Recall (Magery %.1f) — slot %d." % (magery, slot))
         button_base = RECALL_BUTTON_BASE
         needs_mana  = True
     else:
-        # Consume a runebook charge directly — no spell skill or reagents required.
-        _log("No spell skills — consuming runebook charge (slot %d)." % slot)
+        _log("No travel skill — consuming runebook charge (slot %d)." % slot)
         button_base = RECALL_BUTTON_BASE
         needs_mana  = False
 
@@ -342,15 +397,21 @@ def gate_via_book(book, button_id, settle_delay=3000):
 
 # ─── Travel method implementations ───────────────────────────────────────────
 
+def _sacred_journey_gump(runebook, rune_name, settle_delay):
+    """Use the Sacred Journey gump button for a specific named rune (150 + slot)."""
+    slot = _open_and_find_slot(runebook, rune_name)
+    if slot is None:
+        return False
+    Gumps.SendAction(RUNEBOOK_GUMP_ID, SACRED_JOURNEY_BUTTON_BASE + slot)
+    Misc.Pause(settle_delay)
+    return True
+
+
 def _recall(runebook, rune_name, settle_delay):
     slot = _open_and_find_slot(runebook, rune_name)
     if slot is None:
         return False
-    mana_before = Player.Mana
     Gumps.SendAction(RUNEBOOK_GUMP_ID, RECALL_BUTTON_BASE + slot)
-    if not _wait_for_mana_drop(mana_before):
-        _log("Recall fizzled — mana did not drop.", 33)
-        return False
     Misc.Pause(settle_delay)
     return True
 
@@ -371,13 +432,18 @@ def _gate(runebook, rune_name, settle_delay):
     return True
 
 
-def _sacred_journey(runebook, rune_name, settle_delay):
-    slot = _open_and_find_slot(runebook, rune_name)
-    if slot is None:
+def _sacred_journey_spell(runebook, settle_delay):
+    """
+    Cast Sacred Journey targeting the runebook — uses the book's DEFAULT rune.
+    Only correct when the default rune is the intended destination (e.g. home).
+    """
+    if Gumps.HasGump():
+        Gumps.SendAction(RUNEBOOK_GUMP_ID, 0)
+        Misc.Pause(300)
+    Spells.CastChivalry("Sacred Journey")
+    if not Target.WaitForTarget(5000, False):
+        _log("Sacred Journey: target cursor never appeared.", 33)
         return False
-    # SACRED_JOURNEY_BUTTON_BASE is unconfirmed.
-    # Record a macro: open runebook → click Sacred Journey for any rune → check button ID.
-    # Then update SACRED_JOURNEY_BUTTON_BASE at the top of this file.
-    Gumps.SendAction(RUNEBOOK_GUMP_ID, SACRED_JOURNEY_BUTTON_BASE + slot)
+    Target.TargetExecute(runebook.Serial)
     Misc.Pause(settle_delay)
     return True

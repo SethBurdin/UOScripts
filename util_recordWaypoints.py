@@ -1,46 +1,61 @@
 '''
-Description: Records player waypoints to a JSON file as you walk a route.
-    Run this script, walk your patrol loop, then stop the script.
-    The saved file can be loaded by skill_KirinTaming.py (or any patrol script).
+Records player waypoints to a JSON file as you walk a route.
 
 Usage:
-    - Set outputFile to the path where you want waypoints saved.
-    - Set recordIntervalTiles to how many tiles you must move before a new
-      waypoint is recorded (prevents duplicate points when standing still).
-    - Walk your route and stop the script when done.
+  1. (Optional) Set OUTPUT_NAME below to a fixed filename, e.g. 'dropoff'.
+     Leave as None to auto-generate a timestamped name.
+  2. Run this script.
+  3. Walk your route.
+  4. Press Stop in Razor Enhanced — file is saved after every point.
+
+Output: saved in the same folder as this script.
+Format: [[x, y], ...]  compatible with nav.load_waypoints()
 '''
 
-import json
-import os
+import json, os, time
 
-outputFile = os.path.join( os.path.dirname( __file__ ), 'waypoints_random.json' )
-recordIntervalTiles = 5  # minimum tile distance from last recorded point before saving a new one
+INTERVAL = 5   # minimum tiles moved before a new point is recorded
 
-waypoints = []
-lastX = None
-lastY = None
+# Set to a string like 'dropoff' to use a fixed filename.
+# Leave as None to auto-generate: waypoints_YYYYMMDD_HHMM.json
+OUTPUT_NAME = None
 
-Misc.SendMessage( 'Waypoint recorder started. Walk your route and stop the script when done.' )
-Misc.SendMessage( 'Saving to: %s' % outputFile )
+_TAG = '[recorder]'
 
-while not Player.IsGhost:
-    x = Player.Position.X
-    y = Player.Position.Y
 
-    if lastX is None or abs( x - lastX ) + abs( y - lastY ) >= recordIntervalTiles:
-        waypoints.append( [ x, y ] )
-        lastX = x
-        lastY = y
-        with open( outputFile, 'w' ) as f:
-            json.dump( waypoints, f, indent=4 )
-        Misc.SendMessage( 'Waypoint %d recorded: (%d, %d)' % ( len( waypoints ), x, y ) )
+def _log(msg, color=85):
+    Misc.SendMessage(_TAG + ' ' + msg, color)
 
-    Misc.Pause( 250 )
 
-# Script was stopped — write the file
-if len( waypoints ) > 0:
-    with open( outputFile, 'w' ) as f:
-        json.dump( waypoints, f, indent=4 )
-    Misc.SendMessage( 'Saved %d waypoints to %s' % ( len( waypoints ), outputFile ) )
-else:
-    Misc.SendMessage( 'No waypoints recorded.' )
+def _resolve_filename():
+    if OUTPUT_NAME:
+        return OUTPUT_NAME
+    return 'waypoints_' + time.strftime('%Y%m%d_%H%M')
+
+
+def main():
+    name = _resolve_filename()
+
+    output_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), name + '.json')
+    _log('Saving to: %s' % output_path)
+    _log('Walk your route. Press Stop when done.')
+
+    pts    = []
+    last_x = None
+    last_y = None
+
+    while not Player.IsGhost:
+        x = Player.Position.X
+        y = Player.Position.Y
+        if last_x is None or abs(x - last_x) + abs(y - last_y) >= INTERVAL:
+            pts.append([x, y])
+            last_x, last_y = x, y
+            with open(output_path, 'w') as fh:
+                json.dump(pts, fh, indent=2)
+            _log('Point %d: (%d, %d)' % (len(pts), x, y))
+        Misc.Pause(250)
+
+    _log('Done. Saved %d points to %s' % (len(pts), output_path), 68)
+
+
+main()

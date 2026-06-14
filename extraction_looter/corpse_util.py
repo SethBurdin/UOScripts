@@ -3,6 +3,8 @@
 #
 # Functions:
 #   scan_nearby_corpses(scan_range)  -> list[Item]   skinnable creature corpses
+#   nearest_corpse(corpses)          -> Item          closest corpse to player
+#   walk_to_corpse(corpse)           -> None          pathfind to corpse position
 #   open_corpse(corpse)              -> bool          open and wait for contents
 #   skin_corpse(corpse, tool)        -> bool          skin and confirm
 
@@ -16,7 +18,7 @@ from glossary.items.tools import tools
 from glossary.colors import colors
 from utilities.items import FindItem
 
-SKIN_WAIT_MS      = 600    # ms after skinning tool use
+SKIN_WAIT_MS      = 900    # ms after skinning tool use
 ACTION_DELAY_MS   = 1200   # general action cooldown
 
 SKINNING_TOOL_IDS = [
@@ -83,6 +85,31 @@ def scan_nearby_corpses(scan_range):
     return result
 
 
+def nearest_corpse(corpses):
+    """Return the corpse closest to the player from a list."""
+    def _dist(c):
+        return abs(c.Position.X - Player.Position.X) + abs(c.Position.Y - Player.Position.Y)
+    return min(corpses, key=_dist)
+
+
+def walk_to_corpse(corpse):
+    """Pathfind to the corpse's tile. No-op if already adjacent."""
+    dx = abs(corpse.Position.X - Player.Position.X)
+    dy = abs(corpse.Position.Y - Player.Position.Y)
+    if dx <= 1 and dy <= 1:
+        _log('Already adjacent to "%s" (0x%X).' % (corpse.Name, corpse.Serial))
+        return
+    _log('Walking to "%s" (0x%X) at (%d, %d)...' % (
+        corpse.Name, corpse.Serial, corpse.Position.X, corpse.Position.Y))
+    route              = PathFinding.Route()
+    route.X            = corpse.Position.X
+    route.Y            = corpse.Position.Y
+    route.DebugMessage = False
+    route.StopIfStuck  = True
+    PathFinding.Go(route)
+    _log('Arrived at "%s".' % corpse.Name)
+
+
 def open_corpse(corpse):
     """
     Open a corpse and wait for the server to populate its contents.
@@ -94,10 +121,17 @@ def open_corpse(corpse):
     Returns:
         bool  True if contents are available
     """
-    Items.UseItem(corpse.Serial)
-    Items.WaitForContents(corpse.Serial, 3000)
-    Misc.Pause(600)
-    return corpse.Contains is not None
+    _log('Opening corpse "%s" (0x%X)...' % (corpse.Name, corpse.Serial))
+    for attempt in range(5):
+        Journal.Clear()
+        Items.UseItem(corpse.Serial)
+        Misc.Pause(1500)
+        if not Journal.Search("You must wait to perform another action."):
+            break
+        _log('Server busy on open — retry %d/5.' % (attempt + 1), colors['yellow'])
+        Misc.Pause(ACTION_DELAY_MS)
+    has_contents = corpse.Contains is not None
+    return has_contents
 
 
 def skin_corpse(corpse, tool):
@@ -111,13 +145,18 @@ def skin_corpse(corpse, tool):
     Returns:
         bool  True if skinning succeeded (no rejection phrase in journal)
     """
+    _log('Skinning "%s" (0x%X) — clearing journal...' % (corpse.Name, corpse.Serial))
     Journal.Clear()
+    _log('Using skinning tool (0x%X)...' % tool.Serial)
     Items.UseItem(tool.Serial)
+    _log('Waiting for target cursor...')
     if not Target.WaitForTarget(3000, False):
         _log("Target cursor never appeared for 0x%X — skipping." % corpse.Serial, colors['yellow'])
         return False
 
+    _log('Targeting corpse 0x%X...' % corpse.Serial)
     Target.TargetExecute(corpse.Serial)
+    _log('Waiting %dms for skin action to complete...' % SKIN_WAIT_MS)
     Misc.Pause(SKIN_WAIT_MS)
 
     for phrase in CANT_SKIN_PHRASES:
@@ -149,17 +188,27 @@ def cut_hides_in_backpack(scissors):
         scissors -- Item object
     """
     raw_hide_id = 0x1079
+    _log('Testing if findbyid is an action')
     hide = Items.FindByID(raw_hide_id, -1, Player.Backpack.Serial)
+    _log('server action>?')
+    hide = Items.FindByID(raw_hide_id, -1, Player.Backpack.Serial)
+
     while hide is not None:
+        _log('Cutting %dx raw hide (0x%X) with scissors...' % (hide.Amount, hide.Serial))
         for attempt in range(5):
             Journal.Clear()
+            _log('Using scissors (0x%X), attempt %d/5...' % (scissors.Serial, attempt + 1))
             Items.UseItem(scissors.Serial)
+            _log('Waiting for target cursor...')
             if not Target.WaitForTarget(3000, False):
                 _log("Cut hides: target cursor never appeared.", colors['yellow'])
                 return
+            _log('Targeting hide stack 0x%X...' % hide.Serial)
             Target.TargetExecute(hide.Serial)
+            _log('Waiting %dms for cut action...' % ACTION_DELAY_MS)
             Misc.Pause(ACTION_DELAY_MS)
             if not Journal.Search("You must wait to perform another action."):
+                _log('Cut succeeded.', colors['green'])
                 break
             _log("Server busy — retry cut %d/5." % (attempt + 1), colors['yellow'])
             Misc.Pause(ACTION_DELAY_MS)

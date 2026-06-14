@@ -21,7 +21,7 @@ from glossary.colors import colors
 #  Config
 VENDOR_RANGE       = 11     # tile radius to scan for NPCs
 VENDOR_NAME_FILTER = []     # filter by NPC name keywords (empty = all humans)
-VENDOR_REACH       = 2      # tiles — how close we need to be before speaking
+VENDOR_REACH       = 1      # tiles — how close we need to be before speaking
 WALK_TIMEOUT_MS    = 10000  # ms to wait for pathfinding to complete
 BUY_WAIT_MS        = 5000   # ms for BuyAgent to fill and confirm the gump
 BEETLE_SERIAL      = 0      # pin to a specific beetle serial (0 = auto-detect)
@@ -32,11 +32,11 @@ REG_ITEM_IDS = frozenset([
     0x0F7A,  # Black Pearl
     0x0F7B,  # Blood Moss
     0x0F83,  # Garlic
-    0x0F84,  # Ginseng
+    0x0F85,  # Ginseng
     0x0F86,  # Mandrake Root
-    0x0F85,  # Nightshade
+    0x0F88,  # Nightshade
     0x0F8D,  # Spider's Silk
-    0x0FA9,  # Sulfurous Ash
+    0x0F8C,  # Sulfurous Ash
 ])
 
 #  Helpers
@@ -74,7 +74,7 @@ def WalkTo( vendor ):
         dy = abs( Player.Position.Y - pos.Y )
         if dx <= VENDOR_REACH and dy <= VENDOR_REACH:
             return True
-        Misc.Pause( 200 )
+        Misc.Pause( 100 )
         elapsed += 200
     return False
 
@@ -114,7 +114,7 @@ def TransferToBeetle():
     for item in list( Player.Backpack.Contains ):
         if item.ItemID in REG_ITEM_IDS:
             Items.Move( item, pack, item.Amount )
-            Misc.Pause( 600 )
+            Misc.Pause( 900 )
             moved += 1
     if moved:
         Misc.SendMessage( 'Transferred %d reg stack(s) to beetle.' % moved, colors[ 'green' ] )

@@ -43,11 +43,11 @@ CLOTH_ID  = 0x0F9A   # bolts of cloth   (produced by loom)
 # Body IDs for sheep variants (unshorn & shorn)
 SHEEP_BODY_IDS = [ 0x00CF, 0x00D0 ]
 
-PACK_BEETLE_BODY     = 0x00EF   # giant/pack beetle body ID
+PACK_BEETLE_BODY     = 0x0317   # confirmed body ID for this shard's pack beetle
 WEIGHT_OFFLOAD_PCT   = 0.75     # offload wool to beetle at this fraction of max weight
 
 # ── Runebook patrol config ─────────────────────────────────────────────────────
-SHEEP_RUNEBOOK_LABEL = 'sheep'    # label of the runebook to use for patrol
+SHEEP_RUNEBOOK_LABEL = 'Sheep'    # label of the runebook to use for patrol
 SHEEP_RUNE_FILTER    = 'Sheep'    # partial match (case-insensitive) for rune names
 RECALL_CAST_DELAY    = 3000       # ms to wait after travel for map to settle
 

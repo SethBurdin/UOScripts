@@ -41,8 +41,11 @@ def transfer_to_beetle(item, beetle_pack):
           beetle_full -- True if server rejected the move (pack full / weight)
     """
     for attempt in range(MAX_RETRIES):
+        _log('Moving %dx %s (0x%X) → beetle, attempt %d/%d...' % (
+            item.Amount, item.Name, item.Serial, attempt + 1, MAX_RETRIES))
         Journal.Clear()
         Items.Move(item, beetle_pack, item.Amount)
+        _log('Waiting %dms after Items.Move...' % MOVE_PAUSE_MS)
         Misc.Pause(MOVE_PAUSE_MS)
 
         if Journal.Search("You must wait to perform another action."):
@@ -73,6 +76,8 @@ def drop_on_ground(item):
         item -- Item object
     """
     pos = Player.Position
+    _log('Dropping %dx %s (0x%X) on ground at (%d, %d)...' % (
+        item.Amount, item.Name, item.Serial, pos.X, pos.Y))
     Items.MoveOnGround(item, item.Amount, pos.X, pos.Y, pos.Z)
     Misc.Pause(DROP_PAUSE_MS)
     _log("Dropped %dx %s on ground." % (item.Amount, item.Name), colors['yellow'])

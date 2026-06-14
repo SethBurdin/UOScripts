@@ -34,7 +34,7 @@ class cfg:
     mine_rune_slot   = None    # runebook slot (0-15) to return to after banking; None = stop at bank
 
     # Body graphic IDs — verify with Object Inspector if your shard differs.
-    pack_beetle_body   = 0x00EF     # giant/pack beetle
+    pack_beetle_body   = 0x0317     # confirmed body ID for this shard's pack beetle
     fire_beetle_body   = 0x00A9     # fire beetle (acts as mobile forge)
 
     # Optional hardcoded serials — set these to skip the mobile scan entirely.
@@ -56,7 +56,7 @@ class cfg:
 
     home_container_serial = None  # resolved at runtime from config.quick_dropbox
     home_forge_serial     = 0x400750FE
-    pickaxe_box_serial    = 0x4005AA6E  # serial of the box at home holding spare pickaxes
+    pickaxe_box_serial    = None         # serial of the box at home holding spare pickaxes
 
     # Auto mode
     auto_mining_rune_filter = 'Mining Spot'  # partial match (case-insensitive) for runes to visit
@@ -91,6 +91,7 @@ ORE_IDS    = [0x19B7, 0x19B8, 0x19B9, 0x19BA]
 INGOT_IDS  = [0x1BF2, 0x1BEF, 0x1BE0, 0x1BE1, 0x1BE8, 0x1BE9, 0x1BEA, 0x1BEB,
               0x1BEC, 0x1BED, 0x1BEE, 0x1BE2, 0x1BE3, 0x1BE4, 0x1BE5, 0x1BE6,
               0x1BE7]
+GEM_IDS    = [0x3193, 0x3194, 0x3195, 0x3197, 0x3198]  # Turquoise, Perfect Emerald, Ecru Citrine, Fire Ruby, Blue Diamond
 # Forge object IDs (player-placed and built-in map forges)
 FORGE_IDS  = [0x0FB1, 0x0FAF, 0x0FAD, 0x0FAE, 0x0FB0, 0x2DD8]
 
@@ -893,8 +894,9 @@ def bank_ingots():
         log("No mining tool — attempting to craft pickaxe before depositing ingots.")
         try_craft_pickaxe()
 
-    # ── Deposit backpack ingots ───────────────────────────────────────────────
+    # ── Deposit backpack ingots + gems ───────────────────────────────────────
     _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
+    _deposit_stacks(Player.Backpack.Serial, GEM_IDS,   dest, "gems")
 
     # ── Unload pack beetle ────────────────────────────────────────────────────
     if pack is not None:
@@ -922,9 +924,10 @@ def bank_ingots():
         log("Smelting backpack ore with fire beetle...")
         smelt_with_fire_beetle(fire)
 
-    # ── Deposit smelted ingots and leftover ore ───────────────────────────────
+    # ── Deposit smelted ingots, leftover ore, and gems ───────────────────────
     _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots after smelt")
     _deposit_stacks(Player.Backpack.Serial, ORE_IDS,   dest, "remaining ore")
+    _deposit_stacks(Player.Backpack.Serial, GEM_IDS,   dest, "gems after smelt")
 
     # ── Return to mine ────────────────────────────────────────────────────────
     if cfg.mine_rune_slot is None:
@@ -1345,17 +1348,19 @@ def _home_deposit():
     if dest is None:
         log("Drop container (0x%X) not found." % _config.quick_dropbox, 0x25)
     else:
-        # ── Step 1: player ore + ingots → drop box ────────────────────────────
+        # ── Step 1: player ore + ingots + gems → drop box ─────────────────────
         _deposit_stacks(Player.Backpack.Serial, ORE_IDS,   dest, "ore")
         _deposit_stacks(Player.Backpack.Serial, INGOT_IDS, dest, "ingots")
+        _deposit_stacks(Player.Backpack.Serial, GEM_IDS,   dest, "gems")
 
-        # ── Step 2: beetle ore + ingots → drop box ────────────────────────────
+        # ── Step 2: beetle ore + ingots + gems → drop box ─────────────────────
         if pack is not None and pack.Backpack is not None:
             Items.UseItem(pack.Backpack)
             Items.WaitForContents(pack.Backpack, 3000)
             Misc.Pause(1200)
             _deposit_stacks(pack.Backpack.Serial, ORE_IDS,   dest, "ore from beetle")
             _deposit_stacks(pack.Backpack.Serial, INGOT_IDS, dest, "ingots from beetle")
+            _deposit_stacks(pack.Backpack.Serial, GEM_IDS,   dest, "gems from beetle")
 
         # ── Step 3: smelt all ore in drop box ─────────────────────────────────
         smelt_forge = None

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(Get-ChildItem -Path \"c:\\\\Users\\\\sethb\\\\apps\\\\razor-enhanced\" -Filter \"*stub*\" -Recurse -ErrorAction SilentlyContinue)",
       "Bash(Select-Object FullName)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:razorenhanced.readthedocs.io)"
     ]
   }
 }
