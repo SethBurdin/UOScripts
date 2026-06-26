@@ -16,6 +16,7 @@ from glossary.runebook_handler import (
     arrived_at, walk_steps,
 )
 from glossary.enemies import GetEnemies
+from extraction_looter.corpse_util import scan_nearby_corpses, nearest_corpse, walk_to_corpse
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 PET_FOLLOW_RANGE     = 1      # tiles — beyond this the pet is recalled
@@ -32,6 +33,7 @@ ENEMY_SCAN_RANGE    = 12   # tile radius to scan for hostile mobs each tick
 KILL_ENGAGE_RANGE   = 1    # Chebyshev pet-to-enemy distance that triggers recall phase
 GUARD_TRIGGER_RANGE = 2    # enemy-to-player distance that triggers "all guard"
 HUNT_GUARD_TIMEOUT  = 12   # seconds to wait in phase 3 for enemy to close
+CORPSE_SCAN_RANGE   = 12   # tile radius to scan for corpses (kill mode)
 
 # Animal Whispering mastery spell
 WHISPER_ENABLED      = True
@@ -112,6 +114,7 @@ _session_start   = None
 _session_gold    = 0
 _last_whisper    = 0.0
 _kill_times      = {}   # { enemy_serial: timestamp } — throttle repeated kill commands
+_kill_mode       = 'leash'  # set at runtime via prompt
 
 KILL_COOLDOWN_SEC = 8   # minimum seconds between kill commands for the same enemy
 
@@ -457,10 +460,77 @@ def hunt_cycle(pet, enemy_serial):
     return False
 
 
+def _prompt_kill_mode():
+    """Ask the player to choose leash or kill mode. Returns 'leash' or 'kill'."""
+    log("Kill mode — say the number:", colors['cyan'])
+    log("  1) Leash  (tag, recall pet, guard when mob closes)", colors['cyan'])
+    log("  2) Kill   (send pet to kill, walk to corpses)", colors['cyan'])
+    Misc.Pause(400)
+    Journal.Clear()
+
+    deadline = time.time() + 30
+    while time.time() < deadline:
+        if Journal.SearchByName('1', Player.Name):
+            Journal.Clear()
+            return 'leash'
+        if Journal.SearchByName('2', Player.Name):
+            Journal.Clear()
+            return 'kill'
+        Misc.Pause(200)
+
+    log("No mode selected (30s timeout) — defaulting to leash.", colors['yellow'])
+    return 'leash'
+
+
+def _kill_mode_loop():
+    """Kill mode: send pet to kill targets, walk to corpses as they spawn."""
+    looted = set()
+
+    while not Player.IsGhost:
+        if Journal.Search(Player.Name + ": bank"):
+            Journal.Clear()
+            log("Bank command — depositing and stopping.", colors['yellow'])
+            rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
+            if rb is not None:
+                do_banking(rb)
+            return
+
+        bank_gold_if_heavy()
+
+        pet = find_pet()
+        if pet is None:
+            log("No pet found.", colors['yellow'])
+            Misc.Pause(CHECK_INTERVAL)
+            continue
+
+        check_pet_health(pet)
+        cast_animal_whispering(pet)
+
+        enemies = list(GetEnemies(Mobiles, 0, ENEMY_SCAN_RANGE))
+        if enemies:
+            nearest = min(enemies, key=lambda e: Player.DistanceTo(e))
+            if time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC:
+                log("Enemy: %s — sending pet to kill." % nearest.Name, colors['red'])
+                Player.ChatSay("all kill")
+                Misc.Pause(300)
+                if Target.WaitForTarget(2000, False):
+                    Target.TargetExecute(nearest.Serial)
+                _kill_times[nearest.Serial] = time.time()
+
+        corpses = [c for c in scan_nearby_corpses(CORPSE_SCAN_RANGE)
+                   if int(c.Serial) not in looted]
+        if corpses:
+            corpse = nearest_corpse(corpses)
+            walk_to_corpse(corpse)
+            looted.add(int(corpse.Serial))
+
+        Misc.Pause(CHECK_INTERVAL)
+
+
 # ─── Main loop ────────────────────────────────────────────────────────────────
 
 def main():
-    global _session_start, _session_gold, FARM_RUNE_NAME
+    global _session_start, _session_gold, FARM_RUNE_NAME, _kill_mode
     _session_start = time.time()
     _session_gold  = 0
 
@@ -489,6 +559,10 @@ def main():
     FARM_RUNE_NAME = chosen
     log("Target: %s" % FARM_RUNE_NAME, colors['cyan'])
 
+    # ── Kill mode prompt ──────────────────────────────────────────────────────
+    _kill_mode = _prompt_kill_mode()
+    log("Kill mode: %s" % _kill_mode, colors['cyan'])
+
     # ── Pet discovery (before recall so mount is confirmed at the house) ─────
     if not discover_pet():
         log("Pet discovery failed — stopping.", colors['red'])
@@ -511,24 +585,25 @@ def main():
             log("Location check failed — expected %s, got (%d, %d)." % (
                 TRANSFER_FROM_POS, Player.Position.X, Player.Position.Y), colors['red'])
 
-    log("Guardian started.", colors['cyan'])
-
-    is_guarding = False
-    is_hunting  = False
-    guard_pos   = None  # player tile when "all guard me" was last issued
-
-    # Default to guard immediately so the pet is already protecting on script start.
-    # Voice command works at any distance (covers drop-off / resume scenarios).
-    if find_pet() is not None:
-        Player.ChatSay("all guard me")
-        is_guarding = True
-        guard_pos   = (Player.Position.X, Player.Position.Y)
-        log("Default guard active.", colors['cyan'])
-
+    log("Guardian started (mode=%s)." % _kill_mode, colors['cyan'])
     Journal.Clear()
     log("Say 'bank' to deposit and stop.", colors['cyan'])
 
     try:
+        if _kill_mode == 'kill':
+            _kill_mode_loop()
+            return
+
+        is_guarding = False
+        is_hunting  = False
+        guard_pos   = None
+
+        if find_pet() is not None:
+            Player.ChatSay("all guard me")
+            is_guarding = True
+            guard_pos   = (Player.Position.X, Player.Position.Y)
+            log("Default guard active.", colors['cyan'])
+
         while not Player.IsGhost:
             if Journal.Search(Player.Name + ": bank"):
                 Journal.Clear()
