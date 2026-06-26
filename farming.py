@@ -31,15 +31,20 @@ HUNT_GUARD_TIMEOUT  = 12
 WHISPER_ENABLED      = True
 WHISPER_INTERVAL_SEC = 1800
 
+PLAYER_HEALTH_THRESHOLD = 0.85
+INVIS_BEFORE_HEAL       = True
+INVIS_SETTLE_MS         = 3000
+
 PET_CMD_FOLLOW = 2
 PET_CMD_GUARD  = 3
 PET_CMD_KILL   = 4
 
 KILL_COOLDOWN_SEC = 8
 
-_pet_serial   = None
-_last_whisper = 0.0
-_kill_times   = {}
+_pet_serial    = None
+_last_whisper  = 0.0
+_kill_times    = {}
+_skip_serials  = set()
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -55,6 +60,23 @@ def _pet_cmd(serial, entry, target_serial=None):
             Target.WaitForTarget(3000, False)
             Target.TargetExecute(target_serial)
     Misc.Pause(400)
+
+
+def _send_kill(target_serial):
+    """Issue 'all kill' on a target. Returns False and adds the serial to
+    _skip_serials if the server replies 'Target cannot be seen.'"""
+    Journal.Clear()
+    Player.ChatSay("all kill")
+    Misc.Pause(300)
+    if Target.WaitForTarget(2000, False):
+        Target.TargetExecute(target_serial)
+    Misc.Pause(600)
+    if Journal.Search("Target cannot be seen."):
+        log("Target cannot be seen — skipping 0x%X." % target_serial, colors['yellow'])
+        _skip_serials.add(target_serial)
+        return False
+    _kill_times[target_serial] = time.time()
+    return True
 
 
 def discover_pet():
@@ -179,6 +201,31 @@ def check_pet_health(pet):
         heal_pet(pet)
 
 
+def check_player_health():
+    if Player.HitsMax == 0:
+        return
+    hp_ratio = float(Player.Hits) / Player.HitsMax
+    if hp_ratio >= PLAYER_HEALTH_THRESHOLD:
+        return
+    log("Player HP low (%.0f%%) — healing self." % (hp_ratio * 100), colors['red'])
+    if INVIS_BEFORE_HEAL:
+        Spells.CastMagery('Invisibility')
+        Target.WaitForTarget(3000, False)
+        Target.TargetExecute(Player.Serial)
+        Misc.Pause(INVIS_SETTLE_MS)
+    while Player.Hits < Player.HitsMax:
+        if Player.Poisoned:
+            Spells.CastMagery('Arch Cure')
+            Target.WaitForTarget(3000, False)
+            Target.TargetExecute(Player.Serial)
+            Misc.Pause(1200)
+        Spells.CastMagery('Greater Heal')
+        Target.WaitForTarget(3000, False)
+        Target.TargetExecute(Player.Serial)
+        Misc.Pause(1200)
+    log("Player healed to full.", colors['green'])
+
+
 def recall_pet(pet):
     log("Pet too far (%d tiles) — recalling." % Player.DistanceTo(pet), colors['yellow'])
     for i in range(FOLLOW_MAX_CHECKS):
@@ -212,10 +259,8 @@ def hunt_cycle(pet, enemy_serial):
         curr_enemy_dist = Player.DistanceTo(enemy)
         if prev_enemy_dist is not None and curr_enemy_dist > prev_enemy_dist + 3:
             log("Enemy fleeing — re-tagging and recalling.", colors['yellow'])
-            Player.ChatSay("all kill")
-            Misc.Pause(300)
-            if Target.WaitForTarget(2000, False):
-                Target.TargetExecute(enemy_serial)
+            if not _send_kill(enemy_serial):
+                return False
             Player.ChatSay("all follow me")
             break
         prev_enemy_dist = curr_enemy_dist
@@ -302,6 +347,7 @@ def main():
 
         guard_pet_if_low(pet)
         check_pet_health(pet)
+        check_player_health()
         cast_animal_whispering(pet)
 
         if not is_guarding and Player.DistanceTo(pet) > PET_FOLLOW_RANGE:
@@ -314,27 +360,24 @@ def main():
                     continue
                 pet = fresh
 
-        enemies = [] if is_hunting else list(GetEnemies(Mobiles, 0, ENEMY_SCAN_RANGE))
+        enemies = ([] if is_hunting
+                   else [e for e in GetEnemies(Mobiles, 0, ENEMY_SCAN_RANGE)
+                         if e.Serial not in _skip_serials])
 
         if enemies:
             nearest = min(enemies, key=lambda e: Player.DistanceTo(e))
             if Player.DistanceTo(nearest) <= GUARD_TRIGGER_RANGE:
                 if time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC:
                     log("Enemy on us: %s — engaging in place." % nearest.Name, colors['yellow'])
-                    Player.ChatSay("all kill")
-                    Misc.Pause(300)
-                    if Target.WaitForTarget(2000, False):
-                        Target.TargetExecute(nearest.Serial)
-                    _kill_times[nearest.Serial] = time.time()
+                    _send_kill(nearest.Serial)
                 if not is_guarding:
                     is_guarding = True
                     guard_pos   = (Player.Position.X, Player.Position.Y)
             else:
                 log("Enemy: %s — sending pet to tag." % nearest.Name, colors['red'])
-                Player.ChatSay("all kill")
-                Misc.Pause(300)
-                if Target.WaitForTarget(2000, False):
-                    Target.TargetExecute(nearest.Serial)
+                if not _send_kill(nearest.Serial):
+                    Misc.Pause(CHECK_INTERVAL)
+                    continue
                 is_guarding = False
                 guard_pos   = None
                 is_hunting  = True
