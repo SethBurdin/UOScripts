@@ -23,10 +23,10 @@ from glossary.runebook_handler import find_runebook_by_label, travel_to_named_ru
 from glossary.enemies import GetEnemies
 from extraction_looter.corpse_util import (scan_nearby_corpses, walk_to_corpse,
                                            open_corpse)
+import config
 from extraction_looter.containers_util import transfer_to_beetle
 from extraction_looter.nav import (load_waypoints, walk_waypoints,
                                    nearest_waypoint_index, recall_home)
-from extraction_looter.dropoff_util import unload_beetle_to_containers
 from extraction_looter.stealth import mount_beetle
 
 # ─── Config ───────────────────────────────────────────────────────────────────
@@ -49,18 +49,26 @@ CORPSE_SCAN_RANGE = 12       # tile radius to scan for corpses
 CHECK_INTERVAL    = 1500     # ms between main loop ticks
 IDLE_WAIT_MS      = 2000     # ms to wait when no corpses found
 
-GOLD_ITEM_ID = 0x0EED
+GOLD_ITEM_ID     = 0x0EED
+GOLD_DEST_SERIAL = config.quick_dropbox   # house container to deposit gold into
 
 KILL_COOLDOWN_SEC = 8   # minimum seconds between kill commands for the same enemy
 
 # Pet care thresholds
 HEALTH_THRESHOLD          = 0.85
-CRITICAL_HEALTH_THRESHOLD = 0.40
+FAST_HEAL_THRESHOLD       = 0.50   # cast 2x heals back-to-back below this
+CRITICAL_HEALTH_THRESHOLD = 0.40   # cast 3x heals back-to-back below this
 VET_THRESHOLD             = 0.75
+
+BEETLE_TRANSFER_RANGE = 3   # tiles — beetle must be this close for Items.Move to succeed
 BANDAGE_ITEM_ID           = 0x0E21
 BANDAGE_APPLY_MS          = 4000
 MAGERY_MIN_SKILL          = 30.0
 VET_MIN_SKILL             = 30.0
+
+HEAL_CAST_RANGE      = 10   # tiles — max range for targeted healing spells
+RECALL_FOLLOW_CHECKS = 3    # "all follow me" attempts before giving up on recall
+RECALL_FOLLOW_MS     = 2000 # ms to wait between follow attempts
 
 WHISPER_ENABLED      = True
 WHISPER_INTERVAL_SEC = 1800
@@ -204,10 +212,38 @@ def _find_pet():
     return nearest
 
 
+def _ensure_pet_in_heal_range(pet):
+    """Call pet back with 'all follow me' if it is outside HEAL_CAST_RANGE.
+    Returns the refreshed pet reference (or the original if recall fails)."""
+    if Player.DistanceTo(pet) <= HEAL_CAST_RANGE:
+        return pet
+    log("Pet too far to heal (%d tiles) — recalling." % Player.DistanceTo(pet), colors['yellow'])
+    for _ in range(RECALL_FOLLOW_CHECKS):
+        Player.ChatSay("all follow me")
+        Misc.Pause(RECALL_FOLLOW_MS)
+        fresh = _find_pet()
+        if fresh is not None:
+            pet = fresh
+        if Player.DistanceTo(pet) <= HEAL_CAST_RANGE:
+            log("Pet returned — resuming heal.", colors['cyan'])
+            return pet
+    log("Pet did not return to heal range — skipping heal.", colors['yellow'])
+    return pet
+
+
 def _check_pet_health(pet):
     if pet.HitsMax == 0:
         return
     hp_ratio = float(pet.Hits) / pet.HitsMax
+
+    needs_care = (
+        (pet.Poisoned or hp_ratio < HEALTH_THRESHOLD) and _has_magery
+        or (hp_ratio < VET_THRESHOLD and _has_vet)
+    )
+    if needs_care:
+        pet = _ensure_pet_in_heal_range(pet)
+        if Player.DistanceTo(pet) > HEAL_CAST_RANGE:
+            return  # still out of range after recall attempts
 
     if pet.Poisoned and hp_ratio < HEALTH_THRESHOLD and _has_magery:
         log("Curing %s." % pet.Name, colors['cyan'])
@@ -217,8 +253,15 @@ def _check_pet_health(pet):
         Misc.Pause(1200)
 
     if hp_ratio < CRITICAL_HEALTH_THRESHOLD and _has_magery:
-        log("HP critical (%.0f%%) — rapid healing %s." % (hp_ratio * 100, pet.Name), colors['red'])
+        log("HP critical (%.0f%%) — 3x healing %s." % (hp_ratio * 100, pet.Name), colors['red'])
         for _ in range(3):
+            Spells.CastMagery('Greater Heal')
+            Target.WaitForTarget(3000, False)
+            Target.TargetExecute(pet.Serial)
+            Misc.Pause(800)
+    elif hp_ratio < FAST_HEAL_THRESHOLD and _has_magery:
+        log("HP low (%.0f%%) — 2x healing %s." % (hp_ratio * 100, pet.Name), colors['yellow'])
+        for _ in range(2):
             Spells.CastMagery('Greater Heal')
             Target.WaitForTarget(3000, False)
             Target.TargetExecute(pet.Serial)
@@ -275,14 +318,55 @@ def _detect_skills():
     if _has_vet:
         log("Veterinary detected — will bandage pet.", colors['cyan'])
 
+# ─── Drop-off helpers ────────────────────────────────────────────────────────
+
+def _walk_to_drop():
+    for direction in ('East', 'North', 'West'):
+        Player.Walk(direction)
+        Misc.Pause(600)
+
+
+def _ensure_beetle_nearby(beetle_serial):
+    """Call beetle back if it has drifted out of item-transfer range."""
+    beetle = Mobiles.FindBySerial(beetle_serial)
+    if beetle is not None and Player.DistanceTo(beetle) <= BEETLE_TRANSFER_RANGE:
+        return
+    log("Beetle out of range — recalling.", colors['yellow'])
+    Player.ChatSay("all follow me")
+    Misc.Pause(2000)
+
+
+def _drop_beetle_loot(beetle_pack):
+    """Walk to the drop box and move all beetle contents into it."""
+    _dismount()
+    _walk_to_drop()
+    dest = Items.FindBySerial(GOLD_DEST_SERIAL)
+    if dest is None:
+        log("Drop box (0x%X) not found." % GOLD_DEST_SERIAL, colors['red'])
+        return
+    Items.UseItem(beetle_pack)
+    Items.WaitForContents(beetle_pack.Serial, 3000)
+    Misc.Pause(600)
+    total_gold = 0
+    for item in list(beetle_pack.Contains or []):
+        if item.ItemID == GOLD_ITEM_ID:
+            total_gold += item.Amount
+        Items.Move(item, dest, item.Amount)
+        Misc.Pause(800)
+    if total_gold:
+        log("Deposited %d gold." % total_gold, colors['green'])
+    log("Beetle unloaded.", colors['green'])
+
+
 # ─── Kill + gold loot loop ────────────────────────────────────────────────────
 
-def _kill_loot_loop(beetle_pack, staging_x, staging_y):
+def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
     """
     Send pet to kill enemies; walk to each corpse, loot gold to beetle,
     then return to (staging_x, staging_y) between corpses.
 
-    Exits when a gold transfer is rejected (beetle full), or when player dies.
+    Exits when beetle is genuinely full (transfer fails even after beetle is recalled),
+    or when player dies.
 
     Returns: 'beetle_full' | 'ghost' | 'disconnected'
     """
@@ -309,23 +393,29 @@ def _kill_loot_loop(beetle_pack, staging_x, staging_y):
                    if int(c.Serial) not in looted]
 
         if corpses:
+            # Phase 1 — collect gold from all corpses into player backpack
             for corpse in corpses:
                 walk_to_corpse(corpse)
                 if open_corpse(corpse):
                     for item in list(corpse.Contains or []):
                         if item.ItemID != GOLD_ITEM_ID:
                             continue
-                        moved, full = transfer_to_beetle(item, beetle_pack)
-                        if moved:
-                            log("Transferred %d gold to beetle." % item.Amount, colors['green'])
-                        if full:
-                            log("Beetle full — exiting dungeon.", colors['yellow'])
-                            return 'beetle_full'
+                        Items.Move(item, Player.Backpack, item.Amount)
+                        Misc.Pause(800)
+                        log("Picked up %d gold." % item.Amount, colors['green'])
                 looted.add(int(corpse.Serial))
 
-                # Return to staging position after each corpse
-                log("Returning to staging position.", colors['cyan'])
-                _walk_to(staging_x, staging_y)
+            # Phase 2 — return to staging, then transfer gold backpack → beetle
+            log("Returning to staging position.", colors['cyan'])
+            _walk_to(staging_x, staging_y)
+            _ensure_beetle_nearby(beetle_serial)
+            gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+            while gold is not None:
+                _, full = transfer_to_beetle(gold, beetle_pack)
+                if full:
+                    log("Beetle full — exiting dungeon.", colors['yellow'])
+                    return 'beetle_full'
+                gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
         else:
             Misc.Pause(IDLE_WAIT_MS)
 
@@ -399,7 +489,7 @@ def main():
         log("Guard active — starting kill loop.", colors['cyan'])
 
     # ── Kill + gold loot loop ─────────────────────────────────────────────────
-    reason = _kill_loot_loop(beetle_pack, staging_x, staging_y)
+    reason = _kill_loot_loop(beetle.Serial, beetle_pack, staging_x, staging_y)
 
     if reason == 'ghost':
         log("Player died — stopping.", colors['red'])
@@ -415,13 +505,15 @@ def main():
         log("No waypoints_scorp_exit.json — skipping exit walk.", colors['yellow'])
 
     # ── Recall home ───────────────────────────────────────────────────────────
+    log("Recalling beetle before mounting...", colors['cyan'])
+    Player.ChatSay("all follow me")
+    Misc.Pause(2000)
     mount_beetle(beetle.Serial)
     log("Recalling home...", colors['cyan'])
     recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME, RECALL_SETTLE_DELAY)
 
-    # ── Unload beetle ─────────────────────────────────────────────────────────
-    log("Unloading beetle...", colors['cyan'])
-    unload_beetle_to_containers(beetle_pack)
+    # ── Unload beetle to drop box ─────────────────────────────────────────────
+    _drop_beetle_loot(beetle_pack)
 
     log("Done.", colors['green'])
 
