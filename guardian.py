@@ -44,6 +44,20 @@ INVIS_SETTLE_MS         = 3000   # ms to wait after Invis before healing
 WHISPER_ENABLED      = True
 WHISPER_INTERVAL_SEC = 1800  # seconds between casts (30 min)
 
+# Player combat assist
+CHIV_MIN_SKILL       = 30.0   # minimum Chivalry to use combat spells
+RANGED_MIN_SKILL     = 30.0   # minimum Archery/Throwing to auto-attack
+MEDITATION_MIN_SKILL     = 30.0   # minimum Meditation to use the skill
+MEDITATION_COOLDOWN_SEC  = 11.0   # UO skill cooldown between attempts
+MAGERY_MIN_SKILL     = 30.0   # minimum Magery to use magery spells
+VET_MIN_SKILL        = 30.0   # minimum Veterinary to use bandages on pet
+VET_THRESHOLD        = 0.75   # bandage pet when HP ratio drops below this
+BANDAGE_ITEM_ID      = 0x0E21 # clean bandages
+BANDAGE_APPLY_MS     = 4000   # ms to wait for bandage application
+BANDAGE_RESTOCK_TARGET = 100  # top up to this many bandages on each banking trip
+COMBAT_MANA_FLOOR    = 0.30   # cast combat buffs above this if player can meditate
+MANA_REGEN_TARGET    = 0.90   # throttle combat spells until this mana ratio if no meditation
+
 # Pet context menu entry indices (right-click the pet)
 PET_CMD_FOLLOW = 2   # "Command: Follow"
 PET_CMD_GUARD  = 3   # "Command: Guard"
@@ -118,9 +132,16 @@ _pet_serial      = None
 _session_start   = None
 _session_gold    = 0
 _last_whisper    = 0.0
+_last_med_attempt = 0.0
 _kill_times      = {}   # { enemy_serial: timestamp } — throttle repeated kill commands
 _skip_serials    = set()  # enemies that returned "Target cannot be seen."
 _kill_mode       = 'leash'  # set at runtime via prompt
+_has_chiv        = False
+_has_ranged      = False
+_has_meditation  = False
+_has_magery      = False
+_has_vet         = False
+_attacking_serial = None
 
 KILL_COOLDOWN_SEC = 8   # minimum seconds between kill commands for the same enemy
 
@@ -216,6 +237,26 @@ def transfer_gold():
     return total
 
 
+def _restock_bandages():
+    """Pull bandages from the drop-off box until we have BANDAGE_RESTOCK_TARGET."""
+    if not _has_vet:
+        return
+    in_pack = Items.FindByID(BANDAGE_ITEM_ID, -1, Player.Backpack.Serial)
+    current = in_pack.Amount if in_pack is not None else 0
+    needed  = BANDAGE_RESTOCK_TARGET - current
+    if needed <= 0:
+        return
+    in_box = Items.FindByID(BANDAGE_ITEM_ID, -1, GOLD_DEST_SERIAL)
+    if in_box is None:
+        log("No bandages in drop-off box — skipping restock.", colors['yellow'])
+        return
+    to_take = min(needed, in_box.Amount)
+    log("Restocking %d bandages (have %d, want %d)." % (
+        to_take, current, BANDAGE_RESTOCK_TARGET), colors['cyan'])
+    Items.Move(in_box, Player.Backpack, to_take)
+    Misc.Pause(800)
+
+
 def _walk_to_drop():
     """Step east → north → west to reach the drop-off container."""
     for direction in ('East', 'North', 'West'):
@@ -231,6 +272,7 @@ def do_banking(rb):
     _walk_to_drop()
     gold = transfer_gold()
     transfer_loot_to_chest()
+    _restock_bandages()
     if gold and _session_start is not None:
         _append_gold_stat(gold)
     return True
@@ -346,6 +388,29 @@ def cure_pet(pet):
     Misc.Pause(1200)
 
 
+def heal_pet_chiv(pet):
+    log("HP low — Close Wounds on %s" % pet.Name, colors['cyan'])
+    Spells.CastChivalry('Close Wounds')
+    Target.WaitForTarget(3000, False)
+    Target.TargetExecute(pet.Serial)
+    Misc.Pause(1200)
+
+
+def bandage_pet(pet):
+    if not _has_vet:
+        return
+    if Player.BuffsExist('Healing'):
+        return
+    bandage = Items.FindByID(BANDAGE_ITEM_ID, -1, Player.Backpack.Serial)
+    if bandage is None:
+        return
+    log("Bandaging %s." % pet.Name, colors['cyan'])
+    Items.UseItem(bandage.Serial)
+    Target.WaitForTarget(3000, False)
+    Target.TargetExecute(pet.Serial)
+    Misc.Pause(BANDAGE_APPLY_MS)
+
+
 def cast_animal_whispering(pet):
     global _last_whisper
     if not WHISPER_ENABLED:
@@ -357,6 +422,127 @@ def cast_animal_whispering(pet):
     if Target.WaitForTarget(4000, False):
         Target.TargetExecute(pet.Serial)
     _last_whisper = time.time()
+
+
+def _detect_combat_skills():
+    global _has_chiv, _has_ranged, _has_meditation, _has_magery, _has_vet
+    chiv = Player.GetSkillValue('Chivalry')
+    archery = Player.GetSkillValue('Archery')
+    throwing = Player.GetSkillValue('Throwing')
+    meditation = Player.GetSkillValue('Meditation')
+    magery = Player.GetSkillValue('Magery')
+    vet = Player.GetSkillValue('Veterinary')
+
+    _has_chiv = chiv >= CHIV_MIN_SKILL
+    _has_ranged = archery >= RANGED_MIN_SKILL or throwing >= RANGED_MIN_SKILL
+    _has_meditation = meditation >= MEDITATION_MIN_SKILL
+    _has_magery = magery >= MAGERY_MIN_SKILL
+    _has_vet = vet >= VET_MIN_SKILL
+
+    if _has_magery:
+        log("Magery %.1f — will use magery heals." % magery, colors['cyan'])
+    if _has_chiv:
+        log("Chivalry %.1f — will use Enemy of One + Divine Fury." % chiv, colors['cyan'])
+        if not _has_magery:
+            log("  No Magery — using Close Wounds for healing.", colors['cyan'])
+    if _has_vet:
+        log("Veterinary %.1f — will bandage pet at %.0f%% HP." % (
+            vet, VET_THRESHOLD * 100), colors['cyan'])
+    if _has_ranged:
+        skill_name = 'Archery' if archery >= throwing else 'Throwing'
+        log("%s %.1f — will auto-attack after engagement." % (
+            skill_name, max(archery, throwing)), colors['cyan'])
+    if _has_meditation:
+        log("Meditation %.1f — will meditate for mana recovery." % meditation, colors['cyan'])
+    else:
+        log("No Meditation — throttling combat spells until %.0f%% mana." % (
+            MANA_REGEN_TARGET * 100), colors['cyan'])
+
+
+def apply_chiv_buffs():
+    if not _has_chiv:
+        return
+    if Player.ManaMax == 0:
+        return
+    mana_ratio = float(Player.Mana) / Player.ManaMax
+    threshold = COMBAT_MANA_FLOOR if _has_meditation else MANA_REGEN_TARGET
+    if mana_ratio < threshold:
+        return
+    if not Player.BuffsExist('Enemy of One'):
+        log("Casting Enemy of One.", colors['cyan'])
+        Spells.CastChivalry("Enemy of One")
+        Misc.Pause(1500)
+    if not Player.BuffsExist('Divine Fury'):
+        log("Casting Divine Fury.", colors['cyan'])
+        Spells.CastChivalry("Divine Fury")
+        Misc.Pause(1500)
+
+
+def player_attack_enemy(enemy):
+    global _attacking_serial
+    if not _has_ranged or enemy is None:
+        return
+    if _attacking_serial != enemy.Serial:
+        log("Attacking %s." % enemy.Name, colors['yellow'])
+        _attacking_serial = enemy.Serial
+    Player.Attack(enemy.Serial)
+
+
+def _apply_death_ray(enemy):
+    """Cast Death Ray if not already active and mana allows."""
+    if Player.BuffsExist('Death Ray', False):
+        return
+    if Player.ManaMax == 0:
+        return
+    mana_ratio = float(Player.Mana) / Player.ManaMax
+    threshold = COMBAT_MANA_FLOOR if _has_meditation else MANA_REGEN_TARGET
+    if mana_ratio < threshold:
+        return
+    log("Casting Death Ray on %s." % enemy.Name, colors['red'])
+    Spells.CastMastery('Death Ray')
+    if Target.WaitForTarget(5000, False):
+        Target.TargetExecute(enemy.Serial)
+    Misc.Pause(500)
+
+
+def mastery_attack(enemy):
+    """Player combat action for the current tick, routed by active mastery buff."""
+    if enemy is None:
+        return
+    if Player.BuffsExist('EnchantedSummoning'):
+        _apply_death_ray(enemy)
+    else:
+        player_attack_enemy(enemy)
+
+
+def manage_mana():
+    """Activate Meditation when idle and mana is low.
+
+    Called at the END of each tick so healing/combat actions for that tick have
+    already fired.  Guards against three sources of spam/cancellation:
+      1. Buff already active  — nothing to do, regen is running.
+      2. Enemies in range     — any follow-up combat action would cancel it.
+      3. Skill cooldown       — UO enforces ~11 s between attempts; we mirror
+                                that with _last_med_attempt so we don't spam the
+                                server on failed skill checks.
+    """
+    global _last_med_attempt
+    if not _has_meditation:
+        return
+    if Player.ManaMax == 0:
+        return
+    if float(Player.Mana) / Player.ManaMax >= MANA_REGEN_TARGET:
+        return
+    if Player.BuffsExist('Meditation'):
+        return
+    if GetEnemies(Mobiles, 0, ENEMY_SCAN_RANGE):
+        return
+    if time.time() - _last_med_attempt < MEDITATION_COOLDOWN_SEC:
+        return
+    _last_med_attempt = time.time()
+    log("Mana %.0f%% — meditating." % (
+        float(Player.Mana) / Player.ManaMax * 100), colors['cyan'])
+    Player.UseSkill('Meditation')
 
 
 def guard_pet_if_low(pet):
@@ -374,12 +560,24 @@ def check_pet_health(pet):
     if pet.HitsMax == 0:
         return
     hp_ratio = float(pet.Hits) / pet.HitsMax
+
     if pet.Poisoned and hp_ratio < HEALTH_THRESHOLD:
-        cure_pet(pet)
+        if _has_magery:
+            cure_pet(pet)
+
     if hp_ratio < CRITICAL_HEALTH_THRESHOLD:
-        heal_pet_critical(pet)
+        if _has_magery:
+            heal_pet_critical(pet)
+        elif _has_chiv:
+            heal_pet_chiv(pet)
     elif hp_ratio < HEALTH_THRESHOLD:
-        heal_pet(pet)
+        if _has_magery:
+            heal_pet(pet)
+        elif _has_chiv:
+            heal_pet_chiv(pet)
+
+    if hp_ratio < VET_THRESHOLD:
+        bandage_pet(pet)
 
 
 def check_player_health():
@@ -389,22 +587,33 @@ def check_player_health():
     if hp_ratio >= PLAYER_HEALTH_THRESHOLD:
         return
     log("Player HP low (%.0f%%) — healing self." % (hp_ratio * 100), colors['red'])
-    if INVIS_BEFORE_HEAL:
-        Spells.CastMagery('Invisibility')
-        Target.WaitForTarget(3000, False)
-        Target.TargetExecute(Player.Serial)
-        Misc.Pause(INVIS_SETTLE_MS)
-    while Player.Hits < Player.HitsMax:
-        if Player.Poisoned:
-            Spells.CastMagery('Arch Cure')
+
+    if _has_magery:
+        if INVIS_BEFORE_HEAL:
+            Spells.CastMagery('Invisibility')
+            Target.WaitForTarget(3000, False)
+            Target.TargetExecute(Player.Serial)
+            Misc.Pause(INVIS_SETTLE_MS)
+        while Player.Hits < Player.HitsMax:
+            if Player.Poisoned:
+                Spells.CastMagery('Arch Cure')
+                Target.WaitForTarget(3000, False)
+                Target.TargetExecute(Player.Serial)
+                Misc.Pause(1200)
+            Spells.CastMagery('Greater Heal')
             Target.WaitForTarget(3000, False)
             Target.TargetExecute(Player.Serial)
             Misc.Pause(1200)
-        Spells.CastMagery('Greater Heal')
-        Target.WaitForTarget(3000, False)
-        Target.TargetExecute(Player.Serial)
-        Misc.Pause(1200)
-    log("Player healed to full.", colors['green'])
+        log("Player healed to full.", colors['green'])
+    elif _has_chiv:
+        for _ in range(10):
+            if Player.Hits >= Player.HitsMax:
+                break
+            Spells.CastChivalry('Close Wounds')
+            Target.WaitForTarget(3000, False)
+            Target.TargetExecute(Player.Serial)
+            Misc.Pause(1200)
+        log("Player healed.", colors['green'])
 
 
 def recall_pet(pet):
@@ -424,16 +633,14 @@ def recall_pet(pet):
 
 
 def shutdown():
-    """Called on every script exit — guard pet then recall home."""
-    log("Shutting down — returning home.", colors['cyan'])
+    if Player.IsGhost:
+        log("Guardian stopped — player died.", colors['red'])
+    elif not Player.Connected:
+        log("Guardian stopped — disconnected.", colors['red'])
+    else:
+        log("Guardian stopped.", colors['cyan'])
     if not Player.IsGhost:
         Player.ChatSay("all guard me")
-        rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
-        if rb is not None and travel_to_named_rune(rb, HOME_RUNE_NAME, RECALL_SETTLE_DELAY):
-            for direction in ('East', 'North', 'West', 'West'):
-                Player.Walk(direction)
-                Misc.Pause(600)
-    log("Guardian stopped.", colors['cyan'])
 
 
 def hunt_cycle(pet, enemy_serial):
@@ -449,7 +656,7 @@ def hunt_cycle(pet, enemy_serial):
     log("Hunting — waiting for pet to engage...", colors['yellow'])
     prev_enemy_dist  = None
     phase1_deadline  = time.time() + 30  # give up if pet never closes on enemy
-    while not Player.IsGhost and time.time() < phase1_deadline:
+    while Player.Connected and not Player.IsGhost and time.time() < phase1_deadline:
         check_pet_health(pet)
         fresh = find_pet()
         if fresh is not None:
@@ -490,7 +697,7 @@ def hunt_cycle(pet, enemy_serial):
     # ── Phase 3: guard when enemy closes ──────────────────────────────────────
     log("Waiting for enemy to close (guard trigger = %d tiles)..." % GUARD_TRIGGER_RANGE, colors['yellow'])
     deadline = time.time() + HUNT_GUARD_TIMEOUT
-    while time.time() < deadline and not Player.IsGhost:
+    while time.time() < deadline and Player.Connected and not Player.IsGhost:
         fresh = find_pet()
         if fresh is not None:
             pet = fresh
@@ -532,7 +739,7 @@ def _kill_mode_loop():
     """Kill mode: send pet to kill targets, walk to corpses as they spawn."""
     looted = set()
 
-    while not Player.IsGhost:
+    while Player.Connected and not Player.IsGhost:
         if Journal.Search(Player.Name + ": bank"):
             Journal.Clear()
             log("Bank command — depositing and stopping.", colors['yellow'])
@@ -560,6 +767,13 @@ def _kill_mode_loop():
             if time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC:
                 log("Enemy: %s — sending pet to kill." % nearest.Name, colors['red'])
                 _send_kill(nearest.Serial)
+            pet_to_enemy = max(
+                abs(pet.Position.X - nearest.Position.X),
+                abs(pet.Position.Y - nearest.Position.Y),
+            )
+            if pet_to_enemy <= KILL_ENGAGE_RANGE + 2:
+                apply_chiv_buffs()
+                mastery_attack(nearest)
 
         corpses = [c for c in scan_nearby_corpses(CORPSE_SCAN_RANGE)
                    if int(c.Serial) not in looted]
@@ -574,6 +788,7 @@ def _kill_mode_loop():
                 travel_to_named_rune(rb, FARM_RUNE_NAME, RECALL_SETTLE_DELAY)
                 walk_steps(TRANSFER_FROM_STEPS)
 
+        manage_mana()
         Misc.Pause(CHECK_INTERVAL)
 
 
@@ -618,6 +833,8 @@ def main():
         log("Pet discovery failed — stopping.", colors['red'])
         return
 
+    _detect_combat_skills()
+
     # ── Recall from house to farm location ────────────────────────────────────
     rb = find_runebook_by_label(HOME_RUNEBOOK_NAME)
     if rb is None:
@@ -654,7 +871,7 @@ def main():
             guard_pos   = (Player.Position.X, Player.Position.Y)
             log("Default guard active.", colors['cyan'])
 
-        while not Player.IsGhost:
+        while Player.Connected and not Player.IsGhost:
             if Journal.Search(Player.Name + ": bank"):
                 Journal.Clear()
                 log("Bank command — depositing and stopping.", colors['yellow'])
@@ -714,6 +931,8 @@ def main():
                     if time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC:
                         log("Enemy on us: %s — engaging in place." % nearest.Name, colors['yellow'])
                         _send_kill(nearest.Serial)
+                    apply_chiv_buffs()
+                    mastery_attack(nearest)
                     if not is_guarding:
                         is_guarding = True
                         guard_pos   = (Player.Position.X, Player.Position.Y)
@@ -731,6 +950,10 @@ def main():
                     if did_guard:
                         is_guarding = True
                         guard_pos   = (Player.Position.X, Player.Position.Y)
+                        enemy = Mobiles.FindBySerial(nearest.Serial)
+                        if enemy is not None:
+                            apply_chiv_buffs()
+                            mastery_attack(enemy)
                     else:
                         is_guarding = False
                         guard_pos   = None
@@ -743,6 +966,7 @@ def main():
                 is_guarding = True
                 guard_pos   = (pos.X, pos.Y)
 
+            manage_mana()
             Misc.Pause(CHECK_INTERVAL)
 
     finally:
