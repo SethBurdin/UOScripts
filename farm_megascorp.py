@@ -15,7 +15,7 @@
 if False:
     from razorenhanced_stubs import *
 
-import sys, os, time
+import sys, os, time, json
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from glossary.colors import colors
@@ -52,6 +52,9 @@ IDLE_WAIT_MS      = 2000     # ms to wait when no corpses found
 GOLD_ITEM_ID     = 0x0EED
 GOLD_DEST_SERIAL = config.quick_dropbox   # house container to deposit gold into
 
+STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'local', 'guardian_stats.json')
+os.makedirs(os.path.dirname(STATS_FILE), exist_ok=True)
+
 KILL_COOLDOWN_SEC = 8   # minimum seconds between kill commands for the same enemy
 
 # Pet care thresholds
@@ -63,8 +66,19 @@ VET_THRESHOLD             = 0.75
 BEETLE_TRANSFER_RANGE = 3   # tiles — beetle must be this close for Items.Move to succeed
 BANDAGE_ITEM_ID           = 0x0E21
 BANDAGE_APPLY_MS          = 4000
-MAGERY_MIN_SKILL          = 30.0
-VET_MIN_SKILL             = 30.0
+MAGERY_MIN_SKILL  = 30.0
+VET_MIN_SKILL     = 30.0
+CHIV_MIN_SKILL    = 30.0
+RANGED_MIN_SKILL  = 30.0
+
+COMBAT_MANA_FLOOR = 0.30   # minimum mana ratio to cast combat/chiv spells
+MANA_REGEN_TARGET = 0.90   # throttle combat spells until this ratio when mana is low
+
+PLAYER_HEALTH_THRESHOLD = 0.85   # heal self when player HP drops below this
+INVIS_BEFORE_HEAL       = True   # cast Invisibility before healing self
+INVIS_SETTLE_MS         = 3000   # ms to wait after Invis before healing
+
+TRANSFER_WEIGHT_THRESHOLD = 0.80   # only transfer gold to beetle when player weight is above this ratio
 
 HEAL_CAST_RANGE      = 10   # tiles — max range for targeted healing spells
 RECALL_FOLLOW_CHECKS = 3    # "all follow me" attempts before giving up on recall
@@ -82,17 +96,44 @@ WP_EXIT    = os.path.join(_WAYPOINTS_DIR, 'scorp_exit.json')
 
 # ─── Runtime state ────────────────────────────────────────────────────────────
 
-_pet_serial   = None
-_kill_times   = {}
-_skip_serials = set()
-_last_whisper = 0.0
-_has_magery   = False
-_has_vet      = False
+_pet_serial    = None
+_kill_times    = {}
+_skip_serials  = set()
+_last_whisper  = 0.0
+_has_magery       = False
+_has_vet          = False
+_has_chiv         = False
+_has_ranged       = False
+_attacking_serial = None
+_session_start = None
+_session_gold  = 0
 
 # ─── Logging ──────────────────────────────────────────────────────────────────
 
 def log(msg, color=colors['cyan']):
     Misc.SendMessage('[megascorp] ' + msg, color)
+
+
+def _append_gold_stat(gold_this_trip):
+    global _session_gold
+    _session_gold += gold_this_trip
+    elapsed = time.time() - _session_start
+    gph = int(_session_gold / elapsed * 3600) if elapsed > 0 else 0
+    entry = {
+        'player':        Player.Name,
+        'rune':          MEGASCORP_RUNE_NAME,
+        'time':          time.strftime('%Y-%m-%d %H:%M:%S'),
+        'gold_per_hour': gph,
+    }
+    try:
+        with open(STATS_FILE, 'r') as f:
+            data = json.load(f)
+    except (OSError, ValueError):
+        data = []
+    data.append(entry)
+    with open(STATS_FILE, 'w') as f:
+        json.dump(data, f, indent=2)
+    log("Gold/hr: %d  (session: %d gold, %.1f min)" % (gph, _session_gold, elapsed / 60), colors['cyan'])
 
 # ─── Navigation helpers ───────────────────────────────────────────────────────
 
@@ -237,7 +278,7 @@ def _check_pet_health(pet):
     hp_ratio = float(pet.Hits) / pet.HitsMax
 
     needs_care = (
-        (pet.Poisoned or hp_ratio < HEALTH_THRESHOLD) and _has_magery
+        (pet.Poisoned or hp_ratio < HEALTH_THRESHOLD) and (_has_magery or _has_chiv)
         or (hp_ratio < VET_THRESHOLD and _has_vet)
     )
     if needs_care:
@@ -252,26 +293,49 @@ def _check_pet_health(pet):
         Target.TargetExecute(pet.Serial)
         Misc.Pause(1200)
 
-    if hp_ratio < CRITICAL_HEALTH_THRESHOLD and _has_magery:
-        log("HP critical (%.0f%%) — 3x healing %s." % (hp_ratio * 100, pet.Name), colors['red'])
-        for _ in range(3):
+    if hp_ratio < CRITICAL_HEALTH_THRESHOLD:
+        if _has_magery:
+            log("HP critical (%.0f%%) — 3x healing %s." % (hp_ratio * 100, pet.Name), colors['red'])
+            for _ in range(3):
+                Spells.CastMagery('Greater Heal')
+                Target.WaitForTarget(3000, False)
+                Target.TargetExecute(pet.Serial)
+                Misc.Pause(800)
+        elif _has_chiv:
+            log("HP critical (%.0f%%) — Close Wounds x3 on %s." % (hp_ratio * 100, pet.Name), colors['red'])
+            for _ in range(3):
+                Spells.CastChivalry('Close Wounds')
+                Target.WaitForTarget(3000, False)
+                Target.TargetExecute(pet.Serial)
+                Misc.Pause(800)
+    elif hp_ratio < FAST_HEAL_THRESHOLD:
+        if _has_magery:
+            log("HP low (%.0f%%) — 2x healing %s." % (hp_ratio * 100, pet.Name), colors['yellow'])
+            for _ in range(2):
+                Spells.CastMagery('Greater Heal')
+                Target.WaitForTarget(3000, False)
+                Target.TargetExecute(pet.Serial)
+                Misc.Pause(800)
+        elif _has_chiv:
+            log("HP low (%.0f%%) — Close Wounds x2 on %s." % (hp_ratio * 100, pet.Name), colors['yellow'])
+            for _ in range(2):
+                Spells.CastChivalry('Close Wounds')
+                Target.WaitForTarget(3000, False)
+                Target.TargetExecute(pet.Serial)
+                Misc.Pause(800)
+    elif hp_ratio < HEALTH_THRESHOLD:
+        if _has_magery:
+            log("Healing %s." % pet.Name, colors['cyan'])
             Spells.CastMagery('Greater Heal')
             Target.WaitForTarget(3000, False)
             Target.TargetExecute(pet.Serial)
-            Misc.Pause(800)
-    elif hp_ratio < FAST_HEAL_THRESHOLD and _has_magery:
-        log("HP low (%.0f%%) — 2x healing %s." % (hp_ratio * 100, pet.Name), colors['yellow'])
-        for _ in range(2):
-            Spells.CastMagery('Greater Heal')
+            Misc.Pause(1200)
+        elif _has_chiv:
+            log("Close Wounds on %s." % pet.Name, colors['cyan'])
+            Spells.CastChivalry('Close Wounds')
             Target.WaitForTarget(3000, False)
             Target.TargetExecute(pet.Serial)
-            Misc.Pause(800)
-    elif hp_ratio < HEALTH_THRESHOLD and _has_magery:
-        log("Healing %s." % pet.Name, colors['cyan'])
-        Spells.CastMagery('Greater Heal')
-        Target.WaitForTarget(3000, False)
-        Target.TargetExecute(pet.Serial)
-        Misc.Pause(1200)
+            Misc.Pause(1200)
 
     if hp_ratio < VET_THRESHOLD and _has_vet and not Player.BuffsExist('Healing'):
         bandage = Items.FindByID(BANDAGE_ITEM_ID, -1, Player.Backpack.Serial)
@@ -294,6 +358,51 @@ def _cast_animal_whispering(pet):
     _last_whisper = time.time()
 
 
+def check_player_health():
+    if Player.HitsMax == 0:
+        return
+    hp_ratio = float(Player.Hits) / Player.HitsMax
+    if hp_ratio >= PLAYER_HEALTH_THRESHOLD:
+        return
+    log("Player HP low (%.0f%%) — healing self." % (hp_ratio * 100), colors['red'])
+    if _has_magery:
+        if INVIS_BEFORE_HEAL:
+            Spells.CastMagery('Invisibility')
+            Target.WaitForTarget(3000, False)
+            Target.TargetExecute(Player.Serial)
+            Misc.Pause(INVIS_SETTLE_MS)
+        while Player.Hits < Player.HitsMax:
+            if Player.Poisoned:
+                Spells.CastMagery('Arch Cure')
+                Target.WaitForTarget(3000, False)
+                Target.TargetExecute(Player.Serial)
+                Misc.Pause(1200)
+            Spells.CastMagery('Greater Heal')
+            Target.WaitForTarget(3000, False)
+            Target.TargetExecute(Player.Serial)
+            Misc.Pause(1200)
+        log("Player healed to full.", colors['green'])
+    elif _has_chiv:
+        for _ in range(10):
+            if Player.Hits >= Player.HitsMax:
+                break
+            Spells.CastChivalry('Close Wounds')
+            Target.WaitForTarget(3000, False)
+            Target.TargetExecute(Player.Serial)
+            Misc.Pause(1200)
+        log("Player healed.", colors['green'])
+
+
+def player_attack_enemy(enemy):
+    global _attacking_serial
+    if not _has_ranged or enemy is None:
+        return
+    if _attacking_serial != enemy.Serial:
+        log("Attacking %s." % enemy.Name, colors['yellow'])
+        _attacking_serial = enemy.Serial
+    Player.Attack(enemy.Serial)
+
+
 def _send_kill(target_serial):
     Journal.Clear()
     Player.ChatSay("all kill")
@@ -310,13 +419,55 @@ def _send_kill(target_serial):
 
 
 def _detect_skills():
-    global _has_magery, _has_vet
-    _has_magery = Player.GetSkillValue('Magery') >= MAGERY_MIN_SKILL
+    global _has_magery, _has_vet, _has_chiv, _has_ranged
+    archery  = Player.GetSkillValue('Archery')
+    throwing = Player.GetSkillValue('Throwing')
+    _has_magery = Player.GetSkillValue('Magery')     >= MAGERY_MIN_SKILL
     _has_vet    = Player.GetSkillValue('Veterinary') >= VET_MIN_SKILL
+    _has_chiv   = Player.GetSkillValue('Chivalry')   >= CHIV_MIN_SKILL
+    _has_ranged = archery >= RANGED_MIN_SKILL or throwing >= RANGED_MIN_SKILL
     if _has_magery:
-        log("Magery detected — will cast heals/cures on pet.", colors['cyan'])
+        log("Magery %.1f — will use magery heals." % Player.GetSkillValue('Magery'), colors['cyan'])
+    if _has_chiv:
+        log("Chivalry %.1f — will use Enemy of One + Divine Fury." % Player.GetSkillValue('Chivalry'), colors['cyan'])
+        if not _has_magery:
+            log("  No Magery — using Close Wounds for pet healing.", colors['cyan'])
+    if _has_ranged:
+        skill_name = 'Archery' if archery >= throwing else 'Throwing'
+        log("%s %.1f — will auto-attack enemies." % (skill_name, max(archery, throwing)), colors['cyan'])
     if _has_vet:
-        log("Veterinary detected — will bandage pet.", colors['cyan'])
+        log("Veterinary %.1f — will bandage pet." % Player.GetSkillValue('Veterinary'), colors['cyan'])
+
+def apply_chiv_buffs():
+    if not _has_chiv:
+        return
+    if Player.ManaMax == 0:
+        return
+    if float(Player.Mana) / Player.ManaMax < COMBAT_MANA_FLOOR:
+        return
+    if not Player.BuffsExist('Enemy of One'):
+        log("Casting Enemy of One.", colors['cyan'])
+        Spells.CastChivalry("Enemy of One")
+        Misc.Pause(1500)
+    if not Player.BuffsExist('Divine Fury'):
+        log("Casting Divine Fury.", colors['cyan'])
+        Spells.CastChivalry("Divine Fury")
+        Misc.Pause(1500)
+
+
+def _apply_death_ray(enemy):
+    if Player.BuffsExist('Death Ray', False):
+        return
+    if Player.ManaMax == 0:
+        return
+    if float(Player.Mana) / Player.ManaMax < COMBAT_MANA_FLOOR:
+        return
+    log("Casting Death Ray on %s." % enemy.Name, colors['red'])
+    Spells.CastMastery('Death Ray')
+    if Target.WaitForTarget(5000, False):
+        Target.TargetExecute(enemy.Serial)
+    Misc.Pause(500)
+
 
 # ─── Drop-off helpers ────────────────────────────────────────────────────────
 
@@ -354,7 +505,7 @@ def _drop_beetle_loot(beetle_pack):
         Items.Move(item, dest, item.Amount)
         Misc.Pause(800)
     if total_gold:
-        log("Deposited %d gold." % total_gold, colors['green'])
+        _append_gold_stat(total_gold)
     log("Beetle unloaded.", colors['green'])
 
 
@@ -373,13 +524,14 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
     looted = set()
 
     while Player.Connected and not Player.IsGhost:
-        # ── Pet care ──────────────────────────────────────────────────────────
+        # ── Pet + player care ─────────────────────────────────────────────────
         pet = _find_pet()
         if pet is not None:
             _check_pet_health(pet)
             _cast_animal_whispering(pet)
+        check_player_health()
 
-        # ── Send pet to kill nearest enemy ────────────────────────────────────
+        # ── Send pet to kill nearest enemy; apply combat buffs ────────────────
         enemies = [e for e in GetEnemies(Mobiles, 0, ENEMY_SCAN_RANGE)
                    if e.Serial not in _skip_serials]
         if enemies:
@@ -387,6 +539,11 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
             if time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC:
                 log("Enemy: %s — sending pet." % nearest.Name, colors['red'])
                 _send_kill(nearest.Serial)
+            apply_chiv_buffs()
+            if Player.BuffsExist('EnchantedSummoning'):
+                _apply_death_ray(nearest)
+            else:
+                player_attack_enemy(nearest)
 
         # ── Loot gold from new corpses ────────────────────────────────────────
         corpses = [c for c in scan_nearby_corpses(CORPSE_SCAN_RANGE)
@@ -408,14 +565,19 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
             # Phase 2 — return to staging, then transfer gold backpack → beetle
             log("Returning to staging position.", colors['cyan'])
             _walk_to(staging_x, staging_y)
-            _ensure_beetle_nearby(beetle_serial)
-            gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
-            while gold is not None:
-                _, full = transfer_to_beetle(gold, beetle_pack)
-                if full:
-                    log("Beetle full — exiting dungeon.", colors['yellow'])
-                    return 'beetle_full'
+            check_player_health()
+            if Player.MaxWeight > 0 and float(Player.Weight) / Player.MaxWeight < TRANSFER_WEIGHT_THRESHOLD:
+                log("Weight %.0f%% — holding gold in pack, will transfer when heavier." % (
+                    float(Player.Weight) / Player.MaxWeight * 100), colors['yellow'])
+            else:
+                _ensure_beetle_nearby(beetle_serial)
                 gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+                while gold is not None:
+                    _, full = transfer_to_beetle(gold, beetle_pack)
+                    if full:
+                        log("Beetle full — exiting dungeon.", colors['yellow'])
+                        return 'beetle_full'
+                    gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
         else:
             Misc.Pause(IDLE_WAIT_MS)
 
@@ -428,6 +590,10 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
+    global _session_start, _session_gold
+    _session_start = time.time()
+    _session_gold  = 0
+
     # ── Beetle detection ─────────────────────────────────────────────────────
     beetle = _find_beetle()
     if beetle is None:
