@@ -84,6 +84,11 @@ HEAL_CAST_RANGE      = 10   # tiles — max range for targeted healing spells
 RECALL_FOLLOW_CHECKS = 3    # "all follow me" attempts before giving up on recall
 RECALL_FOLLOW_MS     = 2000 # ms to wait between follow attempts
 
+PET_FOLLOW_RANGE      = 1     # tiles — beyond this the pet is leashed back
+PET_LEASH_RANGE       = 10    # tiles — trigger leash recall when pet exceeds this
+FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting
+FOLLOW_MAX_CHECKS     = 3     # max polls before giving up on the leash recall
+
 WHISPER_ENABLED      = True
 WHISPER_INTERVAL_SEC = 1800
 
@@ -251,6 +256,26 @@ def _find_pet():
             nearest_dist = d
             nearest = mob
     return nearest
+
+
+def _recall_pet_if_needed(pet):
+    """Leash: if the pet has wandered beyond PET_LEASH_RANGE, issue 'all follow me'
+    and wait up to FOLLOW_MAX_CHECKS * FOLLOW_CHECK_INTERVAL ms for it to return.
+    Returns a refreshed pet reference."""
+    if Player.DistanceTo(pet) <= PET_LEASH_RANGE:
+        return pet
+    log("Pet too far (%d tiles) — leashing back." % Player.DistanceTo(pet), colors['yellow'])
+    for _ in range(FOLLOW_MAX_CHECKS):
+        Player.ChatSay("all follow me")
+        Misc.Pause(FOLLOW_CHECK_INTERVAL)
+        fresh = _find_pet()
+        if fresh is not None:
+            pet = fresh
+        if Player.DistanceTo(pet) <= PET_FOLLOW_RANGE:
+            log("Pet returned to follow range.", colors['cyan'])
+            return pet
+    log("Pet did not fully return — continuing.", colors['yellow'])
+    return pet
 
 
 def _ensure_pet_in_heal_range(pet):
@@ -487,7 +512,7 @@ def _ensure_beetle_nearby(beetle_serial):
     Misc.Pause(2000)
 
 
-def _drop_beetle_loot(beetle_pack):
+def _drop_beetle_loot(beetle_serial):
     """Walk to the drop box and move all beetle contents into it."""
     _dismount()
     _walk_to_drop()
@@ -495,15 +520,25 @@ def _drop_beetle_loot(beetle_pack):
     if dest is None:
         log("Drop box (0x%X) not found." % GOLD_DEST_SERIAL, colors['red'])
         return
-    Items.UseItem(beetle_pack)
-    Items.WaitForContents(beetle_pack.Serial, 3000)
+    mob = Mobiles.FindBySerial(beetle_serial)
+    if mob is None or mob.Backpack is None:
+        log("Beetle (0x%X) not accessible for unloading." % beetle_serial, colors['red'])
+        return
+    pack = mob.Backpack
+    Items.UseItem(pack)
+    Items.WaitForContents(pack.Serial, 3000)
     Misc.Pause(600)
     total_gold = 0
-    for item in list(beetle_pack.Contains or []):
+    for item in list(pack.Contains or []):
         if item.ItemID == GOLD_ITEM_ID:
             total_gold += item.Amount
         Items.Move(item, dest, item.Amount)
         Misc.Pause(800)
+        # full detection: if item is still in the pack after the move, dest is full
+        if Items.FindBySerial(item.Serial) is not None:
+            if Items.FindBySerial(item.Serial).Container == pack.Serial:
+                log("Drop box appears full — stopping transfer.", colors['yellow'])
+                break
     if total_gold:
         _append_gold_stat(total_gold)
     log("Beetle unloaded.", colors['green'])
@@ -527,6 +562,7 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
         # ── Pet + player care ─────────────────────────────────────────────────
         pet = _find_pet()
         if pet is not None:
+            pet = _recall_pet_if_needed(pet)
             _check_pet_health(pet)
             _cast_animal_whispering(pet)
         check_player_health()
@@ -679,7 +715,7 @@ def main():
     recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME, RECALL_SETTLE_DELAY)
 
     # ── Unload beetle to drop box ─────────────────────────────────────────────
-    _drop_beetle_loot(beetle_pack)
+    _drop_beetle_loot(beetle.Serial)
 
     log("Done.", colors['green'])
 
