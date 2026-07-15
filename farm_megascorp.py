@@ -513,9 +513,10 @@ def _ensure_beetle_nearby(beetle_serial):
 
 
 def _drop_beetle_loot(beetle_serial):
-    """Walk to the drop box and move all beetle contents into it."""
-    _dismount()
-    _walk_to_drop()
+    """Walk to the drop box (while mounted so the beetle arrives with us), then unload."""
+    _walk_to_drop()   # beetle is our mount — it arrives at the drop position with us
+    _dismount()       # beetle is now on the ground right at the drop box
+    Misc.Pause(800)
     dest = Items.FindBySerial(GOLD_DEST_SERIAL)
     if dest is None:
         log("Drop box (0x%X) not found." % GOLD_DEST_SERIAL, colors['red'])
@@ -534,11 +535,11 @@ def _drop_beetle_loot(beetle_serial):
             total_gold += item.Amount
         Items.Move(item, dest, item.Amount)
         Misc.Pause(800)
-        # full detection: if item is still in the pack after the move, dest is full
-        if Items.FindBySerial(item.Serial) is not None:
-            if Items.FindBySerial(item.Serial).Container == pack.Serial:
-                log("Drop box appears full — stopping transfer.", colors['yellow'])
-                break
+        # full detection: if the item is still in the pack after the move, dest is full
+        found = Items.FindBySerial(item.Serial)
+        if found is not None and found.Container == pack.Serial:
+            log("Drop box appears full — stopping transfer.", colors['yellow'])
+            break
     if total_gold:
         _append_gold_stat(total_gold)
     log("Beetle unloaded.", colors['green'])
@@ -626,98 +627,104 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
-    global _session_start, _session_gold
-    _session_start = time.time()
-    _session_gold  = 0
+    global _session_start, _session_gold, _kill_times, _skip_serials, _attacking_serial, _pet_serial
 
-    # ── Beetle detection ─────────────────────────────────────────────────────
-    beetle = _find_beetle()
-    if beetle is None:
-        return
-    beetle_pack = _get_beetle_pack(beetle)
-    if beetle_pack is None:
-        return
+    while Player.Connected and not Player.IsGhost:
+        _session_start    = time.time()
+        _session_gold     = 0
+        _kill_times       = {}
+        _skip_serials     = set()
+        _attacking_serial = None
+        _pet_serial       = None
 
-    # ── Combat pet detection ─────────────────────────────────────────────────
-    if not _discover_combat_pet(beetle.Serial):
-        log("Combat pet detection failed — stopping.", colors['red'])
-        return
+        # ── Beetle detection ─────────────────────────────────────────────────
+        beetle = _find_beetle()
+        if beetle is None:
+            break
+        beetle_pack = _get_beetle_pack(beetle)
+        if beetle_pack is None:
+            break
 
-    _detect_skills()
+        # ── Combat pet + skill detection ─────────────────────────────────────
+        if not _discover_combat_pet(beetle.Serial):
+            log("Combat pet detection failed — stopping.", colors['red'])
+            break
+        _detect_skills()
 
-    # ── Recall to megascorp ──────────────────────────────────────────────────
-    rb = find_runebook_by_label(MEGASCORP_RUNEBOOK_NAME)
-    if rb is None:
-        log("Runebook '%s' not found — stopping." % MEGASCORP_RUNEBOOK_NAME, colors['red'])
-        return
+        # ── Recall to megascorp ──────────────────────────────────────────────
+        rb = find_runebook_by_label(MEGASCORP_RUNEBOOK_NAME)
+        if rb is None:
+            log("Runebook '%s' not found — stopping." % MEGASCORP_RUNEBOOK_NAME, colors['red'])
+            break
 
-    mount_beetle(beetle.Serial)
-    log("Recalling to '%s'..." % MEGASCORP_RUNE_NAME, colors['cyan'])
-    if not travel_to_named_rune(rb, MEGASCORP_RUNE_NAME, RECALL_SETTLE_DELAY):
-        log("Failed to recall to '%s' — stopping." % MEGASCORP_RUNE_NAME, colors['red'])
-        return
-    _dismount()
+        mount_beetle(beetle.Serial)
+        log("Recalling to '%s'..." % MEGASCORP_RUNE_NAME, colors['cyan'])
+        if not travel_to_named_rune(rb, MEGASCORP_RUNE_NAME, RECALL_SETTLE_DELAY):
+            log("Failed to recall to '%s' — stopping." % MEGASCORP_RUNE_NAME, colors['red'])
+            break
+        _dismount()
 
-    # ── Walk to dungeon door ─────────────────────────────────────────────────
-    wps_door = load_waypoints(WP_DOOR) if os.path.exists(WP_DOOR) else None
-    if wps_door:
-        log("Walking scorp_door waypoints (%d points)..." % len(wps_door), colors['cyan'])
-        start_idx, _ = nearest_waypoint_index(wps_door)
-        walk_waypoints(wps_door, start_idx)
-    else:
-        log("No waypoints_scorp_door.json found — skipping door walk.", colors['yellow'])
+        # ── Walk to dungeon door ─────────────────────────────────────────────
+        wps_door = load_waypoints(WP_DOOR) if os.path.exists(WP_DOOR) else None
+        if wps_door:
+            log("Walking scorp_door waypoints (%d points)..." % len(wps_door), colors['cyan'])
+            start_idx, _ = nearest_waypoint_index(wps_door)
+            walk_waypoints(wps_door, start_idx)
+        else:
+            log("No waypoints_scorp_door.json found — skipping door walk.", colors['yellow'])
 
-    # ── Use dungeon door ─────────────────────────────────────────────────────
-    log("Using dungeon door (0x%X)..." % DOOR_SERIAL, colors['cyan'])
-    Items.UseItem(DOOR_SERIAL)
-    Misc.Pause(DOOR_WAIT_MS)
+        # ── Use dungeon door ─────────────────────────────────────────────────
+        log("Using dungeon door (0x%X)..." % DOOR_SERIAL, colors['cyan'])
+        Items.UseItem(DOOR_SERIAL)
+        Misc.Pause(DOOR_WAIT_MS)
 
-    # ── Walk into dungeon kill zone ──────────────────────────────────────────
-    wps_dungeon = load_waypoints(WP_DUNGEON) if os.path.exists(WP_DUNGEON) else None
-    if wps_dungeon:
-        log("Walking scorp_dungeon waypoints (%d points)..." % len(wps_dungeon), colors['cyan'])
-        start_idx, _ = nearest_waypoint_index(wps_dungeon)
-        walk_waypoints(wps_dungeon, start_idx)
-        staging_x, staging_y = wps_dungeon[-1][0], wps_dungeon[-1][1]
-        log("Staging position: (%d, %d)." % (staging_x, staging_y), colors['cyan'])
-    else:
-        log("No waypoints_scorp_dungeon.json — using current position as staging.", colors['yellow'])
-        staging_x = Player.Position.X
-        staging_y = Player.Position.Y
+        # ── Walk into dungeon kill zone ──────────────────────────────────────
+        wps_dungeon = load_waypoints(WP_DUNGEON) if os.path.exists(WP_DUNGEON) else None
+        if wps_dungeon:
+            log("Walking scorp_dungeon waypoints (%d points)..." % len(wps_dungeon), colors['cyan'])
+            start_idx, _ = nearest_waypoint_index(wps_dungeon)
+            walk_waypoints(wps_dungeon, start_idx)
+            staging_x, staging_y = wps_dungeon[-1][0], wps_dungeon[-1][1]
+            log("Staging position: (%d, %d)." % (staging_x, staging_y), colors['cyan'])
+        else:
+            log("No waypoints_scorp_dungeon.json — using current position as staging.", colors['yellow'])
+            staging_x = Player.Position.X
+            staging_y = Player.Position.Y
 
-    # ── Initial guard ─────────────────────────────────────────────────────────
-    if _find_pet() is not None:
-        Player.ChatSay("all guard me")
-        log("Guard active — starting kill loop.", colors['cyan'])
+        # ── Initial guard ─────────────────────────────────────────────────────
+        if _find_pet() is not None:
+            Player.ChatSay("all guard me")
+            log("Guard active — starting kill loop.", colors['cyan'])
 
-    # ── Kill + gold loot loop ─────────────────────────────────────────────────
-    reason = _kill_loot_loop(beetle.Serial, beetle_pack, staging_x, staging_y)
+        # ── Kill + gold loot loop ─────────────────────────────────────────────
+        reason = _kill_loot_loop(beetle.Serial, beetle_pack, staging_x, staging_y)
 
-    if reason == 'ghost':
-        log("Player died — stopping.", colors['red'])
-        return
+        if reason == 'ghost':
+            log("Player died — stopping.", colors['red'])
+            break
 
-    # ── Exit dungeon via scorp_exit waypoints ─────────────────────────────────
-    wps_exit = load_waypoints(WP_EXIT) if os.path.exists(WP_EXIT) else None
-    if wps_exit:
-        log("Walking scorp_exit waypoints (%d points)..." % len(wps_exit), colors['cyan'])
-        start_idx, _ = nearest_waypoint_index(wps_exit)
-        walk_waypoints(wps_exit, start_idx)
-    else:
-        log("No waypoints_scorp_exit.json — skipping exit walk.", colors['yellow'])
+        # ── Exit dungeon via scorp_exit waypoints ─────────────────────────────
+        wps_exit = load_waypoints(WP_EXIT) if os.path.exists(WP_EXIT) else None
+        if wps_exit:
+            log("Walking scorp_exit waypoints (%d points)..." % len(wps_exit), colors['cyan'])
+            start_idx, _ = nearest_waypoint_index(wps_exit)
+            walk_waypoints(wps_exit, start_idx)
+        else:
+            log("No waypoints_scorp_exit.json — skipping exit walk.", colors['yellow'])
 
-    # ── Recall home ───────────────────────────────────────────────────────────
-    log("Recalling beetle before mounting...", colors['cyan'])
-    Player.ChatSay("all follow me")
-    Misc.Pause(2000)
-    mount_beetle(beetle.Serial)
-    log("Recalling home...", colors['cyan'])
-    recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME, RECALL_SETTLE_DELAY)
+        # ── Recall home (mounted so beetle travels with us) ───────────────────
+        log("Recalling beetle before mounting...", colors['cyan'])
+        Player.ChatSay("all follow me")
+        Misc.Pause(2000)
+        mount_beetle(beetle.Serial)
+        log("Recalling home...", colors['cyan'])
+        recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME, RECALL_SETTLE_DELAY)
 
-    # ── Unload beetle to drop box ─────────────────────────────────────────────
-    _drop_beetle_loot(beetle.Serial)
+        # ── Unload beetle to drop box (still mounted; dismount at destination) ─
+        _drop_beetle_loot(beetle.Serial)
 
-    log("Done.", colors['green'])
+        log("Run complete — restarting.", colors['green'])
+        Misc.Pause(2000)
 
 
 main()
