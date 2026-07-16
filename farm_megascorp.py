@@ -85,8 +85,8 @@ RECALL_FOLLOW_CHECKS = 3    # "all follow me" attempts before giving up on recal
 RECALL_FOLLOW_MS     = 2000 # ms to wait between follow attempts
 
 PET_FOLLOW_RANGE      = 1     # tiles — beyond this the pet is leashed back
-PET_LEASH_RANGE       = 10    # tiles — trigger leash recall when pet exceeds this
-FOLLOW_CHECK_INTERVAL = 4000  # ms between "all follow me" repeats while waiting
+PET_LEASH_RANGE       = 7     # tiles — trigger leash recall when pet exceeds this (well inside HEAL_CAST_RANGE)
+FOLLOW_CHECK_INTERVAL = 2000  # ms to wait after "all follow me" before checking distance
 FOLLOW_MAX_CHECKS     = 3     # max polls before giving up on the leash recall
 
 WHISPER_ENABLED      = True
@@ -260,22 +260,20 @@ def _find_pet():
 
 def _recall_pet_if_needed(pet):
     """Leash: if the pet has wandered beyond PET_LEASH_RANGE, issue 'all follow me'
-    and wait up to FOLLOW_MAX_CHECKS * FOLLOW_CHECK_INTERVAL ms for it to return.
-    Returns a refreshed pet reference."""
+    and wait FOLLOW_CHECK_INTERVAL ms. When pet returns to range, re-issues 'all guard me'.
+    Returns (fresh_pet, was_recalled). Caller skips new kill orders when was_recalled is True."""
     if Player.DistanceTo(pet) <= PET_LEASH_RANGE:
-        return pet
-    log("Pet too far (%d tiles) — leashing back." % Player.DistanceTo(pet), colors['yellow'])
-    for _ in range(FOLLOW_MAX_CHECKS):
-        Player.ChatSay("all follow me")
-        Misc.Pause(FOLLOW_CHECK_INTERVAL)
-        fresh = _find_pet()
-        if fresh is not None:
-            pet = fresh
-        if Player.DistanceTo(pet) <= PET_FOLLOW_RANGE:
-            log("Pet returned to follow range.", colors['cyan'])
-            return pet
-    log("Pet did not fully return — continuing.", colors['yellow'])
-    return pet
+        return pet, False
+    log("Pet too far (%d tiles) — recalling." % Player.DistanceTo(pet), colors['yellow'])
+    Player.ChatSay("all follow me")
+    Misc.Pause(FOLLOW_CHECK_INTERVAL)
+    fresh = _find_pet()
+    if fresh is not None:
+        pet = fresh
+    if Player.DistanceTo(pet) <= PET_LEASH_RANGE:
+        log("Pet back in range — issuing guard.", colors['cyan'])
+        Player.ChatSay("all guard me")
+    return pet, True
 
 
 def _ensure_pet_in_heal_range(pet):
@@ -428,20 +426,6 @@ def player_attack_enemy(enemy):
     Player.Attack(enemy.Serial)
 
 
-def _send_kill(target_serial):
-    Journal.Clear()
-    Player.ChatSay("all kill")
-    Misc.Pause(300)
-    if Target.WaitForTarget(2000, False):
-        Target.TargetExecute(target_serial)
-    Misc.Pause(600)
-    if Journal.Search("Target cannot be seen."):
-        log("Target cannot be seen — skipping 0x%X." % target_serial, colors['yellow'])
-        _skip_serials.add(target_serial)
-        return False
-    _kill_times[target_serial] = time.time()
-    return True
-
 
 def _detect_skills():
     global _has_magery, _has_vet, _has_chiv, _has_ranged
@@ -563,19 +547,16 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
         # ── Pet + player care ─────────────────────────────────────────────────
         pet = _find_pet()
         if pet is not None:
-            pet = _recall_pet_if_needed(pet)
+            pet, _ = _recall_pet_if_needed(pet)
             _check_pet_health(pet)
             _cast_animal_whispering(pet)
         check_player_health()
 
-        # ── Send pet to kill nearest enemy; apply combat buffs ────────────────
+        # ── Combat buffs + player attack (pet handles engagement via guard mode) ─
         enemies = [e for e in GetEnemies(Mobiles, 0, ENEMY_SCAN_RANGE)
                    if e.Serial not in _skip_serials]
         if enemies:
             nearest = min(enemies, key=lambda e: Player.DistanceTo(e))
-            if time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC:
-                log("Enemy: %s — sending pet." % nearest.Name, colors['red'])
-                _send_kill(nearest.Serial)
             apply_chiv_buffs()
             if Player.BuffsExist('EnchantedSummoning'):
                 _apply_death_ray(nearest)
