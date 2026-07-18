@@ -1,3 +1,5 @@
 secrets/
 guardian_stats.json
 local/
+__pycache__
+*.pyc
