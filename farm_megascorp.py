@@ -4,7 +4,7 @@
 # Flow:
 #   1. Detect pack beetle (body-ID scan, mining.py style).
 #   2. If the beetle already holds gold, recall home and deposit it first.
-#   3. Detect combat pet (nearest follower that isn't the beetle).
+#   3. The beetle is also the combat pet — lock its serial directly.
 #   4. Mount beetle, recall to 'megascorp' rune in the home runebook.
 #   5. Dismount, walk scorp_door waypoints → use dungeon door → walk scorp_dungeon waypoints.
 #   6. Kill loop: send pet to kill enemies; walk to each corpse, loot gold → beetle,
@@ -86,6 +86,9 @@ TRANSFER_WEIGHT_THRESHOLD = 0.80   # only transfer gold to beetle when player we
 HEAL_CAST_RANGE      = 10   # tiles — max range for targeted healing spells
 RECALL_FOLLOW_CHECKS = 3    # "all follow me" attempts before giving up on recall
 RECALL_FOLLOW_MS     = 2000 # ms to wait between follow attempts
+
+RETREAT_TRIGGER_RANGE = 4   # tiles — retreat when an enemy is this close to the player
+RETREAT_STEPS         = 4   # max tiles to step away from a close enemy
 
 PET_FOLLOW_RANGE      = 1     # tiles — beyond this the pet is leashed back
 PET_LEASH_RANGE       = 7     # tiles — trigger leash recall when pet exceeds this (well inside HEAL_CAST_RANGE)
@@ -236,66 +239,28 @@ def _beetle_gold_total(pack_serial):
 
 # ─── Combat pet discovery ─────────────────────────────────────────────────────
 
-def _discover_combat_pet(beetle_serial):
-    """Pick the combat pet by elimination: the beetle is already identified by
-    body ID, so the nearest remaining non-human follower is the combat pet.
-    No mount-testing — that misfires on non-mountable pets and ends in the
-    manual prompt every run. Prefers friends-list mobiles (same assumption
-    _find_pet relies on); prompts only if no candidate is found at all."""
+def _lock_combat_pet(beetle):
+    """The beetle IS the combat pet in this script — it hauls the gold and
+    does the fighting. Lock its serial directly; no scanning or prompting."""
     global _pet_serial
-
-    _dismount()
-
-    log("Scanning for combat pet within %d tiles..." % PET_SCAN_RANGE, colors['cyan'])
-
-    def _candidates(friends_only):
-        f          = Mobiles.Filter()
-        f.Enabled  = True
-        f.IsHuman  = False
-        f.RangeMin = 0
-        f.RangeMax = PET_SCAN_RANGE
-        if friends_only:
-            f.Friend = True
-        result = []
-        for mob in Mobiles.ApplyFilter(f):
-            if mob.Serial in (Player.Serial, beetle_serial) or mob.IsHuman:
-                continue
-            if mob.Body == PACK_BEETLE_BODY:
-                continue  # another pack animal, not the fighter
-            result.append(mob)
-        return result
-
-    candidates = _candidates(True) or _candidates(False)
-    if candidates:
-        pet = min(candidates, key=lambda m: Player.DistanceTo(m))
-        _pet_serial = pet.Serial
-        log("Combat pet locked: %s (0x%X)." % (pet.Name, _pet_serial), colors['cyan'])
-        return True
-
-    log("No combat pet found — click your pet.", colors['yellow'])
-    serial = Target.PromptTarget("Click your combat pet:")
-    if serial and serial != 0:
-        _pet_serial = serial
-        mob  = Mobiles.FindBySerial(serial)
-        name = mob.Name if mob is not None else ('0x%X' % serial)
-        log("Combat pet locked via prompt: %s (0x%X)." % (name, serial), colors['cyan'])
-        return True
-    return False
+    _pet_serial = beetle.Serial
+    log("Combat pet is the beetle: %s (0x%X)." % (beetle.Name, beetle.Serial), colors['cyan'])
 
 # ─── Pet care ─────────────────────────────────────────────────────────────────
 
 def _find_pet():
+    # Serial lookup first — the pet is the beetle, so the serial is always
+    # known and this avoids depending on the Razor friends list.
+    if _pet_serial is not None:
+        mob = Mobiles.FindBySerial(_pet_serial)
+        if mob is not None:
+            return mob
     f          = Mobiles.Filter()
     f.Enabled  = True
     f.Friend   = True
     f.IsHuman  = False
     f.RangeMin = 0
     f.RangeMax = PET_SCAN_RANGE
-    for mob in Mobiles.ApplyFilter(f):
-        if mob.Serial == Player.Serial:
-            continue
-        if _pet_serial is not None and mob.Serial == _pet_serial:
-            return mob
     nearest, nearest_dist = None, 9999
     for mob in Mobiles.ApplyFilter(f):
         if mob.Serial == Player.Serial:
@@ -309,19 +274,25 @@ def _find_pet():
 
 def _recall_pet_if_needed(pet):
     """Leash: if the pet has wandered beyond PET_LEASH_RANGE, issue 'all follow me'
-    and wait FOLLOW_CHECK_INTERVAL ms. When pet returns to range, re-issues 'all guard me'.
+    and poll until it returns. Guard is ALWAYS re-issued afterward — previously it
+    was skipped when the pet took longer than one poll to return, leaving the pet
+    in follow mode (trailing the player but not defending) for a long stretch.
     Returns (fresh_pet, was_recalled). Caller skips new kill orders when was_recalled is True."""
     if Player.DistanceTo(pet) <= PET_LEASH_RANGE:
         return pet, False
     log("Pet too far (%d tiles) — recalling." % Player.DistanceTo(pet), colors['yellow'])
-    Player.ChatSay("all follow me")
-    Misc.Pause(FOLLOW_CHECK_INTERVAL)
-    fresh = _find_pet()
-    if fresh is not None:
-        pet = fresh
-    if Player.DistanceTo(pet) <= PET_LEASH_RANGE:
-        log("Pet back in range — issuing guard.", colors['cyan'])
-        Player.ChatSay("all guard me")
+    for _ in range(FOLLOW_MAX_CHECKS):
+        Player.ChatSay("all follow me")
+        Misc.Pause(FOLLOW_CHECK_INTERVAL)
+        fresh = _find_pet()
+        if fresh is not None:
+            pet = fresh
+        if Player.DistanceTo(pet) <= PET_LEASH_RANGE:
+            break
+    # 'all guard me' both pulls the pet to the player and restores guard mode,
+    # so issue it even if the pet is still on its way.
+    Player.ChatSay("all guard me")
+    log("Guard re-issued after recall (pet at %d tiles)." % Player.DistanceTo(pet), colors['cyan'])
     return pet, True
 
 
@@ -338,10 +309,50 @@ def _ensure_pet_in_heal_range(pet):
         if fresh is not None:
             pet = fresh
         if Player.DistanceTo(pet) <= HEAL_CAST_RANGE:
-            log("Pet returned — resuming heal.", colors['cyan'])
+            log("Pet returned — re-guarding and resuming heal.", colors['cyan'])
+            Player.ChatSay("all guard me")
             return pet
     log("Pet did not return to heal range — skipping heal.", colors['yellow'])
     return pet
+
+
+def _cast_pet_heal(kind, spell_name, pet_serial):
+    """Cast a targeted heal/cure, only targeting once the cursor actually
+    appears. A cast rejected mid-recovery produces no cursor — wait out the
+    recovery and retry instead of losing the cast. (Fixed-pause chaining
+    fired follow-up heals before recovery finished, so the 2x/3x heals
+    silently never happened.)"""
+    for _ in range(3):
+        if kind == 'magery':
+            Spells.CastMagery(spell_name)
+        else:
+            Spells.CastChivalry(spell_name)
+        if Target.WaitForTarget(4000, False):
+            Target.TargetExecute(pet_serial)
+            Misc.Pause(1200)
+            return True
+        Misc.Pause(800)   # no cursor — still recovering; wait and retry
+    log("%s never got a target cursor — skipping." % spell_name, colors['yellow'])
+    return False
+
+
+def _ensure_pet_guarding():
+    """Pull the pet to the player and put it in guard mode, verifying range.
+    Used when entering the dungeon — the walk in can leave the pet behind if
+    it wasn't in follow mode."""
+    pet = _find_pet()
+    if pet is None:
+        log("No pet found to guard.", colors['yellow'])
+        return
+    for _ in range(RECALL_FOLLOW_CHECKS):
+        if Player.DistanceTo(pet) <= PET_LEASH_RANGE:
+            break
+        log("Pet %d tiles away — calling it in before guard." % Player.DistanceTo(pet), colors['yellow'])
+        Player.ChatSay("all follow me")
+        Misc.Pause(RECALL_FOLLOW_MS)
+        pet = _find_pet() or pet
+    Player.ChatSay("all guard me")
+    log("Guard active — pet at %d tiles." % Player.DistanceTo(pet), colors['cyan'])
 
 
 def _check_pet_health(pet):
@@ -360,54 +371,33 @@ def _check_pet_health(pet):
 
     if pet.Poisoned and hp_ratio < HEALTH_THRESHOLD and _has_magery:
         log("Curing %s." % pet.Name, colors['cyan'])
-        Spells.CastMagery('Arch Cure')
-        Target.WaitForTarget(3000, False)
-        Target.TargetExecute(pet.Serial)
-        Misc.Pause(1200)
+        _cast_pet_heal('magery', 'Arch Cure', pet.Serial)
 
     if hp_ratio < CRITICAL_HEALTH_THRESHOLD:
         if _has_magery:
             log("HP critical (%.0f%%) — 3x healing %s." % (hp_ratio * 100, pet.Name), colors['red'])
             for _ in range(3):
-                Spells.CastMagery('Greater Heal')
-                Target.WaitForTarget(3000, False)
-                Target.TargetExecute(pet.Serial)
-                Misc.Pause(800)
+                _cast_pet_heal('magery', 'Greater Heal', pet.Serial)
         elif _has_chiv:
             log("HP critical (%.0f%%) — Close Wounds x3 on %s." % (hp_ratio * 100, pet.Name), colors['red'])
             for _ in range(3):
-                Spells.CastChivalry('Close Wounds')
-                Target.WaitForTarget(3000, False)
-                Target.TargetExecute(pet.Serial)
-                Misc.Pause(800)
+                _cast_pet_heal('chiv', 'Close Wounds', pet.Serial)
     elif hp_ratio < FAST_HEAL_THRESHOLD:
         if _has_magery:
             log("HP low (%.0f%%) — 2x healing %s." % (hp_ratio * 100, pet.Name), colors['yellow'])
             for _ in range(2):
-                Spells.CastMagery('Greater Heal')
-                Target.WaitForTarget(3000, False)
-                Target.TargetExecute(pet.Serial)
-                Misc.Pause(800)
+                _cast_pet_heal('magery', 'Greater Heal', pet.Serial)
         elif _has_chiv:
             log("HP low (%.0f%%) — Close Wounds x2 on %s." % (hp_ratio * 100, pet.Name), colors['yellow'])
             for _ in range(2):
-                Spells.CastChivalry('Close Wounds')
-                Target.WaitForTarget(3000, False)
-                Target.TargetExecute(pet.Serial)
-                Misc.Pause(800)
+                _cast_pet_heal('chiv', 'Close Wounds', pet.Serial)
     elif hp_ratio < HEALTH_THRESHOLD:
         if _has_magery:
             log("Healing %s." % pet.Name, colors['cyan'])
-            Spells.CastMagery('Greater Heal')
-            Target.WaitForTarget(3000, False)
-            Target.TargetExecute(pet.Serial)
-            Misc.Pause(1200)
+            _cast_pet_heal('magery', 'Greater Heal', pet.Serial)
         elif _has_chiv:
             log("Close Wounds on %s." % pet.Name, colors['cyan'])
-            Spells.CastChivalry('Close Wounds')
-            Target.WaitForTarget(3000, False)
-            Target.TargetExecute(pet.Serial)
-            Misc.Pause(1200)
+            _cast_pet_heal('chiv', 'Close Wounds', pet.Serial)
 
     if hp_ratio < VET_THRESHOLD and _has_vet and not Player.BuffsExist('Healing'):
         bandage = Items.FindByID(BANDAGE_ITEM_ID, -1, Player.Backpack.Serial)
@@ -474,6 +464,26 @@ def player_attack_enemy(enemy):
         _attacking_serial = enemy.Serial
     Player.Attack(enemy.Serial)
 
+
+
+def _retreat_from(enemy):
+    """Step away from an enemy that spawned close to the player, one tile at a
+    time along the dominant axis away from it. Stops early once the enemy is
+    outside RETREAT_TRIGGER_RANGE or disappears."""
+    for _ in range(RETREAT_STEPS):
+        mob = Mobiles.FindBySerial(enemy.Serial)
+        if mob is None:
+            return
+        if Player.DistanceTo(mob) > RETREAT_TRIGGER_RANGE:
+            return
+        dx = Player.Position.X - mob.Position.X
+        dy = Player.Position.Y - mob.Position.Y
+        if abs(dx) >= abs(dy):
+            direction = 'East' if dx >= 0 else 'West'
+        else:
+            direction = 'South' if dy >= 0 else 'North'
+        Player.Walk(direction)
+        Misc.Pause(300)
 
 
 def _send_kill(target_serial):
@@ -673,7 +683,13 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
                    if e.Serial not in _skip_serials]
         if enemies:
             nearest = min(enemies, key=lambda e: Player.DistanceTo(e))
-            if pet is not None and time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC:
+            spawned_close = Player.DistanceTo(nearest) <= RETREAT_TRIGGER_RANGE
+            if spawned_close:
+                log("Enemy %s is %d tiles from us — stepping away." % (
+                    nearest.Name, Player.DistanceTo(nearest)), colors['yellow'])
+                _retreat_from(nearest)
+            if pet is not None and (spawned_close or
+                    time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC):
                 log("Enemy: %s — sending pet." % nearest.Name, colors['red'])
                 _send_kill(nearest.Serial)  # issues "all kill" then "all guard me"
             apply_chiv_buffs()
@@ -751,9 +767,7 @@ def main():
         _startup_deposit_if_needed(beetle.Serial, beetle_pack)
 
         # ── Combat pet + skill detection ─────────────────────────────────────
-        if not _discover_combat_pet(beetle.Serial):
-            log("Combat pet detection failed — stopping.", colors['red'])
-            break
+        _lock_combat_pet(beetle)
         _detect_skills()
 
         # ── Recall to megascorp ──────────────────────────────────────────────
@@ -768,6 +782,9 @@ def main():
             log("Failed to recall to '%s' — stopping." % MEGASCORP_RUNE_NAME, colors['red'])
             break
         _dismount()
+        # Beetle must tail us through the door and dungeon walk
+        Player.ChatSay("all follow me")
+        Misc.Pause(500)
 
         # ── Walk to dungeon door ─────────────────────────────────────────────
         wps_door = load_waypoints(WP_DOOR) if os.path.exists(WP_DOOR) else None
@@ -796,10 +813,8 @@ def main():
             staging_x = Player.Position.X
             staging_y = Player.Position.Y
 
-        # ── Initial guard ─────────────────────────────────────────────────────
-        if _find_pet() is not None:
-            Player.ChatSay("all guard me")
-            log("Guard active — starting kill loop.", colors['cyan'])
+        # ── Initial guard (verify the beetle made it to staging) ─────────────
+        _ensure_pet_guarding()
 
         # ── Kill + gold loot loop ─────────────────────────────────────────────
         reason = _kill_loot_loop(beetle.Serial, beetle_pack, staging_x, staging_y)
