@@ -427,6 +427,27 @@ def player_attack_enemy(enemy):
 
 
 
+def _send_kill(target_serial):
+    """Point pet at a specific target, then immediately re-issue guard so it stays
+    near the player and doesn't chase the target across the dungeon."""
+    Journal.Clear()
+    Player.ChatSay("all kill")
+    Misc.Pause(300)
+    if not Target.WaitForTarget(2000, False):
+        Player.ChatSay("all guard me")
+        return False
+    Target.TargetExecute(target_serial)
+    Misc.Pause(400)
+    if Journal.Search("Target cannot be seen."):
+        log("Target cannot be seen — skipping 0x%X." % target_serial, colors['yellow'])
+        _skip_serials.add(target_serial)
+        Player.ChatSay("all guard me")
+        return False
+    Player.ChatSay("all guard me")
+    _kill_times[target_serial] = time.time()
+    return True
+
+
 def _detect_skills():
     global _has_magery, _has_vet, _has_chiv, _has_ranged
     archery  = Player.GetSkillValue('Archery')
@@ -487,13 +508,19 @@ def _walk_to_drop():
 
 
 def _ensure_beetle_nearby(beetle_serial):
-    """Call beetle back if it has drifted out of item-transfer range."""
+    """Call beetle back and poll until it is within BEETLE_TRANSFER_RANGE tiles."""
     beetle = Mobiles.FindBySerial(beetle_serial)
     if beetle is not None and Player.DistanceTo(beetle) <= BEETLE_TRANSFER_RANGE:
         return
     log("Beetle out of range — recalling.", colors['yellow'])
-    Player.ChatSay("all follow me")
-    Misc.Pause(2000)
+    for _ in range(6):
+        Player.ChatSay("all follow me")
+        Misc.Pause(1500)
+        beetle = Mobiles.FindBySerial(beetle_serial)
+        if beetle is not None and Player.DistanceTo(beetle) <= BEETLE_TRANSFER_RANGE:
+            log("Beetle in range.", colors['cyan'])
+            return
+    log("Beetle did not return in time — proceeding anyway.", colors['yellow'])
 
 
 def _drop_beetle_loot(beetle_serial):
@@ -501,32 +528,73 @@ def _drop_beetle_loot(beetle_serial):
     _walk_to_drop()   # beetle is our mount — it arrives at the drop position with us
     _dismount()       # beetle is now on the ground right at the drop box
     Misc.Pause(800)
-    dest = Items.FindBySerial(GOLD_DEST_SERIAL)
-    if dest is None:
-        log("Drop box (0x%X) not found." % GOLD_DEST_SERIAL, colors['red'])
-        return
+
     mob = Mobiles.FindBySerial(beetle_serial)
     if mob is None or mob.Backpack is None:
         log("Beetle (0x%X) not accessible for unloading." % beetle_serial, colors['red'])
         return
     pack = mob.Backpack
+
+    # Open beetle pack first to load its contents into the client cache
     Items.UseItem(pack)
-    Items.WaitForContents(pack.Serial, 3000)
+    if not Items.WaitForContents(pack.Serial, 4000):
+        log("Beetle pack contents did not load.", colors['red'])
+        return
     Misc.Pause(600)
+
+    dest = Items.FindBySerial(GOLD_DEST_SERIAL)
+    if dest is None:
+        log("Drop box (0x%X) not found." % GOLD_DEST_SERIAL, colors['red'])
+        return
+    # Open destination so the server registers it as an active container
+    Items.UseItem(dest)
+    Items.WaitForContents(dest.Serial, 3000)
+    Misc.Pause(600)
+
     total_gold = 0
     for item in list(pack.Contains or []):
-        if item.ItemID == GOLD_ITEM_ID:
-            total_gold += item.Amount
-        Items.Move(item, dest, item.Amount)
-        Misc.Pause(800)
-        # full detection: if the item is still in the pack after the move, dest is full
-        found = Items.FindBySerial(item.Serial)
-        if found is not None and found.Container == pack.Serial:
-            log("Drop box appears full — stopping transfer.", colors['yellow'])
+        before_serial = item.Serial
+        before_amount = item.Amount
+        for attempt in range(1, 4):
+            Journal.Clear()
+            Items.Move(item, dest, item.Amount)
+            Misc.Pause(1200)
+            if Journal.Search("You must wait"):
+                log("Rate-limited — waiting...", colors['yellow'])
+                Misc.Pause(2000)
+                continue
+            # If the item (by ID+serial) is still in the beetle pack, dest is full
+            still_in_pack = Items.FindByID(item.ItemID, -1, pack.Serial)
+            if still_in_pack is not None and still_in_pack.Serial == before_serial:
+                log("Drop box full — stopping transfer.", colors['yellow'])
+                if total_gold:
+                    _append_gold_stat(total_gold)
+                return
+            # Item left the pack — moved successfully
+            if item.ItemID == GOLD_ITEM_ID:
+                total_gold += before_amount
             break
+
     if total_gold:
         _append_gold_stat(total_gold)
-    log("Beetle unloaded.", colors['green'])
+    log("Beetle unloaded — %d gold deposited." % total_gold, colors['green'])
+
+
+def _startup_deposit_if_needed(beetle_serial):
+    """Check beetle pack at script start; if it has gold, deposit before heading to dungeon."""
+    mob = Mobiles.FindBySerial(beetle_serial)
+    if mob is None or mob.Backpack is None:
+        return
+    pack = mob.Backpack
+    Items.UseItem(pack)
+    Items.WaitForContents(pack.Serial, 4000)
+    Misc.Pause(600)
+    if Items.FindByID(GOLD_ITEM_ID, -1, pack.Serial) is None:
+        log("Beetle pack empty — no startup deposit needed.", colors['green'])
+        return
+    log("Beetle has leftover gold — depositing before dungeon run.", colors['yellow'])
+    mount_beetle(beetle_serial)
+    _drop_beetle_loot(beetle_serial)
 
 
 # ─── Kill + gold loot loop ────────────────────────────────────────────────────
@@ -552,11 +620,14 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
             _cast_animal_whispering(pet)
         check_player_health()
 
-        # ── Combat buffs + player attack (pet handles engagement via guard mode) ─
+        # ── Engage + combat buffs ─────────────────────────────────────────────
         enemies = [e for e in GetEnemies(Mobiles, 0, ENEMY_SCAN_RANGE)
                    if e.Serial not in _skip_serials]
         if enemies:
             nearest = min(enemies, key=lambda e: Player.DistanceTo(e))
+            if pet is not None and time.time() - _kill_times.get(nearest.Serial, 0) >= KILL_COOLDOWN_SEC:
+                log("Enemy: %s — sending pet." % nearest.Name, colors['red'])
+                _send_kill(nearest.Serial)  # issues "all kill" then "all guard me"
             apply_chiv_buffs()
             if Player.BuffsExist('EnchantedSummoning'):
                 _apply_death_ray(nearest)
@@ -584,18 +655,14 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
             log("Returning to staging position.", colors['cyan'])
             _walk_to(staging_x, staging_y)
             check_player_health()
-            if Player.MaxWeight > 0 and float(Player.Weight) / Player.MaxWeight < TRANSFER_WEIGHT_THRESHOLD:
-                log("Weight %.0f%% — holding gold in pack, will transfer when heavier." % (
-                    float(Player.Weight) / Player.MaxWeight * 100), colors['yellow'])
-            else:
-                _ensure_beetle_nearby(beetle_serial)
+            _ensure_beetle_nearby(beetle_serial)
+            gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+            while gold is not None:
+                _, full = transfer_to_beetle(gold, beetle_pack)
+                if full:
+                    log("Beetle full — exiting dungeon.", colors['yellow'])
+                    return 'beetle_full'
                 gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
-                while gold is not None:
-                    _, full = transfer_to_beetle(gold, beetle_pack)
-                    if full:
-                        log("Beetle full — exiting dungeon.", colors['yellow'])
-                        return 'beetle_full'
-                    gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
         else:
             Misc.Pause(IDLE_WAIT_MS)
 
@@ -625,6 +692,9 @@ def main():
         beetle_pack = _get_beetle_pack(beetle)
         if beetle_pack is None:
             break
+
+        # ── Startup: deposit any leftover beetle gold before heading out ────────
+        _startup_deposit_if_needed(beetle.Serial)
 
         # ── Combat pet + skill detection ─────────────────────────────────────
         if not _discover_combat_pet(beetle.Serial):
