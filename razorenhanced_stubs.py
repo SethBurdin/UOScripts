@@ -58,7 +58,7 @@ class Mobile:
     MobileID: int           # body / animation ID
     Hits: int
     HitsMax: int
-    Notoriety: int          # 1=innocent 2=friend 3=animal 4=criminal 5=enemy 6=murderer 8=invulnerable
+    Notoriety: int          # 1=innocent 2=friend/ally 3=gray/attackable 4=criminal 5=enemy 6=murderer 7=npc
     WarMode: bool
     Poisoned: bool
     IsHuman: bool

@@ -6,6 +6,7 @@ if False:
 
 from utilities.mobiles import GetEmptyMobileList
 from glossary.colors import colors
+from glossary.enemies import GetFriendlyNotorieties
 
 # ── Config ────────────────────────────────────────────────────────────────────
 SCAN_RANGE           = 8    # tile radius to scan for friends
@@ -28,26 +29,56 @@ def _has_renewal(mob):
     return time.time() - _renewal_times.get(mob.Serial, 0) < RENEWAL_DURATION_SEC
 
 
+# ── Safe targeting ───────────────────────────────────────────────────────────
+# Razor's "Friend" list is a manually curated whitelist — it says nothing about
+# a mobile's current in-game notoriety. A listed friend can still be flagged
+# gray/attackable or criminal (e.g. they hit something they shouldn't have),
+# and casting a beneficial spell on a gray/criminal target flags the caster
+# gray too. So candidates are filtered by notoriety at scan time, AND
+# re-checked immediately before each TargetExecute since notoriety can change
+# during the ~1.5-2s spell cast.
+
+def _safe_to_help(serial):
+    if serial == Player.Serial:
+        return True
+    mob = Mobiles.FindBySerial(serial)
+    return mob is not None and mob.Notoriety in (1, 2, 7)  # innocent, ally, npc
+
+def _execute_safe_target(serial, name):
+    """Call after Target.WaitForTarget() succeeds. Executes the target only if
+    still safe to help; otherwise cancels the cursor and returns False."""
+    if _safe_to_help(serial):
+        Target.TargetExecute(serial)
+        return True
+    Target.Cancel()
+    Player.HeadMessage(colors['yellow'], 'Skipped %s — flagged gray/criminal' % name)
+    return False
+
+
 # ── Friend scan ───────────────────────────────────────────────────────────────
 
 def _get_friends():
-    """Returns living (non-ghost) friendly mobiles within range."""
+    """Returns living (non-ghost) friendly mobiles within range that are
+    currently safe to cast beneficial spells on."""
     f = Mobiles.Filter()
-    f.IsGhost  = 0
-    f.Friend   = 1
-    f.RangeMin = 0
-    f.RangeMax = SCAN_RANGE
+    f.IsGhost      = 0
+    f.Friend       = 1
+    f.RangeMin     = 0
+    f.RangeMax     = SCAN_RANGE
+    f.Notorieties  = GetFriendlyNotorieties()
     result = GetEmptyMobileList(Mobiles)
     result.AddRange(Mobiles.ApplyFilter(f))
     return result
 
 def _get_ghosts():
-    """Returns friendly ghosts within range."""
+    """Returns friendly ghosts within range that are currently safe to
+    resurrect (see _safe_to_help)."""
     f = Mobiles.Filter()
-    f.IsGhost  = 1
-    f.Friend   = 1
-    f.RangeMin = 0
-    f.RangeMax = 2
+    f.IsGhost      = 1
+    f.Friend       = 1
+    f.RangeMin     = 0
+    f.RangeMax     = 2
+    f.Notorieties  = GetFriendlyNotorieties()
     result = GetEmptyMobileList(Mobiles)
     result.AddRange(Mobiles.ApplyFilter(f))
     return result
@@ -65,38 +96,38 @@ def ResurrectGhosts():
         Player.HeadMessage(colors['cyan'], 'Resurrecting %s' % ghost.Name)
         Spells.CastMagery('Resurrection')
         if Target.WaitForTarget(5000, False):
-            Target.TargetExecute(ghost)
+            _execute_safe_target(ghost.Serial, ghost.Name)
         Misc.Pause(2000)
     return True
 
 
 # ── Heal / cure ───────────────────────────────────────────────────────────────
 
-def _cast_heal_cure(serial):
+def _cast_heal_cure(serial, name):
     """Cast the best available heal+cure spell at the given serial."""
     if _has_mysticism:
         # Cleansing Winds heals and cures in one cast
         Spells.CastMysticism('Cleansing Winds')
         if Target.WaitForTarget(5000, False):
-            Target.TargetExecute(serial)
+            _execute_safe_target(serial, name)
         Misc.Pause(1700)
     else:
         Spells.CastMagery('Greater Heal')
         if Target.WaitForTarget(5000, False):
-            Target.TargetExecute(serial)
+            _execute_safe_target(serial, name)
         Misc.Pause(1700)
 
-def _cast_cure(serial):
+def _cast_cure(serial, name):
     """Cast the best available cure at the given serial."""
     if _has_mysticism:
         Spells.CastMysticism('Cleansing Winds')
         if Target.WaitForTarget(5000, False):
-            Target.TargetExecute(serial)
+            _execute_safe_target(serial, name)
         Misc.Pause(1700)
     else:
         Spells.CastMagery('Arch Cure')
         if Target.WaitForTarget(4000, False):
-            Target.TargetExecute(serial)
+            _execute_safe_target(serial, name)
         Misc.Pause(1500)
 
 def HealPets():
@@ -109,7 +140,7 @@ def HealPets():
     if Player.Poisoned:
         Player.HeadMessage(colors['cyan'], 'Curing self (%d%%)' % (
             int(float(Player.Hits) / Player.HitsMax * 100)))
-        _cast_cure(Player.Serial)
+        _cast_cure(Player.Serial, 'self')
         return True
 
     poisoned_friends = [m for m in friends if m.Poisoned]
@@ -117,7 +148,7 @@ def HealPets():
         target = min(poisoned_friends, key=lambda m: m.Hits)
         Player.HeadMessage(colors['cyan'], 'Curing %s (%d%%)' % (
             target.Name, int(float(target.Hits) / target.HitsMax * 100)))
-        _cast_cure(target.Serial)
+        _cast_cure(target.Serial, target.Name)
         return True
 
     # Priority 2: heal lowest-HP target among self + friends
@@ -132,7 +163,7 @@ def HealPets():
         Player.HeadMessage(colors['cyan'], 'Healing %s (%d%%)' % (
             name, int(float(target.Hits) / target.HitsMax * 100)))
         serial = Player.Serial if target.Serial == Player.Serial else target.Serial
-        _cast_heal_cure(serial)
+        _cast_heal_cure(serial, name)
         return True
 
     return False
@@ -149,8 +180,8 @@ def GiftOfRenewalFriends():
             Player.HeadMessage(colors['cyan'], 'Gift of Renewal on %s' % mob.Name)
             Spells.CastSpellweaving('Gift Of Renewal')
             if Target.WaitForTarget(5000, False):
-                Target.TargetExecute(mob)
-            _renewal_times[mob.Serial] = time.time()
+                if _execute_safe_target(mob.Serial, mob.Name):
+                    _renewal_times[mob.Serial] = time.time()
             Misc.Pause(1700)
 
 
@@ -166,8 +197,8 @@ def BlessFriends():
             Player.HeadMessage(colors['cyan'], 'Blessing %s' % mob.Name)
             Spells.CastMagery('Bless')
             if Target.WaitForTarget(5000, False):
-                Target.TargetExecute(mob)
-            _bless_times[mob.Serial] = time.time()
+                if _execute_safe_target(mob.Serial, mob.Name):
+                    _bless_times[mob.Serial] = time.time()
             Misc.Pause(1700)
 
 

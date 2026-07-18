@@ -29,7 +29,9 @@ def transfer_to_beetle(item, beetle_pack):
     Move item to beetle_pack.  Detects beetle-full condition by checking
     whether the item's container serial changed after the move.
 
-    Retries up to MAX_RETRIES times on server-busy rejection.
+    Retries up to MAX_RETRIES times on any failure (server-busy rejection or
+    an unmoved item — the move may have been swallowed by a queued action);
+    only reports beetle_full after all attempts fail.
 
     Input:
         item        -- Item object to transfer
@@ -60,11 +62,12 @@ def transfer_to_beetle(item, beetle_pack):
         if found.Container == beetle_pack.Serial:
             return True, False
 
-        # Item did not move — beetle is full or move was rejected
-        _log("Transfer failed (attempt %d) — beetle may be full." % (attempt + 1), colors['yellow'])
-        return False, True
+        # Item did not move — could be a queued/blocked action rather than a
+        # full beetle, so only report full after all attempts fail.
+        _log("Transfer failed (attempt %d/%d) — retrying." % (attempt + 1, MAX_RETRIES), colors['yellow'])
+        Misc.Pause(MOVE_PAUSE_MS)
 
-    _log("Transfer failed after %d retries." % MAX_RETRIES, colors['red'])
+    _log("Transfer failed after %d attempts — beetle full." % MAX_RETRIES, colors['red'])
     return False, True
 
 

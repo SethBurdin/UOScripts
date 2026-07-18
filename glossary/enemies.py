@@ -44,6 +44,20 @@ def GetEnemyNotorieties( minRange = 0, maxRange = 12 ):
         notorieties[ 'murderer' ]
     ] )
 
+def GetFriendlyNotorieties():
+    '''
+    Returns the notorieties safe to cast beneficial spells on (heal/cure/bless/
+    resurrect/etc). Casting on anything else — including 'attackable' (gray) —
+    flags the caster criminal/gray too, so this deliberately excludes it.
+    '''
+    global notorieties
+
+    return GetNotorietyList( [
+        notorieties[ 'innocent' ],
+        notorieties[ 'ally' ],
+        notorieties[ 'npc' ]
+    ] )
+
 
 def GetEnemies( Mobiles, minRange = 0, maxRange = 12, notorieties = GetEnemyNotorieties(), IgnorePartyMembers = True ):
     '''

@@ -2,15 +2,17 @@
 # Pet-kill farming at Megascorp dungeon with pack beetle gold collection.
 #
 # Flow:
-#   1. Detect pack beetle (body-ID scan).
-#   2. Detect combat pet (mount-test, skips beetle).
-#   3. Mount beetle, recall to 'megascorp' rune in the home runebook.
-#   4. Dismount, walk scorp_door waypoints → use dungeon door → walk scorp_dungeon waypoints.
-#   5. Kill loop: send pet to kill enemies; walk to each corpse, loot gold → beetle,
+#   1. Detect pack beetle (body-ID scan, mining.py style).
+#   2. If the beetle already holds gold, recall home and deposit it first.
+#   3. Detect combat pet (mount-test, skips beetle).
+#   4. Mount beetle, recall to 'megascorp' rune in the home runebook.
+#   5. Dismount, walk scorp_door waypoints → use dungeon door → walk scorp_dungeon waypoints.
+#   6. Kill loop: send pet to kill enemies; walk to each corpse, loot gold → beetle,
 #      then return to staging position (last point of scorp_dungeon waypoints).
-#      Exits when a gold transfer is rejected (beetle full).
-#   6. Walk scorp_exit waypoints to the recall point.
-#   7. Mount beetle, recall home, unload beetle to containers.
+#      Exits when a gold transfer is rejected (beetle full) or the beetle
+#      holds GOLD_BANK_THRESHOLD (60k) gold.
+#   7. Walk scorp_exit waypoints to the recall point.
+#   8. Mount beetle, recall home, unload beetle to containers.
 
 if False:
     from razorenhanced_stubs import *
@@ -51,6 +53,7 @@ IDLE_WAIT_MS      = 2000     # ms to wait when no corpses found
 
 GOLD_ITEM_ID     = 0x0EED
 GOLD_DEST_SERIAL = config.quick_dropbox   # house container to deposit gold into
+GOLD_BANK_THRESHOLD = 60000   # head home to deposit once the beetle holds this much gold
 
 STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'local', 'guardian_stats.json')
 os.makedirs(os.path.dirname(STATS_FILE), exist_ok=True)
@@ -159,30 +162,60 @@ def _walk_to(x, y):
 # ─── Beetle discovery ─────────────────────────────────────────────────────────
 
 def _find_beetle():
-    """Dismount, then scan for pack beetle by body ID with backpack fallback."""
+    """Dismount, then scan for pack beetle by body ID (mining.py style).
+    Body ID alone identifies the beetle — the Backpack layer is often not
+    cached until the pack has been opened, so requiring it here makes
+    detection fail at script start. Pack access is verified afterward by
+    _get_beetle_pack."""
     _dismount()
 
-    filt          = Mobiles.Filter()
-    filt.Enabled  = True
-    filt.RangeMax = BEETLE_SCAN_RANGE
-    filt.IsHuman  = False
+    for attempt in range(3):
+        filt          = Mobiles.Filter()
+        filt.Enabled  = True
+        filt.RangeMax = BEETLE_SCAN_RANGE
+        filt.IsHuman  = False
+        mobs = Mobiles.ApplyFilter(filt)
 
-    for mob in Mobiles.ApplyFilter(filt):
-        if mob.Serial == Player.Serial or mob.IsHuman:
-            continue
-        if mob.Body == PACK_BEETLE_BODY and mob.Backpack is not None:
-            log("Pack beetle found: %s (0x%X)." % (mob.Name, mob.Serial), colors['green'])
-            return mob
+        for mob in mobs:
+            if mob.Serial == Player.Serial or mob.IsHuman:
+                continue
+            if mob.Body == PACK_BEETLE_BODY:
+                log("Pack beetle found: %s (0x%X)." % (mob.Name, mob.Serial), colors['green'])
+                return mob
 
-    for mob in Mobiles.ApplyFilter(filt):
-        if mob.Serial == Player.Serial or mob.IsHuman:
-            continue
-        if mob.Backpack is not None:
-            log("Pack animal (fallback): %s (0x%X)." % (mob.Name, mob.Serial), colors['green'])
-            return mob
+        for mob in mobs:
+            if mob.Serial == Player.Serial or mob.IsHuman:
+                continue
+            if mob.Backpack is not None:
+                log("Pack animal (fallback): %s (0x%X)." % (mob.Name, mob.Serial), colors['green'])
+                return mob
+
+        log("No pack animal yet (scan %d/3) — retrying..." % (attempt + 1), colors['yellow'])
+        Misc.Pause(1000)
 
     log("No pack animal found within %d tiles." % BEETLE_SCAN_RANGE, colors['red'])
     return None
+
+
+def _open_container_retry(container_serial, attempts=6):
+    """Open a container, retrying on rate-limit or if contents never arrive.
+    Same pattern as bank_gold.py — a single UseItem right after a dismount or
+    recall frequently misses the contents packet."""
+    for attempt in range(1, attempts + 1):
+        Journal.Clear()
+        Items.UseItem(container_serial)
+        Misc.Pause(900)
+        if Journal.Search("You must wait"):
+            log("Rate-limited opening container (attempt %d) — waiting..." % attempt, colors['yellow'])
+            Misc.Pause(2000)
+            continue
+        if Items.WaitForContents(container_serial, 3000):
+            Misc.Pause(300)
+            return True
+        log("Contents not received (attempt %d) — retrying..." % attempt, colors['yellow'])
+        Misc.Pause(1000)
+    log("Could not load container contents (0x%X)." % container_serial, colors['red'])
+    return False
 
 
 def _get_beetle_pack(beetle):
@@ -190,10 +223,16 @@ def _get_beetle_pack(beetle):
     if pack is None:
         log("Beetle has no accessible backpack.", colors['red'])
         return None
-    Items.UseItem(pack)
-    Items.WaitForContents(pack.Serial, 3000)
-    Misc.Pause(600)
+    if not _open_container_retry(pack.Serial):
+        return None
     return pack
+
+
+def _beetle_gold_total(pack_serial):
+    total = 0
+    for item in Items.FindAllByID(GOLD_ITEM_ID, -1, pack_serial, -1):
+        total += item.Amount
+    return total
 
 # ─── Combat pet discovery ─────────────────────────────────────────────────────
 
@@ -536,20 +575,22 @@ def _drop_beetle_loot(beetle_serial):
     pack = mob.Backpack
 
     # Open beetle pack first to load its contents into the client cache
-    Items.UseItem(pack)
-    if not Items.WaitForContents(pack.Serial, 4000):
-        log("Beetle pack contents did not load.", colors['red'])
+    if not _open_container_retry(pack.Serial):
         return
-    Misc.Pause(600)
 
     dest = Items.FindBySerial(GOLD_DEST_SERIAL)
     if dest is None:
         log("Drop box (0x%X) not found." % GOLD_DEST_SERIAL, colors['red'])
         return
     # Open destination so the server registers it as an active container
-    Items.UseItem(dest)
-    Items.WaitForContents(dest.Serial, 3000)
-    Misc.Pause(600)
+    if not _open_container_retry(dest.Serial):
+        return
+
+    # Re-fetch the pack after contents arrive so .Contains is populated
+    pack = Items.FindBySerial(pack.Serial)
+    if pack is None:
+        log("Beetle pack vanished after opening.", colors['red'])
+        return
 
     total_gold = 0
     for item in list(pack.Contains or []):
@@ -580,20 +621,17 @@ def _drop_beetle_loot(beetle_serial):
     log("Beetle unloaded — %d gold deposited." % total_gold, colors['green'])
 
 
-def _startup_deposit_if_needed(beetle_serial):
-    """Check beetle pack at script start; if it has gold, deposit before heading to dungeon."""
-    mob = Mobiles.FindBySerial(beetle_serial)
-    if mob is None or mob.Backpack is None:
-        return
-    pack = mob.Backpack
-    Items.UseItem(pack)
-    Items.WaitForContents(pack.Serial, 4000)
-    Misc.Pause(600)
-    if Items.FindByID(GOLD_ITEM_ID, -1, pack.Serial) is None:
+def _startup_deposit_if_needed(beetle_serial, beetle_pack):
+    """Check beetle pack at script start; if it has gold, deposit before heading out.
+    Recalls home first — _walk_to_drop assumes the home recall landing tile, so
+    depositing from an arbitrary start position never reached the drop box."""
+    total = _beetle_gold_total(beetle_pack.Serial)
+    if total <= 0:
         log("Beetle pack empty — no startup deposit needed.", colors['green'])
         return
-    log("Beetle has leftover gold — depositing before dungeon run.", colors['yellow'])
+    log("Beetle has %d leftover gold — recalling home to deposit." % total, colors['yellow'])
     mount_beetle(beetle_serial)
+    recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME, RECALL_SETTLE_DELAY)
     _drop_beetle_loot(beetle_serial)
 
 
@@ -604,10 +642,10 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
     Send pet to kill enemies; walk to each corpse, loot gold to beetle,
     then return to (staging_x, staging_y) between corpses.
 
-    Exits when beetle is genuinely full (transfer fails even after beetle is recalled),
-    or when player dies.
+    Exits when beetle is genuinely full (transfer fails even after beetle is
+    recalled), when the beetle holds GOLD_BANK_THRESHOLD gold, or when player dies.
 
-    Returns: 'beetle_full' | 'ghost' | 'disconnected'
+    Returns: 'beetle_full' | 'gold_target' | 'ghost' | 'disconnected'
     """
     looted = set()
 
@@ -663,6 +701,12 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
                     log("Beetle full — exiting dungeon.", colors['yellow'])
                     return 'beetle_full'
                 gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+
+            total = _beetle_gold_total(beetle_pack.Serial)
+            if total >= GOLD_BANK_THRESHOLD:
+                log("Beetle holds %d gold (>= %d) — heading home to deposit." % (
+                    total, GOLD_BANK_THRESHOLD), colors['yellow'])
+                return 'gold_target'
         else:
             Misc.Pause(IDLE_WAIT_MS)
 
@@ -694,7 +738,7 @@ def main():
             break
 
         # ── Startup: deposit any leftover beetle gold before heading out ────────
-        _startup_deposit_if_needed(beetle.Serial)
+        _startup_deposit_if_needed(beetle.Serial, beetle_pack)
 
         # ── Combat pet + skill detection ─────────────────────────────────────
         if not _discover_combat_pet(beetle.Serial):
