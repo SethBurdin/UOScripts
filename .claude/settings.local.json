@@ -5,7 +5,9 @@
       "Bash(Select-Object FullName)",
       "WebSearch",
       "WebFetch(domain:razorenhanced.readthedocs.io)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "PowerShell(python -m py_compile farm_megascorp.py)",
+      "PowerShell(if \\($?\\) { \"OK\" })"
     ]
   }
 }

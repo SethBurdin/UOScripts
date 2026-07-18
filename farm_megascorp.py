@@ -4,7 +4,7 @@
 # Flow:
 #   1. Detect pack beetle (body-ID scan, mining.py style).
 #   2. If the beetle already holds gold, recall home and deposit it first.
-#   3. Detect combat pet (mount-test, skips beetle).
+#   3. Detect combat pet (nearest follower that isn't the beetle).
 #   4. Mount beetle, recall to 'megascorp' rune in the home runebook.
 #   5. Dismount, walk scorp_door waypoints → use dungeon door → walk scorp_dungeon waypoints.
 #   6. Kill loop: send pet to kill enemies; walk to each corpse, loot gold → beetle,
@@ -237,32 +237,42 @@ def _beetle_gold_total(pack_serial):
 # ─── Combat pet discovery ─────────────────────────────────────────────────────
 
 def _discover_combat_pet(beetle_serial):
-    """Mount-test nearby non-human mobiles (skipping the beetle) to lock in
-    the combat pet serial. Falls back to manual targeting."""
+    """Pick the combat pet by elimination: the beetle is already identified by
+    body ID, so the nearest remaining non-human follower is the combat pet.
+    No mount-testing — that misfires on non-mountable pets and ends in the
+    manual prompt every run. Prefers friends-list mobiles (same assumption
+    _find_pet relies on); prompts only if no candidate is found at all."""
     global _pet_serial
 
     _dismount()
 
     log("Scanning for combat pet within %d tiles..." % PET_SCAN_RANGE, colors['cyan'])
-    f          = Mobiles.Filter()
-    f.Enabled  = True
-    f.IsHuman  = False
-    f.RangeMin = 0
-    f.RangeMax = PET_SCAN_RANGE
 
-    for mob in Mobiles.ApplyFilter(f):
-        if mob.Serial in (Player.Serial, beetle_serial) or mob.IsHuman:
-            continue
-        log("Trying %s (0x%X)..." % (mob.Name, mob.Serial), colors['yellow'])
-        Mobiles.UseMobile(mob.Serial)
-        Misc.Pause(1500)
-        if Player.Mount is not None:
-            _pet_serial = mob.Serial
-            log("Combat pet locked: %s (0x%X) — dismounting." % (mob.Name, _pet_serial), colors['cyan'])
-            _dismount()
-            return True
+    def _candidates(friends_only):
+        f          = Mobiles.Filter()
+        f.Enabled  = True
+        f.IsHuman  = False
+        f.RangeMin = 0
+        f.RangeMax = PET_SCAN_RANGE
+        if friends_only:
+            f.Friend = True
+        result = []
+        for mob in Mobiles.ApplyFilter(f):
+            if mob.Serial in (Player.Serial, beetle_serial) or mob.IsHuman:
+                continue
+            if mob.Body == PACK_BEETLE_BODY:
+                continue  # another pack animal, not the fighter
+            result.append(mob)
+        return result
 
-    log("No mountable combat pet found — click your pet.", colors['yellow'])
+    candidates = _candidates(True) or _candidates(False)
+    if candidates:
+        pet = min(candidates, key=lambda m: Player.DistanceTo(m))
+        _pet_serial = pet.Serial
+        log("Combat pet locked: %s (0x%X)." % (pet.Name, _pet_serial), colors['cyan'])
+        return True
+
+    log("No combat pet found — click your pet.", colors['yellow'])
     serial = Target.PromptTarget("Click your combat pet:")
     if serial and serial != 0:
         _pet_serial = serial
