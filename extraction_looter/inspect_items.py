@@ -32,9 +32,12 @@ def is_leather(item):
 
 def is_magical(item):
     """
-    Return True if item has any magic properties beyond its base name line.
-    Uses GetPropStringList — a prop list with more than 1 entry means the
-    server sent actual magic stats (matches ELoot behavior).
+    Return True if the item's tooltip shows an artifact rarity line —
+    'Lesser Artifact' or higher (Artifact, Greater/Major/Legendary Artifact).
+
+    Plain magic-item tiers (Lesser/Minor/Greater/Major Magic Item) and
+    mundane items with extra prop lines (durability, weight, requirements)
+    are ignored — counting prop lines looted non-magical gear.
 
     Input:
         item  -- Item object
@@ -48,4 +51,7 @@ def is_magical(item):
     props = Items.GetPropStringList(item.Serial)
     if not props:
         return False
-    return len(props) > 1
+    for line in props:
+        if 'artifact' in line.lower():
+            return True
+    return False

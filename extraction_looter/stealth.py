@@ -117,7 +117,7 @@ def handle_threat(beetle_serial, poll_ms, timeout_ms, body_ids=None):
     magery = Player.GetSkillValue("Magery")
     hiding = Player.GetSkillValue("Hiding")
 
-    Misc.ClearSendQueue()
+    Misc.Pause(600)  # let any queued actions drain before mounting
     mount_beetle(beetle_serial)
 
     if magery > MAGERY_INVIS_THRESHOLD:

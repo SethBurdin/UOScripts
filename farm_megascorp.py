@@ -566,6 +566,14 @@ def _walk_to_drop():
         Misc.Pause(600)
 
 
+def _guard_then_mount(beetle_serial):
+    """Say 'all guard me' half a second before mounting so the combat pet
+    re-anchors to the player right as we mount up."""
+    Player.ChatSay("all guard me")
+    Misc.Pause(500)
+    mount_beetle(beetle_serial)
+
+
 def _ensure_beetle_nearby(beetle_serial):
     """Call beetle back and poll until it is within BEETLE_TRANSFER_RANGE tiles."""
     beetle = Mobiles.FindBySerial(beetle_serial)
@@ -650,7 +658,7 @@ def _startup_deposit_if_needed(beetle_serial, beetle_pack):
         log("Beetle pack empty — no startup deposit needed.", colors['green'])
         return
     log("Beetle has %d leftover gold — recalling home to deposit." % total, colors['yellow'])
-    mount_beetle(beetle_serial)
+    _guard_then_mount(beetle_serial)
     recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME, RECALL_SETTLE_DELAY)
     _drop_beetle_loot(beetle_serial)
 
@@ -776,7 +784,7 @@ def main():
             log("Runebook '%s' not found — stopping." % MEGASCORP_RUNEBOOK_NAME, colors['red'])
             break
 
-        mount_beetle(beetle.Serial)
+        _guard_then_mount(beetle.Serial)
         log("Recalling to '%s'..." % MEGASCORP_RUNE_NAME, colors['cyan'])
         if not travel_to_named_rune(rb, MEGASCORP_RUNE_NAME, RECALL_SETTLE_DELAY):
             log("Failed to recall to '%s' — stopping." % MEGASCORP_RUNE_NAME, colors['red'])
@@ -836,7 +844,7 @@ def main():
         log("Recalling beetle before mounting...", colors['cyan'])
         Player.ChatSay("all follow me")
         Misc.Pause(2000)
-        mount_beetle(beetle.Serial)
+        _guard_then_mount(beetle.Serial)
         log("Recalling home...", colors['cyan'])
         recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME, RECALL_SETTLE_DELAY)
 

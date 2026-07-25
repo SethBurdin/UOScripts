@@ -40,6 +40,8 @@ RETREAT_STEPS         = 4     # max tiles to step away from a close enemy
 
 FRIEND_SCAN_RANGE    = 8      # tile radius for heal/cure candidates
 RES_SCAN_RANGE       = 2      # tile radius for resurrecting player ghosts
+CLOSE_WOUNDS_RANGE   = 2      # Close Wounds only reaches 2 tiles
+BANDAGE_RANGE        = 2      # max tiles to attempt a vet bandage
 
 # Health thresholds (ratios)
 HEALTH_THRESHOLD          = 0.85   # heal below this
@@ -332,7 +334,21 @@ def _get_player_ghosts():
 
 # ─── Healing / care ───────────────────────────────────────────────────────────
 
+def _heal_range():
+    """How far the available heal actually reaches."""
+    return FRIEND_SCAN_RANGE if _has_magery else CLOSE_WOUNDS_RANGE
+
+
+def _in_heal_range(serial):
+    if serial == Player.Serial:
+        return True
+    mob = Mobiles.FindBySerial(serial)
+    return mob is not None and Player.DistanceTo(mob) <= _heal_range()
+
+
 def _cast_heal(serial, name):
+    if not _in_heal_range(serial):
+        return
     if _has_magery:
         Spells.CastMagery('Greater Heal')
     elif _has_chiv:
@@ -372,6 +388,8 @@ def resurrect_ghosts():
 def bandage_pet(pet):
     """Vet bandage runs alongside spell heals — it doesn't block casting."""
     if not _has_vet or pet is None or pet.HitsMax == 0:
+        return
+    if Player.DistanceTo(pet) > BANDAGE_RANGE:
         return
     if float(pet.Hits) / pet.HitsMax >= VET_THRESHOLD:
         return
@@ -422,7 +440,8 @@ def care_cycle(pet):
 
     bandage_pet(pet)
 
-    poisoned = [m for m in candidates if m.Poisoned]
+    poisoned = [m for m in candidates
+                if m.Poisoned and Player.DistanceTo(m) <= FRIEND_SCAN_RANGE]
     if poisoned and _has_magery:
         target = min(poisoned, key=lambda m: m.Hits)
         log("Curing %s." % target.Name, colors['cyan'])
@@ -430,7 +449,8 @@ def care_cycle(pet):
         return True
 
     damaged = [m for m in candidates
-               if m.HitsMax > 0 and float(m.Hits) / m.HitsMax < HEALTH_THRESHOLD]
+               if m.HitsMax > 0 and float(m.Hits) / m.HitsMax < HEALTH_THRESHOLD
+               and Player.DistanceTo(m) <= _heal_range()]
     if Player.HitsMax > 0 and float(Player.Hits) / Player.HitsMax < HEALTH_THRESHOLD:
         damaged.append(Player)
     if damaged:

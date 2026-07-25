@@ -67,7 +67,21 @@ FARM_LOCATIONS = [
     'ancient',        # Ancient Wyrms
     'titans',         # Titans
     'greater dragon', # Greater Dragons
+    'megascorp',      # Megascorp dungeon (door entry)
 ]
+
+# Dungeon-entry sequences (farm_megascorp style). After recalling to the rune:
+# dismount, beetle follows, walk to the door, use it, walk inside to the loot
+# zone. On the way home, walk the exit waypoints back to the recall point.
+DOOR_WAIT_MS = 1500   # ms to wait after using a dungeon door
+LOCATION_DUNGEON_ENTRY = {
+    'megascorp': {
+        'door_serial': 0x4001A734,
+        'wp_door':     'scorp_door.json',
+        'wp_dungeon':  'scorp_dungeon.json',
+        'wp_exit':     'scorp_exit.json',
+    },
+}
 
 # Per-location hostile range overrides (tiles). Falls back to HOSTILE_RANGE if absent.
 LOCATION_HOSTILE_RANGE = {
@@ -113,12 +127,17 @@ def _prompt_farm_location():
     Misc.Pause(200)
     Journal.Clear()
 
+    # Check multi-digit options first: SearchByName is a substring match, so
+    # saying "10" would otherwise hit the "1" check and select option 1.
+    indices = sorted(range(len(FARM_LOCATIONS)),
+                     key=lambda i: len(str(i + 1)), reverse=True)
+
     deadline = time.time() + 30
     while time.time() < deadline:
-        for i, loc in enumerate(FARM_LOCATIONS):
+        for i in indices:
             if Journal.SearchByName(str(i + 1), Player.Name):
                 Journal.Clear()
-                return loc
+                return FARM_LOCATIONS[i]
         Misc.Pause(200)
 
     log("No location selected (30s timeout).", colors['red'])
@@ -130,6 +149,44 @@ def _dismount():
     if Player.Mount is not None:
         Mobiles.UseMobile(Player.Serial)
         Misc.Pause(1500)
+
+
+def _walk_named_waypoints(filename, label):
+    """Walk a waypoints file from _WAYPOINTS_DIR, starting at the nearest point.
+    No-op with a warning if the file is missing."""
+    path = os.path.join(_WAYPOINTS_DIR, filename)
+    wps = load_waypoints(path) if os.path.exists(path) else None
+    if not wps:
+        log("No %s — skipping %s walk." % (filename, label), colors['yellow'])
+        return
+    log("Walking %s waypoints (%d points)..." % (label, len(wps)), colors['cyan'])
+    start_idx, _ = nearest_waypoint_index(wps)
+    walk_waypoints(wps, start_idx)
+
+
+def _enter_dungeon(farm_rune):
+    """Megascorp-style dungeon entry: dismount, beetle follows, walk to the
+    door, use it, then walk inside to the loot zone."""
+    entry = LOCATION_DUNGEON_ENTRY[farm_rune]
+    _dismount()
+    # Beetle must tail us through the door and dungeon walk
+    Player.ChatSay("all follow me")
+    Misc.Pause(500)
+    _walk_named_waypoints(entry['wp_door'], 'door')
+    log("Using dungeon door (0x%X)..." % entry['door_serial'], colors['cyan'])
+    Items.UseItem(entry['door_serial'])
+    Misc.Pause(DOOR_WAIT_MS)
+    _walk_named_waypoints(entry['wp_dungeon'], 'dungeon')
+
+
+def _exit_dungeon(farm_rune, beetle_serial):
+    """Walk the exit waypoints back to the recall point, then mount the beetle
+    so it recalls home with us."""
+    entry = LOCATION_DUNGEON_ENTRY[farm_rune]
+    _walk_named_waypoints(entry['wp_exit'], 'exit')
+    Player.ChatSay("all follow me")
+    Misc.Pause(2000)
+    mount_beetle(beetle_serial)
 
 
 def _find_beetle():
@@ -620,7 +677,11 @@ def main():
         if not recall_to_farm(farm_rune, FARM_RUNEBOOK_NAME):
             log("Failed to recall to farm — stopping.", colors['red'])
             return
+        if farm_rune in LOCATION_DUNGEON_ENTRY:
+            _enter_dungeon(farm_rune)
         _skinning_loop(beetle, beetle_pack)
+        if farm_rune in LOCATION_DUNGEON_ENTRY:
+            _exit_dungeon(farm_rune, beetle.Serial)
         recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME)
         unload_beetle_to_containers(beetle_pack)
         return
@@ -640,6 +701,10 @@ def main():
     if not recall_to_farm(farm_rune, FARM_RUNEBOOK_NAME):
         log("Failed to recall to farm — stopping.", colors['red'])
         return
+
+    # ── Dungeon entry (megascorp-style door walk) ─────────────────────────────
+    if farm_rune in LOCATION_DUNGEON_ENTRY:
+        _enter_dungeon(farm_rune)
 
     # ── Walk waypoints to loot zone ───────────────────────────────────────────
     waypoints_file = os.path.join(_WAYPOINTS_DIR, 'waypoints_%s.json' % farm_rune)
@@ -669,7 +734,9 @@ def main():
         log("Threat timeout — returning home.", colors['red'])
 
     # ── Return home via Home runebook ─────────────────────────────────────────
-    if waypoints:
+    if farm_rune in LOCATION_DUNGEON_ENTRY:
+        _exit_dungeon(farm_rune, beetle.Serial)
+    elif waypoints:
         log("Walking reverse waypoints back...", colors['cyan'])
         reversed_wps = list(reversed(waypoints))
         start_idx, _ = nearest_waypoint_index(reversed_wps)
