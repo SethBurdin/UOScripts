@@ -1,13 +1,22 @@
-# explorer.py
-# Dungeon-crawl combat assistant. You drive the movement; the script keeps the
-# pet leashed, keeps the player/pet/friends alive, and fights with whatever
-# skills the character actually has (weapon skill, Chivalry, Magery, Vet, ...).
+# explorer_followbob.py
+# Variant of explorer.py: instead of the player driving movement, the player
+# auto-follows a named character (default "Bob") around the dungeon while the
+# same pet-leash/kill, heal, and combat-assist logic from explorer.py runs.
+# Change FOLLOW_NAME below to follow someone else.
 #
-# Startup (all answered in game chat):
+# NOTE: since the player is no longer walked manually, weapon-skill melee
+# attacks only land when the leader (or a retreat step / the pet's fight)
+# happens to bring the player into striking range — magery/chivalry/pet
+# damage still work at range regardless. Following pauses automatically
+# while an enemy is on top of the player, so it won't drag you out of a
+# fight the pet is already in.
+#
+# Startup (all answered in game chat, except the two clicks):
 #   1. Say a name for the location — only used to tag the gold/hr stats entry.
 #   2. Say 1 (leash: pet guards you, fights what reaches you) or
 #      2 (kill: pet is sent at the nearest enemy in scan range).
-#   3. Click your pet when prompted.
+#   3. Click Bob (the character to follow) when prompted.
+#   4. Click your pet when prompted.
 #
 # Say 'bank' (normal or party chat — party members can trigger it too) to
 # recall home, deposit gold/loot, log gold/hr to local/guardian_stats.json,
@@ -85,11 +94,19 @@ TRANSFER_ITEMS = [
     0x0F26, 0x0F25, 0x0F0F, 0x0F10, 0x0F15, 0x0F11, 0x0F13, 0x0F18, 0x0F16,  # gems
 ]
 
+# Follow-the-leader (this variant only)
+FOLLOW_NAME              = "bob"  # case-insensitive; change to follow someone else
+FOLLOW_RANGE             = 3      # tiles — stop pathing once this close to the leader
+FOLLOW_LOST_RANGE        = 30     # tiles — max distance the leader can be and still be tracked
+FOLLOW_PATH_TIMEOUT_MS   = 1200   # max ms spent pathfinding toward the leader per tick
+FOLLOW_WARN_INTERVAL_SEC = 10.0   # seconds between "leader not found" log spam
+
 STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "local/guardian_stats.json")
 os.makedirs(os.path.dirname(STATS_FILE), exist_ok=True)
 
 # ─── State ────────────────────────────────────────────────────────────────────
 _pet_serial      = None
+_leader_serial   = None
 _session_start   = None
 _session_gold    = 0
 _location_label  = "explorer"
@@ -107,6 +124,7 @@ _last_follow_cmd  = 0.0
 _last_guard_cmd   = 0.0
 _last_whisper     = 0.0
 _last_med_attempt = 0.0
+_last_leader_warn = 0.0
 _kill_times       = {}     # { enemy_serial: timestamp } — throttle repeated kill commands
 _skip_serials     = set()  # enemies that returned "Target cannot be seen."
 _attacking_serial = None
@@ -114,7 +132,7 @@ _kill_target      = None   # serial the pet was last sent to kill; guard is re-i
 
 
 def log(msg, color=68):
-    Misc.SendMessage("[explorer] " + msg, color)
+    Misc.SendMessage("[explorer-bob] " + msg, color)
 
 
 # ─── Safe targeting ───────────────────────────────────────────────────────────
@@ -331,6 +349,84 @@ def find_pet():
     if mob is not None and Player.DistanceTo(mob) <= ENEMY_SCAN_RANGE * 2:
         return mob
     return None
+
+
+# ─── Leader discovery / following ─────────────────────────────────────────────
+
+def _scan_for_leader():
+    """Name match (case-insensitive) among nearby mobiles."""
+    f = Mobiles.Filter()
+    f.Enabled  = True
+    f.RangeMin = 0
+    f.RangeMax = FOLLOW_LOST_RANGE
+    for mob in Mobiles.ApplyFilter(f):
+        if mob.Serial == Player.Serial:
+            continue
+        if mob.Name and mob.Name.strip().lower() == FOLLOW_NAME.lower():
+            return mob
+    return None
+
+
+def discover_leader():
+    """Locks onto the character to follow. Click them when prompted; if the
+    prompt times out (or the target isn't right), falls back to a name scan
+    of nearby mobiles."""
+    global _leader_serial
+    log("Click %s (the character to follow)..." % FOLLOW_NAME, colors['cyan'])
+    serial = Target.PromptTarget("Click %s:" % FOLLOW_NAME)
+    if serial and serial != 0:
+        mob = Mobiles.FindBySerial(serial)
+        if mob is not None and mob.Serial != Player.Serial:
+            _leader_serial = mob.Serial
+            log("Following: %s (0x%X)" % (mob.Name, _leader_serial), colors['cyan'])
+            return True
+        log("That target isn't valid.", colors['yellow'])
+
+    mob = _scan_for_leader()
+    if mob is not None:
+        _leader_serial = mob.Serial
+        log("Found %s nearby by name: 0x%X" % (mob.Name, _leader_serial), colors['cyan'])
+        return True
+    return False
+
+
+def find_leader():
+    if _leader_serial is None:
+        return None
+    mob = Mobiles.FindBySerial(_leader_serial)
+    if mob is not None and Player.DistanceTo(mob) <= FOLLOW_LOST_RANGE:
+        return mob
+    return None
+
+
+def follow_leader(leader, pet, enemies):
+    """Keeps the player near the leader by pathfinding toward them each tick.
+    Bounded to FOLLOW_PATH_TIMEOUT_MS so it never stalls the loop for long —
+    the next tick just resumes the walk. Paused whenever the player is in
+    range of the fight (same check player_combat uses to engage), so it
+    doesn't drag the player off mid-combat."""
+    global _last_leader_warn
+
+    if _player_engaged(pet, enemies):
+        return
+
+    if leader is None:
+        if time.time() - _last_leader_warn > FOLLOW_WARN_INTERVAL_SEC:
+            log("%s not in range — holding position." % FOLLOW_NAME, colors['yellow'])
+            _last_leader_warn = time.time()
+        return
+
+    if Player.DistanceTo(leader) <= FOLLOW_RANGE:
+        return
+
+    pos = leader.Position
+    Player.PathFindTo(pos.X, pos.Y, pos.Z)
+    deadline = time.time() + FOLLOW_PATH_TIMEOUT_MS / 1000.0
+    while time.time() < deadline:
+        cur = Mobiles.FindBySerial(leader.Serial)
+        if cur is None or Player.DistanceTo(cur) <= FOLLOW_RANGE:
+            return
+        Misc.Pause(200)
 
 
 # ─── Friend / ghost scans ─────────────────────────────────────────────────────
@@ -650,6 +746,21 @@ def cast_energy_bolt(enemy):
     Misc.Pause(600)
 
 
+def _player_engaged(pet, enemies):
+    """True once the fight is actually joined — pet engaged with the nearest
+    enemy, or that enemy is on the player. Shared by player_combat (to decide
+    whether to attack) and follow_leader (to decide whether to hold position
+    instead of walking toward the leader)."""
+    if not enemies:
+        return False
+    nearest = min(enemies, key=lambda e: Player.DistanceTo(e))
+    pet_engaged = pet is not None and max(
+        abs(pet.Position.X - nearest.Position.X),
+        abs(pet.Position.Y - nearest.Position.Y),
+    ) <= KILL_ENGAGE_RANGE + 2
+    return pet_engaged or Player.DistanceTo(nearest) <= GUARD_TRIGGER_RANGE
+
+
 def player_combat(pet, enemies):
     """Attack/cast only once the fight is actually joined — pet engaged or the
     enemy is on the player — so ranged attacks don't pull fresh aggro."""
@@ -658,11 +769,7 @@ def player_combat(pet, enemies):
         _attacking_serial = None
         return
     nearest = min(enemies, key=lambda e: Player.DistanceTo(e))
-    pet_engaged = pet is not None and max(
-        abs(pet.Position.X - nearest.Position.X),
-        abs(pet.Position.Y - nearest.Position.Y),
-    ) <= KILL_ENGAGE_RANGE + 2
-    if not pet_engaged and Player.DistanceTo(nearest) > GUARD_TRIGGER_RANGE:
+    if not _player_engaged(pet, enemies):
         return
     if not _safe_to_attack(nearest.Serial):
         return
@@ -706,7 +813,7 @@ def _append_gold_stat(gold_this_trip):
         "rune":          _location_label,
         "time":          time.strftime("%Y-%m-%d %H:%M:%S"),
         "gold_per_hour": gph,
-        "script":        "explorer",
+        "script":        "explorer_followbob",
     }
     try:
         with open(STATS_FILE, "r") as f:
@@ -824,7 +931,7 @@ def shutdown():
 
 
 def main():
-    global _session_start, _session_gold, _location_label, _kill_mode
+    global _session_start, _session_gold, _location_label, _kill_mode, _leader_serial
     _session_start = time.time()
     _session_gold  = 0
 
@@ -833,6 +940,10 @@ def main():
 
     _kill_mode = _prompt_kill_mode()
     log("Pet mode: %s" % _kill_mode, colors['cyan'])
+
+    if not discover_leader():
+        log("%s not found — stopping." % FOLLOW_NAME, colors['red'])
+        return
 
     if not discover_pet():
         log("No pet found — stopping.", colors['red'])
@@ -843,7 +954,8 @@ def main():
     if find_runebook_by_label(HOME_RUNEBOOK_NAME) is None:
         log("Warning: no '%s' runebook in backpack — 'bank' will fail." % HOME_RUNEBOOK_NAME, colors['yellow'])
 
-    log("Explorer started (mode=%s). Walk the dungeon — I'll keep up." % _kill_mode, colors['cyan'])
+    log("Explorer started (mode=%s). Following %s — I'll keep up and fight." % (
+        _kill_mode, FOLLOW_NAME), colors['cyan'])
     log("Say 'bank' (self or party chat) to deposit and stop.", colors['cyan'])
     Journal.Clear()
     Player.ChatSay("all follow me")
@@ -865,6 +977,15 @@ def main():
             pet = find_pet()
             if pet is None:
                 log("Pet not in range.", colors['yellow'])
+
+            leader = find_leader()
+            if leader is None:
+                # Try a name-based reacquire — the leader may just have moved
+                # out of tracking range and come back, or been re-logged.
+                reacquired = _scan_for_leader()
+                if reacquired is not None:
+                    _leader_serial = reacquired.Serial
+                    leader = reacquired
 
             # Runs even when the pet is out of detection range — that's exactly
             # when it's off on a kill and needs the guard recall.
@@ -892,6 +1013,7 @@ def main():
             player_combat(pet, enemies)
 
             manage_mana()
+            follow_leader(leader, pet, enemies)
             Misc.Pause(CHECK_INTERVAL)
     finally:
         shutdown()
