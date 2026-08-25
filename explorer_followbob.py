@@ -22,6 +22,11 @@
 # recall home, deposit gold/loot, log gold/hr to local/guardian_stats.json,
 # and stop.  Hitting the weight threshold banks-and-stops the same way, since
 # deep dungeon spots usually can't be recalled back into.
+#
+# Exception: if the clicked pet is a pack beetle (body 0x0317) the weight
+# threshold offloads gold into its pack and the run continues; that gold is
+# deposited on the next bank run. Any other pet has no container, so gold
+# never gets handed to it — the threshold just banks.
 
 if False:
     from razorenhanced_stubs import *
@@ -34,6 +39,7 @@ from glossary.colors import colors
 from glossary.enemies import GetEnemies, GetFriendlyNotorieties
 from glossary.runebook_handler import find_runebook_by_label, travel_to_named_rune
 from utilities.mobiles import GetEmptyMobileList
+from extraction_looter.containers_util import transfer_to_beetle
 
 # ─── Config ───────────────────────────────────────────────────────────────────
 CHECK_INTERVAL       = 1500   # ms between main loop ticks
@@ -81,6 +87,9 @@ WHISPER_INTERVAL_SEC = 1800
 # Banking (same house setup as guardian.py)
 WEIGHT_BANK_THRESHOLD = 0.90
 GOLD_DEST_SERIAL      = config.quick_dropbox
+PACK_BEETLE_BODY      = 0x0317   # only this body has a pack we can offload gold into
+BEETLE_OFFLOAD_RANGE  = 3        # tiles — beetle must be this close for Items.Move to succeed
+BEETLE_RECALL_MS      = 2000     # ms to wait after "all follow me" when the beetle is too far
 HOME_RUNEBOOK_NAME    = "home"
 HOME_RUNE_NAME        = "new home"
 RECALL_SETTLE_DELAY   = 2000
@@ -98,7 +107,12 @@ TRANSFER_ITEMS = [
 FOLLOW_NAME              = "bob"  # case-insensitive; change to follow someone else
 FOLLOW_RANGE             = 3      # tiles — stop pathing once this close to the leader
 FOLLOW_LOST_RANGE        = 30     # tiles — max distance the leader can be and still be tracked
-FOLLOW_PATH_TIMEOUT_MS   = 1200   # max ms spent pathfinding toward the leader per tick
+FOLLOW_PATH_TIMEOUT_MS   = 6000   # overall ms bound per follow attempt (lets stuck-retries run)
+FOLLOW_POLL_MS           = 100    # ms between position checks while pathing
+FOLLOW_STUCK_LIMIT_MS    = 1200   # ms with no movement before treating the path as stuck
+FOLLOW_MAX_RETRIES       = 2      # re-issue the path this many times before giving up
+FOLLOW_LOST_SIGHT_GRACE_MS = 3000 # ms to tolerate the leader being unresolvable, as long as we're still moving
+FOLLOW_GIVEUP_COOLDOWN_SEC = 5.0  # after giving up, stop trying to path to the leader for this long
 FOLLOW_WARN_INTERVAL_SEC = 10.0   # seconds between "leader not found" log spam
 
 STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "local/guardian_stats.json")
@@ -106,6 +120,7 @@ os.makedirs(os.path.dirname(STATS_FILE), exist_ok=True)
 
 # ─── State ────────────────────────────────────────────────────────────────────
 _pet_serial      = None
+_pet_is_beetle   = False   # True only when the locked pet's body is PACK_BEETLE_BODY
 _leader_serial   = None
 _session_start   = None
 _session_gold    = 0
@@ -125,6 +140,7 @@ _last_guard_cmd   = 0.0
 _last_whisper     = 0.0
 _last_med_attempt = 0.0
 _last_leader_warn = 0.0
+_last_follow_giveup = 0.0  # throttles re-attempts after a path to the leader failed/stalled
 _kill_times       = {}     # { enemy_serial: timestamp } — throttle repeated kill commands
 _skip_serials     = set()  # enemies that returned "Target cannot be seen."
 _attacking_serial = None
@@ -308,6 +324,23 @@ def _prompt_kill_mode():
     return 'leash'
 
 
+def _classify_pet(mob):
+    """Record whether the locked pet is a pack beetle. Body ID alone decides —
+    the Backpack layer is often not cached until the pack has been opened, so
+    testing mob.Backpack here would mislabel a real beetle as container-less.
+    Any other body (dragon, mare, ...) has no pack, so gold stays on us and the
+    weight threshold banks instead."""
+    global _pet_is_beetle
+    _pet_is_beetle = mob.Body == PACK_BEETLE_BODY
+    if _pet_is_beetle:
+        log("Pet is a pack beetle — gold will offload to its pack when heavy.",
+            colors['green'])
+    else:
+        log("Pet body 0x%X is not a pack beetle — no pack to offload into; "
+            "will bank at %.0f%% weight." % (mob.Body, WEIGHT_BANK_THRESHOLD * 100),
+            colors['yellow'])
+
+
 def discover_pet():
     """Explorer can start mid-dungeon, so no mount-testing random mobiles —
     the player clicks the pet directly, with a nearest-friend fallback."""
@@ -319,6 +352,7 @@ def discover_pet():
         if mob is not None and not mob.IsHuman and mob.Serial != Player.Serial:
             _pet_serial = mob.Serial
             log("Pet locked: %s (0x%X)" % (mob.Name, _pet_serial), colors['cyan'])
+            _classify_pet(mob)
             return True
         log("That target isn't a usable pet.", colors['yellow'])
 
@@ -338,6 +372,7 @@ def discover_pet():
     if nearest is not None:
         _pet_serial = nearest.Serial
         log("Pet locked from friend list: %s (0x%X)" % (nearest.Name, _pet_serial), colors['cyan'])
+        _classify_pet(nearest)
         return True
     return False
 
@@ -391,21 +426,121 @@ def discover_leader():
 
 
 def find_leader():
+    """Fetches the leader by serial. No distance gate here — RazorEnhanced's
+    own object cache already drops mobiles once they're truly out of range,
+    so an extra fixed-tile cutoff on top of that only meant giving up on a
+    leader who was simply sprinting ahead but still tracked client-side."""
     if _leader_serial is None:
         return None
-    mob = Mobiles.FindBySerial(_leader_serial)
-    if mob is not None and Player.DistanceTo(mob) <= FOLLOW_LOST_RANGE:
-        return mob
-    return None
+    return Mobiles.FindBySerial(_leader_serial)
+
+
+def _walk_to_mobile(mobile, max_range):
+    """Pathfinds toward a mobile without stalling — routes to the nearest
+    adjacent tile rather than the mobile's own tile, since a mobile occupies
+    its tile and PathFinding.Go stalls immediately if routed straight at it
+    (same fix used in wool_collector.py's MoveToSheep).
+
+    Detects being stuck (no movement for FOLLOW_STUCK_LIMIT_MS) and re-issues
+    the path up to FOLLOW_MAX_RETRIES times before giving up, all bounded by
+    FOLLOW_PATH_TIMEOUT_MS overall. Returns True once within max_range, False
+    if it gave up, the leader stayed unresolvable past FOLLOW_LOST_SIGHT_GRACE_MS,
+    or the player died/disconnected — callers should back off rather than call
+    this again immediately.
+
+    A leader who sprints out of the client's sight range makes
+    Mobiles.FindBySerial() return None even though they haven't actually
+    "disappeared" — they're just temporarily out of view. That's tolerated as
+    long as the player's own position keeps changing (i.e. we're still
+    walking the last route toward their last-known spot); only a leader
+    that's unresolvable *and* our own movement has stalled counts as lost."""
+    if Player.DistanceTo(mobile) <= max_range:
+        return True
+
+    def _go(pos):
+        px, py = Player.Position.X, Player.Position.Y
+        best_x, best_y, best_dist = pos.X, pos.Y, 9999
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            tx, ty = pos.X + dx, pos.Y + dy
+            d = abs(tx - px) + abs(ty - py)
+            if d < best_dist:
+                best_dist = d
+                best_x, best_y = tx, ty
+        route = PathFinding.Route()
+        route.X = best_x
+        route.Y = best_y
+        route.DebugMessage = False
+        route.StopIfStuck = True
+        PathFinding.Go(route)
+
+    fresh = Mobiles.FindBySerial(mobile.Serial)
+    if fresh is None:
+        return False
+    _go(fresh.Position)
+
+    deadline      = time.time() + FOLLOW_PATH_TIMEOUT_MS / 1000.0
+    last_pos      = Player.Position
+    stuck_ms      = 0
+    stuck_retries = 0
+    lost_ms       = 0   # how long the leader has been unresolvable
+
+    while time.time() < deadline:
+        if not Player.Connected or Player.IsGhost:
+            return False
+
+        fresh   = Mobiles.FindBySerial(mobile.Serial)
+        cur_pos = Player.Position
+        moved   = cur_pos.X != last_pos.X or cur_pos.Y != last_pos.Y
+
+        if fresh is None:
+            # Out of sight, not necessarily gone — keep going as long as we're
+            # still making our own progress toward their last-known position.
+            if moved:
+                lost_ms  = 0
+                last_pos = cur_pos
+            else:
+                lost_ms += FOLLOW_POLL_MS
+                if lost_ms >= FOLLOW_LOST_SIGHT_GRACE_MS:
+                    return False
+            Misc.Pause(FOLLOW_POLL_MS)
+            continue
+
+        lost_ms = 0
+        if Player.DistanceTo(fresh) <= max_range:
+            return True
+
+        if moved:
+            stuck_ms      = 0
+            stuck_retries = 0
+            last_pos      = cur_pos
+        else:
+            stuck_ms += FOLLOW_POLL_MS
+            if stuck_ms >= FOLLOW_STUCK_LIMIT_MS:
+                stuck_ms = 0
+                stuck_retries += 1
+                if stuck_retries >= FOLLOW_MAX_RETRIES:
+                    return False   # path is genuinely blocked — let the caller back off
+                _go(fresh.Position)
+
+        Misc.Pause(FOLLOW_POLL_MS)
+
+    fresh = Mobiles.FindBySerial(mobile.Serial)
+    return fresh is not None and Player.DistanceTo(fresh) <= max_range
 
 
 def follow_leader(leader, pet, enemies):
     """Keeps the player near the leader by pathfinding toward them each tick.
-    Bounded to FOLLOW_PATH_TIMEOUT_MS so it never stalls the loop for long —
-    the next tick just resumes the walk. Paused whenever the player is in
-    range of the fight (same check player_combat uses to engage), so it
-    doesn't drag the player off mid-combat."""
-    global _last_leader_warn
+    Paused whenever the player is in range of the fight (same check
+    player_combat uses to engage), so it doesn't drag the player off
+    mid-combat. If the path to the leader is genuinely blocked, backs off for
+    FOLLOW_GIVEUP_COOLDOWN_SEC instead of hammering pathfinding every tick —
+    that repeated-retry loop is what looked like a lockup. A failed attempt
+    also triggers a fresh name-scan for the leader: find_leader() only
+    reacquires when the tracked serial goes completely unresolvable, but a
+    stuck path more often means the cached mobile is still "found" — just
+    behind something, or its last-known position is stale — so re-scanning
+    here can pick up a fresher/reachable reference."""
+    global _last_leader_warn, _last_follow_giveup, _leader_serial
 
     if _player_engaged(pet, enemies):
         return
@@ -419,14 +554,17 @@ def follow_leader(leader, pet, enemies):
     if Player.DistanceTo(leader) <= FOLLOW_RANGE:
         return
 
-    pos = leader.Position
-    Player.PathFindTo(pos.X, pos.Y, pos.Z)
-    deadline = time.time() + FOLLOW_PATH_TIMEOUT_MS / 1000.0
-    while time.time() < deadline:
-        cur = Mobiles.FindBySerial(leader.Serial)
-        if cur is None or Player.DistanceTo(cur) <= FOLLOW_RANGE:
-            return
-        Misc.Pause(200)
+    if time.time() - _last_follow_giveup < FOLLOW_GIVEUP_COOLDOWN_SEC:
+        return
+
+    if not _walk_to_mobile(leader, FOLLOW_RANGE):
+        log("Can't reach %s — waiting %.0fs before retrying." % (
+            FOLLOW_NAME, FOLLOW_GIVEUP_COOLDOWN_SEC), colors['yellow'])
+        _last_follow_giveup = time.time()
+        rescanned = _scan_for_leader()
+        if rescanned is not None and rescanned.Serial != leader.Serial:
+            log("Reacquired %s at a different mobile — will retry with that one." % FOLLOW_NAME, colors['cyan'])
+            _leader_serial = rescanned.Serial
 
 
 # ─── Friend / ghost scans ─────────────────────────────────────────────────────
@@ -859,6 +997,48 @@ def transfer_gold():
     return total
 
 
+def unload_beetle_gold():
+    """Deposit gold parked in the beetle's pack into the drop box. No-op for a
+    non-beetle pet (nothing was ever put there) or when the beetle didn't make
+    the trip home — in that case the gold stays safe in its pack until the next
+    bank run, so this only warns."""
+    if not _pet_is_beetle:
+        return 0
+
+    pet = find_pet()
+    if pet is None:
+        log("Beetle not here — its gold stays in the pack.", colors['yellow'])
+        return 0
+
+    dest = Items.FindBySerial(GOLD_DEST_SERIAL)
+    if dest is None:
+        log("Gold destination (0x%X) not found — beetle not unloaded." % GOLD_DEST_SERIAL,
+            colors['red'])
+        return 0
+
+    pack = _get_pet_pack(pet)
+    if pack is None:
+        log("Beetle pack not accessible — beetle not unloaded.", colors['yellow'])
+        return 0
+
+    total = 0
+    gold  = Items.FindByID(GOLD_ITEM_ID, -1, pack.Serial)
+    while gold is not None:
+        amount = gold.Amount
+        Items.Move(gold, dest, amount)
+        Misc.Pause(800)
+        # Still in the pack with the same serial means the move was rejected
+        still = Items.FindByID(GOLD_ITEM_ID, -1, pack.Serial)
+        if still is not None and still.Serial == gold.Serial:
+            log("Gold move from beetle rejected — stopping unload.", colors['yellow'])
+            break
+        total += amount
+        gold = still
+    if total:
+        log("Deposited %d gold from the beetle." % total, colors['cyan'])
+    return total
+
+
 def _restock_bandages():
     if not _has_vet:
         return
@@ -895,6 +1075,7 @@ def do_banking():
         return False
     _walk_to_drop()
     gold = transfer_gold()
+    gold += unload_beetle_gold()
     transfer_loot_to_chest()
     _restock_bandages()
     if gold:
@@ -915,6 +1096,62 @@ def _weight_heavy():
     if Player.MaxWeight == 0:
         return False
     return float(Player.Weight) / Player.MaxWeight >= WEIGHT_BANK_THRESHOLD
+
+
+def _get_pet_pack(pet):
+    """Open the pet's pack and return it. Only meaningful for a pack beetle;
+    the pack must be opened before Items.Move into it will land."""
+    pack = pet.Backpack
+    if pack is None:
+        return None
+    Items.UseItem(pack)
+    Items.WaitForContents(pack.Serial, 3000)
+    Misc.Pause(600)
+    return pack
+
+
+def offload_gold_to_pet():
+    """Move all backpack gold into the pet's pack so the run can continue past
+    the weight threshold. Only ever runs for a pack beetle — every other pet
+    body has no container, and dropping gold on a container-less pet silently
+    fails (or worse, drops it on the ground).
+
+    Returns True if gold moved and we're back under the weight threshold."""
+    if not _pet_is_beetle:
+        return False
+
+    pet = find_pet()
+    if pet is None:
+        log("Beetle not in range to offload gold.", colors['yellow'])
+        return False
+
+    if Player.DistanceTo(pet) > BEETLE_OFFLOAD_RANGE:
+        Player.ChatSay("all follow me")
+        Misc.Pause(BEETLE_RECALL_MS)
+        pet = find_pet()
+        if pet is None or Player.DistanceTo(pet) > BEETLE_OFFLOAD_RANGE:
+            log("Beetle too far to offload gold — banking instead.", colors['yellow'])
+            return False
+
+    pack = _get_pet_pack(pet)
+    if pack is None:
+        log("Beetle pack not accessible — banking instead.", colors['yellow'])
+        return False
+
+    moved = 0
+    gold  = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+    while gold is not None:
+        amount = gold.Amount
+        _, full = transfer_to_beetle(gold, pack)
+        if full:
+            log("Beetle pack full — banking instead.", colors['yellow'])
+            break
+        moved += amount
+        gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+
+    if moved:
+        log("Offloaded %d gold to the beetle." % moved, colors['green'])
+    return moved > 0 and not _weight_heavy()
 
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
@@ -969,10 +1206,15 @@ def main():
                 break
 
             if _weight_heavy():
-                log("Weight at %.0f%% — banking and stopping." % (
-                    float(Player.Weight) / Player.MaxWeight * 100), colors['yellow'])
-                do_banking()
-                break
+                # A pack beetle can take the gold and keep us out here; any
+                # other pet has no container, so the only option is to bank.
+                if offload_gold_to_pet():
+                    log("Weight relieved by the beetle — continuing.", colors['green'])
+                else:
+                    log("Weight at %.0f%% — banking and stopping." % (
+                        float(Player.Weight) / Player.MaxWeight * 100), colors['yellow'])
+                    do_banking()
+                    break
 
             pet = find_pet()
             if pet is None:

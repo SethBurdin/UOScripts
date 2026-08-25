@@ -2,7 +2,8 @@
 # Pet-kill farming at Megascorp dungeon with pack beetle gold collection.
 #
 # Flow:
-#   1. Detect pack beetle (body-ID scan, mining.py style).
+#   1. Detect pack beetle (body-ID scan, mining.py style). A non-beetle pet is
+#      still used as mount and fighter, but never receives gold — see step 6.
 #   2. If the beetle already holds gold, recall home and deposit it first.
 #   3. The beetle is also the combat pet — lock its serial directly.
 #   4. Mount beetle, recall to 'megascorp' rune in the home runebook.
@@ -10,7 +11,8 @@
 #   6. Kill loop: send pet to kill enemies; walk to each corpse, loot gold → beetle,
 #      then return to staging position (last point of scorp_dungeon waypoints).
 #      Exits when a gold transfer is rejected (beetle full) or the beetle
-#      holds GOLD_BANK_THRESHOLD (60k) gold.
+#      holds GOLD_BANK_THRESHOLD (60k) gold. Without a beetle, gold stays in
+#      the player's backpack and the run exits at TRANSFER_WEIGHT_THRESHOLD.
 #   7. Walk scorp_exit waypoints to the recall point.
 #   8. Mount beetle, recall home, unload beetle to containers.
 
@@ -169,7 +171,11 @@ def _find_beetle():
     Body ID alone identifies the beetle — the Backpack layer is often not
     cached until the pack has been opened, so requiring it here makes
     detection fail at script start. Pack access is verified afterward by
-    _get_beetle_pack."""
+    _get_beetle_pack.
+
+    Returns (mob, is_beetle). The fallback mob is only a mount and combat pet:
+    a non-beetle body has no pack we can rely on, so gold is never handed to it
+    — the run banks at TRANSFER_WEIGHT_THRESHOLD instead."""
     _dismount()
 
     for attempt in range(3):
@@ -184,20 +190,23 @@ def _find_beetle():
                 continue
             if mob.Body == PACK_BEETLE_BODY:
                 log("Pack beetle found: %s (0x%X)." % (mob.Name, mob.Serial), colors['green'])
-                return mob
+                return mob, True
 
         for mob in mobs:
             if mob.Serial == Player.Serial or mob.IsHuman:
                 continue
             if mob.Backpack is not None:
-                log("Pack animal (fallback): %s (0x%X)." % (mob.Name, mob.Serial), colors['green'])
-                return mob
+                log("Non-beetle pet (fallback): %s (0x%X, body 0x%X) — gold stays on "
+                    "the player and banks at %.0f%% weight." % (
+                        mob.Name, mob.Serial, mob.Body, TRANSFER_WEIGHT_THRESHOLD * 100),
+                    colors['yellow'])
+                return mob, False
 
         log("No pack animal yet (scan %d/3) — retrying..." % (attempt + 1), colors['yellow'])
         Misc.Pause(1000)
 
     log("No pack animal found within %d tiles." % BEETLE_SCAN_RANGE, colors['red'])
-    return None
+    return None, False
 
 
 def _open_container_retry(container_serial, attempts=6):
@@ -236,6 +245,14 @@ def _beetle_gold_total(pack_serial):
     for item in Items.FindAllByID(GOLD_ITEM_ID, -1, pack_serial, -1):
         total += item.Amount
     return total
+
+
+def _weight_heavy():
+    """Player weight at or above the transfer threshold. Only consulted when
+    there is no pack beetle to offload into — then it's the signal to bank."""
+    if Player.MaxWeight == 0:
+        return False
+    return float(Player.Weight) / Player.MaxWeight >= TRANSFER_WEIGHT_THRESHOLD
 
 # ─── Combat pet discovery ─────────────────────────────────────────────────────
 
@@ -649,6 +666,40 @@ def _drop_beetle_loot(beetle_serial):
     log("Beetle unloaded — %d gold deposited." % total_gold, colors['green'])
 
 
+def _drop_player_gold():
+    """Walk to the drop box and deposit gold from the player's own backpack.
+    Used when the pet is not a pack beetle: the gold was never handed off, so
+    it comes home on us instead."""
+    _walk_to_drop()
+    _dismount()
+    Misc.Pause(800)
+
+    dest = Items.FindBySerial(GOLD_DEST_SERIAL)
+    if dest is None:
+        log("Drop box (0x%X) not found." % GOLD_DEST_SERIAL, colors['red'])
+        return
+    if not _open_container_retry(dest.Serial):
+        return
+
+    total = 0
+    gold  = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+    while gold is not None:
+        amount = gold.Amount
+        Items.Move(gold, dest, amount)
+        Misc.Pause(1200)
+        # Same serial still in our pack means the move was rejected
+        still = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+        if still is not None and still.Serial == gold.Serial:
+            log("Drop box full — stopping transfer.", colors['yellow'])
+            break
+        total += amount
+        gold = still
+
+    if total:
+        _append_gold_stat(total)
+    log("Deposited %d gold from backpack." % total, colors['green'])
+
+
 def _startup_deposit_if_needed(beetle_serial, beetle_pack):
     """Check beetle pack at script start; if it has gold, deposit before heading out.
     Recalls home first — _walk_to_drop assumes the home recall landing tile, so
@@ -670,10 +721,14 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
     Send pet to kill enemies; walk to each corpse, loot gold to beetle,
     then return to (staging_x, staging_y) between corpses.
 
-    Exits when beetle is genuinely full (transfer fails even after beetle is
-    recalled), when the beetle holds GOLD_BANK_THRESHOLD gold, or when player dies.
+    beetle_pack is None when the pet is not a pack beetle — gold then stays in
+    the player's backpack and the run ends at TRANSFER_WEIGHT_THRESHOLD.
 
-    Returns: 'beetle_full' | 'gold_target' | 'ghost' | 'disconnected'
+    Exits when beetle is genuinely full (transfer fails even after beetle is
+    recalled), when the beetle holds GOLD_BANK_THRESHOLD gold, when the player
+    is too heavy to keep carrying gold, or when player dies.
+
+    Returns: 'beetle_full' | 'gold_target' | 'weight_full' | 'ghost' | 'disconnected'
     """
     looted = set()
 
@@ -727,6 +782,17 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
             log("Returning to staging position.", colors['cyan'])
             _walk_to(staging_x, staging_y)
             check_player_health()
+
+            if beetle_pack is None:
+                # No pack beetle — nothing to hand the gold to, so we carry it
+                # and head home once it gets heavy.
+                if _weight_heavy():
+                    log("Weight at %.0f%% and no pack beetle — heading home to deposit." % (
+                        float(Player.Weight) / Player.MaxWeight * 100), colors['yellow'])
+                    return 'weight_full'
+                Misc.Pause(CHECK_INTERVAL)
+                continue
+
             _ensure_beetle_nearby(beetle_serial)
             gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
             while gold is not None:
@@ -764,15 +830,18 @@ def main():
         _pet_serial       = None
 
         # ── Beetle detection ─────────────────────────────────────────────────
-        beetle = _find_beetle()
+        beetle, is_beetle = _find_beetle()
         if beetle is None:
             break
-        beetle_pack = _get_beetle_pack(beetle)
-        if beetle_pack is None:
-            break
 
-        # ── Startup: deposit any leftover beetle gold before heading out ────────
-        _startup_deposit_if_needed(beetle.Serial, beetle_pack)
+        beetle_pack = None
+        if is_beetle:
+            beetle_pack = _get_beetle_pack(beetle)
+            if beetle_pack is None:
+                break
+
+            # ── Startup: deposit any leftover beetle gold before heading out ──
+            _startup_deposit_if_needed(beetle.Serial, beetle_pack)
 
         # ── Combat pet + skill detection ─────────────────────────────────────
         _lock_combat_pet(beetle)
@@ -848,8 +917,11 @@ def main():
         log("Recalling home...", colors['cyan'])
         recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME, RECALL_SETTLE_DELAY)
 
-        # ── Unload beetle to drop box (still mounted; dismount at destination) ─
-        _drop_beetle_loot(beetle.Serial)
+        # ── Unload to drop box (still mounted; dismount at destination) ───────
+        if is_beetle:
+            _drop_beetle_loot(beetle.Serial)
+        else:
+            _drop_player_gold()
 
         log("Run complete — restarting.", colors['green'])
         Misc.Pause(2000)
