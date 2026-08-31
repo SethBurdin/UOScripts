@@ -2,8 +2,9 @@
 # Pet-kill farming at Megascorp dungeon with pack beetle gold collection.
 #
 # Flow:
-#   1. Detect pack beetle (body-ID scan, mining.py style). A non-beetle pet is
-#      still used as mount and fighter, but never receives gold — see step 6.
+#   1. Detect pack beetle (body-ID scan, mining.py style). Falling back to any
+#      friendly pet — no pack required — as mount and fighter; a pet without a
+#      container never receives gold, see step 6.
 #   2. If the beetle already holds gold, recall home and deposit it first.
 #   3. The beetle is also the combat pet — lock its serial directly.
 #   4. Mount beetle, recall to 'megascorp' rune in the home runebook.
@@ -11,8 +12,9 @@
 #   6. Kill loop: send pet to kill enemies; walk to each corpse, loot gold → beetle,
 #      then return to staging position (last point of scorp_dungeon waypoints).
 #      Exits when a gold transfer is rejected (beetle full) or the beetle
-#      holds GOLD_BANK_THRESHOLD (60k) gold. Without a beetle, gold stays in
-#      the player's backpack and the run exits at TRANSFER_WEIGHT_THRESHOLD.
+#      holds GOLD_BANK_THRESHOLD (60k) gold. Without a pack, gold stays in the
+#      player's backpack and the run heads home to the drop box as soon as
+#      weight reaches TRANSFER_WEIGHT_THRESHOLD.
 #   7. Walk scorp_exit waypoints to the recall point.
 #   8. Mount beetle, recall home, unload beetle to containers.
 
@@ -24,7 +26,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from glossary.colors import colors
 from glossary.runebook_handler import find_runebook_by_label, travel_to_named_rune
-from glossary.enemies import GetEnemies
+from glossary.enemies import GetEnemies, GetFriendlyNotorieties
 from extraction_looter.corpse_util import (scan_nearby_corpses, walk_to_corpse,
                                            open_corpse)
 import config
@@ -55,6 +57,10 @@ IDLE_WAIT_MS      = 2000     # ms to wait when no corpses found
 
 GOLD_ITEM_ID     = 0x0EED
 GOLD_DEST_SERIAL = config.quick_dropbox   # house container to deposit gold into
+DROP_BOX_RANGE       = 2      # tiles — Items.Move into a container needs us this close
+DROP_MOVE_ATTEMPTS   = 4      # tries per gold stack before giving up on the deposit
+DROP_MOVE_PAUSE_MS   = 1200   # ms after Items.Move before checking whether it landed
+DROP_MOVE_RETRY_MS   = 2000   # ms to let the action queue drain after "You must wait"
 GOLD_BANK_THRESHOLD = 60000   # head home to deposit once the beetle holds this much gold
 
 STATS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'local', 'guardian_stats.json')
@@ -164,18 +170,22 @@ def _walk_to(x, y):
     route.StopIfStuck  = True
     PathFinding.Go(route)
 
-# ─── Beetle discovery ─────────────────────────────────────────────────────────
+# ─── Pet discovery ────────────────────────────────────────────────────────────
 
 def _find_beetle():
-    """Dismount, then scan for pack beetle by body ID (mining.py style).
-    Body ID alone identifies the beetle — the Backpack layer is often not
-    cached until the pack has been opened, so requiring it here makes
-    detection fail at script start. Pack access is verified afterward by
-    _get_beetle_pack.
+    """Dismount, then scan for the run's pet. Returns (mob, is_beetle).
 
-    Returns (mob, is_beetle). The fallback mob is only a mount and combat pet:
-    a non-beetle body has no pack we can rely on, so gold is never handed to it
-    — the run banks at TRANSFER_WEIGHT_THRESHOLD instead."""
+    Pass 1 looks for a pack beetle by body ID (mining.py style). Body ID alone
+    identifies it — the Backpack layer is often not cached until the pack has
+    been opened, so requiring it here makes detection fail at script start.
+    Pack access is verified afterward by _get_beetle_pack.
+
+    Pass 2 takes the nearest friendly non-human as mount and fighter, with no
+    pack requirement: a pet without a container isn't a reason to refuse to
+    run, it just means gold rides home in our backpack and gets dropped at the
+    box when we hit TRANSFER_WEIGHT_THRESHOLD. Notoriety is what keeps this
+    pass from locking onto a wild animal that happens to be standing nearby —
+    'attackable' (gray) and worse are excluded."""
     _dismount()
 
     for attempt in range(3):
@@ -183,29 +193,39 @@ def _find_beetle():
         filt.Enabled  = True
         filt.RangeMax = BEETLE_SCAN_RANGE
         filt.IsHuman  = False
-        mobs = Mobiles.ApplyFilter(filt)
 
-        for mob in mobs:
+        for mob in Mobiles.ApplyFilter(filt):
             if mob.Serial == Player.Serial or mob.IsHuman:
                 continue
             if mob.Body == PACK_BEETLE_BODY:
                 log("Pack beetle found: %s (0x%X)." % (mob.Name, mob.Serial), colors['green'])
                 return mob, True
 
-        for mob in mobs:
+        pet_filt             = Mobiles.Filter()
+        pet_filt.Enabled     = True
+        pet_filt.RangeMax    = BEETLE_SCAN_RANGE
+        pet_filt.IsHuman     = False
+        pet_filt.Notorieties = GetFriendlyNotorieties()
+
+        nearest, nearest_dist = None, 9999
+        for mob in Mobiles.ApplyFilter(pet_filt):
             if mob.Serial == Player.Serial or mob.IsHuman:
                 continue
-            if mob.Backpack is not None:
-                log("Non-beetle pet (fallback): %s (0x%X, body 0x%X) — gold stays on "
-                    "the player and banks at %.0f%% weight." % (
-                        mob.Name, mob.Serial, mob.Body, TRANSFER_WEIGHT_THRESHOLD * 100),
-                    colors['yellow'])
-                return mob, False
+            d = Player.DistanceTo(mob)
+            if d < nearest_dist:
+                nearest, nearest_dist = mob, d
 
-        log("No pack animal yet (scan %d/3) — retrying..." % (attempt + 1), colors['yellow'])
+        if nearest is not None:
+            log("Pet without a pack: %s (0x%X, body 0x%X) — gold stays on the "
+                "player and goes to the drop box at %.0f%% weight." % (
+                    nearest.Name, nearest.Serial, nearest.Body,
+                    TRANSFER_WEIGHT_THRESHOLD * 100), colors['yellow'])
+            return nearest, False
+
+        log("No pet yet (scan %d/3) — retrying..." % (attempt + 1), colors['yellow'])
         Misc.Pause(1000)
 
-    log("No pack animal found within %d tiles." % BEETLE_SCAN_RANGE, colors['red'])
+    log("No pet found within %d tiles." % BEETLE_SCAN_RANGE, colors['red'])
     return None, False
 
 
@@ -577,10 +597,53 @@ def _apply_death_ray(enemy):
 
 # ─── Drop-off helpers ────────────────────────────────────────────────────────
 
+def _tile_distance(item):
+    """Chebyshev tiles between the player and an Item."""
+    return max(abs(Player.Position.X - item.Position.X),
+               abs(Player.Position.Y - item.Position.Y))
+
+
 def _walk_to_drop():
-    for direction in ('East', 'North', 'West'):
-        Player.Walk(direction)
-        Misc.Pause(600)
+    """Get within reach of the drop box.
+
+    Pathfinds to the box itself rather than stepping East/North/West blind:
+    those three steps only land on the box from the exact home recall tile,
+    and Player.Walk spends a call turning when we aren't already facing that
+    way — so we could easily end up short. A move into a container we aren't
+    standing next to is rejected by the server with no journal message, which
+    looks exactly like 'the script didn't deposit anything'."""
+    box = Items.FindBySerial(GOLD_DEST_SERIAL)
+    if box is None:
+        log("Drop box (0x%X) not in the client yet — stepping to the usual spot." %
+            GOLD_DEST_SERIAL, colors['yellow'])
+        for direction in ('East', 'North', 'West'):
+            Player.Walk(direction)
+            Misc.Pause(600)
+        return
+
+    if _tile_distance(box) <= DROP_BOX_RANGE:
+        return
+
+    bx, by = box.Position.X, box.Position.Y
+    log("Walking to drop box at (%d, %d)..." % (bx, by), colors['cyan'])
+    _walk_to(bx, by)
+    Misc.Pause(600)
+
+    # The box's own tile is often not walkable (against a wall, on a table),
+    # so fall back to trying each neighbouring tile.
+    if _tile_distance(box) > DROP_BOX_RANGE:
+        for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            _walk_to(bx + dx, by + dy)
+            Misc.Pause(400)
+            if _tile_distance(box) <= DROP_BOX_RANGE:
+                break
+
+    dist = _tile_distance(box)
+    if dist > DROP_BOX_RANGE:
+        log("Could not get closer than %d tiles to the drop box — moves may be "
+            "rejected." % dist, colors['yellow'])
+    else:
+        log("At the drop box (%d tiles)." % dist, colors['cyan'])
 
 
 def _guard_then_mount(beetle_serial):
@@ -627,9 +690,10 @@ def _drop_beetle_loot(beetle_serial):
     if dest is None:
         log("Drop box (0x%X) not found." % GOLD_DEST_SERIAL, colors['red'])
         return
-    # Open destination so the server registers it as an active container
-    if not _open_container_retry(dest.Serial):
-        return
+    # Open destination so the server registers it as an active container.
+    # Best-effort: an empty box never sends a contents packet, so a reported
+    # failure here doesn't mean the box is unusable — the moves below decide.
+    _open_container_retry(dest.Serial)
 
     # Re-fetch the pack after contents arrive so .Contains is populated
     pack = Items.FindBySerial(pack.Serial)
@@ -666,34 +730,78 @@ def _drop_beetle_loot(beetle_serial):
     log("Beetle unloaded — %d gold deposited." % total_gold, colors['green'])
 
 
-def _drop_player_gold():
-    """Walk to the drop box and deposit gold from the player's own backpack.
-    Used when the pet is not a pack beetle: the gold was never handed off, so
-    it comes home on us instead."""
-    _walk_to_drop()
-    _dismount()
-    Misc.Pause(800)
+def _drop_player_gold(walk=True):
+    """Deposit gold from the player's own backpack into the drop box.
+
+    Runs on every trip home, not just the no-beetle case. _drop_beetle_loot
+    only empties the beetle's pack, so gold looted after the last staging
+    transfer — or that the beetle refused when it filled up — would otherwise
+    ride home in our backpack and never be deposited.
+
+    walk=False when the caller has already walked to the box and dismounted.
+
+    Every exit logs — a silent return here is indistinguishable from the gold
+    quietly riding back out to the dungeon with us.
+    """
+    gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+    if gold is None:
+        log("No gold in the backpack to deposit.", colors['cyan'])
+        return
+
+    if walk:
+        _walk_to_drop()
+        _dismount()
+        Misc.Pause(800)
 
     dest = Items.FindBySerial(GOLD_DEST_SERIAL)
     if dest is None:
-        log("Drop box (0x%X) not found." % GOLD_DEST_SERIAL, colors['red'])
-        return
-    if not _open_container_retry(dest.Serial):
+        log("Drop box (0x%X) not found — gold stays in the backpack." % GOLD_DEST_SERIAL,
+            colors['red'])
         return
 
+    # Opening is best-effort, not a gate: an empty box never sends a contents
+    # packet, so _open_container_retry reports failure for a perfectly good
+    # container. Items.Move is what actually has to succeed.
+    _open_container_retry(dest.Serial)
+
+    log("Depositing backpack gold into 0x%X..." % GOLD_DEST_SERIAL, colors['cyan'])
     total = 0
-    gold  = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
     while gold is not None:
-        amount = gold.Amount
-        Items.Move(gold, dest, amount)
-        Misc.Pause(1200)
-        # Same serial still in our pack means the move was rejected
-        still = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
-        if still is not None and still.Serial == gold.Serial:
-            log("Drop box full — stopping transfer.", colors['yellow'])
+        before = gold.Amount
+        moved  = 0
+
+        # Two distinct failures look identical from the item list, so they are
+        # told apart by the journal: a queued action ("You must wait") just
+        # needs time and the same move again, while a silent no-op means we
+        # aren't in reach of the box and need to reposition first.
+        for attempt in range(1, DROP_MOVE_ATTEMPTS + 1):
+            Journal.Clear()
+            Items.Move(gold, dest, before)
+            Misc.Pause(DROP_MOVE_PAUSE_MS)
+
+            if Journal.Search("You must wait"):
+                log("Action still queued (attempt %d/%d) — waiting." % (
+                    attempt, DROP_MOVE_ATTEMPTS), colors['yellow'])
+                Misc.Pause(DROP_MOVE_RETRY_MS)
+                continue
+
+            still = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
+            after = still.Amount if (still is not None and still.Serial == gold.Serial) else 0
+            moved = before - after
+            if moved > 0:
+                break
+
+            log("Move did nothing (attempt %d/%d) — repositioning at the box." % (
+                attempt, DROP_MOVE_ATTEMPTS), colors['yellow'])
+            _walk_to_drop()
+
+        if moved <= 0:
+            log("Gave up after %d attempts — %d gold still on us." % (
+                DROP_MOVE_ATTEMPTS, before), colors['red'])
             break
-        total += amount
-        gold = still
+
+        total += moved
+        gold = Items.FindByID(GOLD_ITEM_ID, -1, Player.Backpack.Serial)
 
     if total:
         _append_gold_stat(total)
@@ -733,6 +841,13 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
     looted = set()
 
     while Player.Connected and not Player.IsGhost:
+        # ── No pack to offload into — head home once the gold gets heavy ──────
+        if beetle_pack is None and _weight_heavy():
+            log("Weight at %.0f%% and no pack to offload into — heading home to "
+                "drop the gold." % (float(Player.Weight) / Player.MaxWeight * 100),
+                colors['yellow'])
+            return 'weight_full'
+
         # ── Pet + player care ─────────────────────────────────────────────────
         pet = _find_pet()
         if pet is not None:
@@ -784,12 +899,8 @@ def _kill_loot_loop(beetle_serial, beetle_pack, staging_x, staging_y):
             check_player_health()
 
             if beetle_pack is None:
-                # No pack beetle — nothing to hand the gold to, so we carry it
-                # and head home once it gets heavy.
-                if _weight_heavy():
-                    log("Weight at %.0f%% and no pack beetle — heading home to deposit." % (
-                        float(Player.Weight) / Player.MaxWeight * 100), colors['yellow'])
-                    return 'weight_full'
+                # No pack to hand the gold to — it stays on us until the weight
+                # check at the top of the loop sends us home to the drop box.
                 Misc.Pause(CHECK_INTERVAL)
                 continue
 
@@ -919,7 +1030,8 @@ def main():
 
         # ── Unload to drop box (still mounted; dismount at destination) ───────
         if is_beetle:
-            _drop_beetle_loot(beetle.Serial)
+            _drop_beetle_loot(beetle.Serial)   # walks to the box and dismounts
+            _drop_player_gold(walk=False)      # sweep up gold still on us
         else:
             _drop_player_gold()
 
