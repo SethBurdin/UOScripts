@@ -95,6 +95,9 @@ HEAL_CAST_RANGE      = 10   # tiles — max range for targeted healing spells
 RECALL_FOLLOW_CHECKS = 3    # "all follow me" attempts before giving up on recall
 RECALL_FOLLOW_MS     = 2000 # ms to wait between follow attempts
 
+MOUNT_FOR_TRAVEL = True   # ride the pet through the door/dungeon walk and back out
+MOUNT_ATTEMPTS   = 3      # tries to seat the rider before giving up and walking
+
 RETREAT_TRIGGER_RANGE = 4   # tiles — retreat when an enemy is this close to the player
 RETREAT_STEPS         = 4   # max tiles to step away from a close enemy
 
@@ -654,6 +657,29 @@ def _guard_then_mount(beetle_serial):
     mount_beetle(beetle_serial)
 
 
+def _mount_for_travel(pet_serial, label):
+    """Ride the pet for the long walks in and out of the dungeon.
+
+    Walking is always an acceptable fallback — a non-beetle pet may not take a
+    rider at all — so a mount that never confirms only logs and we continue on
+    foot. The pet has to be adjacent before Mobiles.UseMobile will seat us, so
+    each attempt calls it back in first."""
+    if not MOUNT_FOR_TRAVEL or Player.Mount is not None:
+        return
+
+    for attempt in range(1, MOUNT_ATTEMPTS + 1):
+        _ensure_beetle_nearby(pet_serial)
+        _guard_then_mount(pet_serial)
+        if Player.Mount is not None:
+            log("Mounted for the %s walk." % label, colors['green'])
+            return
+        log("Mount did not take (attempt %d/%d)." % (attempt, MOUNT_ATTEMPTS),
+            colors['yellow'])
+        Misc.Pause(1000)
+
+    log("Could not mount — walking the %s leg on foot." % label, colors['yellow'])
+
+
 def _ensure_beetle_nearby(beetle_serial):
     """Call beetle back and poll until it is within BEETLE_TRANSFER_RANGE tiles."""
     beetle = Mobiles.FindBySerial(beetle_serial)
@@ -969,10 +995,14 @@ def main():
         if not travel_to_named_rune(rb, MEGASCORP_RUNE_NAME, RECALL_SETTLE_DELAY):
             log("Failed to recall to '%s' — stopping." % MEGASCORP_RUNE_NAME, colors['red'])
             break
-        _dismount()
-        # Beetle must tail us through the door and dungeon walk
-        Player.ChatSay("all follow me")
-        Misc.Pause(500)
+        # Ride in: we land from the recall already mounted, so the pet comes
+        # along as the mount and there's nothing to leash. The follow command
+        # is for the on-foot case — a pet that wouldn't take a rider has to
+        # tail us through the door and dungeon walk instead.
+        _mount_for_travel(beetle.Serial, 'dungeon entry')
+        if Player.Mount is None:
+            Player.ChatSay("all follow me")
+            Misc.Pause(500)
 
         # ── Walk to dungeon door ─────────────────────────────────────────────
         wps_door = load_waypoints(WP_DOOR) if os.path.exists(WP_DOOR) else None
@@ -1001,6 +1031,9 @@ def main():
             staging_x = Player.Position.X
             staging_y = Player.Position.Y
 
+        # ── Dismount at staging so the pet can fight and haul ─────────────────
+        _dismount()
+
         # ── Initial guard (verify the beetle made it to staging) ─────────────
         _ensure_pet_guarding()
 
@@ -1010,6 +1043,12 @@ def main():
         if reason == 'ghost':
             log("Player died — stopping.", colors['red'])
             break
+
+        # ── Ride out: mount before the exit walk, not at the recall point ─────
+        _mount_for_travel(beetle.Serial, 'dungeon exit')
+        if Player.Mount is None:
+            Player.ChatSay("all follow me")
+            Misc.Pause(500)
 
         # ── Exit dungeon via scorp_exit waypoints ─────────────────────────────
         wps_exit = load_waypoints(WP_EXIT) if os.path.exists(WP_EXIT) else None
@@ -1021,10 +1060,13 @@ def main():
             log("No waypoints_scorp_exit.json — skipping exit walk.", colors['yellow'])
 
         # ── Recall home (mounted so beetle travels with us) ───────────────────
-        log("Recalling beetle before mounting...", colors['cyan'])
-        Player.ChatSay("all follow me")
-        Misc.Pause(2000)
-        _guard_then_mount(beetle.Serial)
+        # Usually already mounted from the exit walk; this catches the case
+        # where the mount failed then and the pet has since caught up.
+        if Player.Mount is None:
+            log("Recalling beetle before mounting...", colors['cyan'])
+            Player.ChatSay("all follow me")
+            Misc.Pause(2000)
+            _guard_then_mount(beetle.Serial)
         log("Recalling home...", colors['cyan'])
         recall_home(HOME_RUNEBOOK_NAME, HOME_RUNE_NAME, RECALL_SETTLE_DELAY)
 
